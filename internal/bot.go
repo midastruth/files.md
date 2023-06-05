@@ -293,6 +293,8 @@ func (b *Bot) extractTitleAndContent(msg string) (string, string, error) {
 }
 
 func (b *Bot) tr(str string, args ...any) string {
+	str = i18n.Emojify(i18n.Tr(str))
+
 	return fmt.Sprintf(str, args...)
 }
 
@@ -336,6 +338,9 @@ func (b *Bot) showMove(params []string) error {
 			tg.NewBtn(b.tr("To Note"), tg.NewCmd("to_note", []string{filenameHash})),
 			tg.NewBtn(b.tr("To Checklist"), tg.NewCmd("to_checklist", []string{filenameHash})),
 			tg.NewBtn(b.tr("To Doc"), tg.NewCmd("to_doc", []string{filenameHash})),
+		),
+		tg.NewRow(
+			tg.NewBtn(b.tr("Today"), tg.NewCmd(cmdShowToday, nil)),
 		),
 	})
 
@@ -682,7 +687,6 @@ func (b *Bot) showChecklist(params []string) error {
 }
 
 func (b *Bot) showToday(params []string) error {
-	fmt.Printf(i18n.Tr("hi"))
 	return b.showList([]string{fs.DirToday})
 }
 
