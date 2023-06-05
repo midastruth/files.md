@@ -23,18 +23,25 @@ var now = func() time.Time {
 }
 
 const (
-	maxTitleLength    = 100
-	cmdShowStart      = "start"
-	cmdShowLater      = "later"
-	cmdShowToday      = "today"
-	cmdShowNotes      = "notes"
-	cmdShowPostpone   = "postpone"
-	cmdShowDocs       = "docs"
-	cmdShowRename     = "rename"
-	cmdShowChecklists = "checklists"
-	cmdShowStats      = "stats"
-	cmdComplete       = "comp"
-	cmdPostpone       = "post"
+	maxTitleLength       = 100
+	cmdShowStart         = "start"
+	cmdShowLater         = "later"
+	cmdShowToday         = "today"
+	cmdShowNotes         = "notes"
+	cmdShowPostpone      = "postpone"
+	cmdShowDocs          = "docs"
+	cmdShowRename        = "rename"
+	cmdShowChecklists    = "checklists"
+	cmdShowStats         = "stats"
+	cmdComplete          = "comp"
+	cmdPostpone          = "post"
+	cmdRenameFile        = "rename_file"
+	cmdShowMultilineTask = "task"
+	cmdShowDoc           = "doc"
+	cmdShowChecklist     = "checklist"
+	cmdShowChooseDay     = "to_day"
+	cmdShowToNote        = "to_note"
+	cmdShowToDoc         = "to_doc"
 )
 
 // TGInterface provides a simple interface to telegram API
@@ -117,24 +124,23 @@ func (b *Bot) handlers() map[string]func([]string) error {
 		cmdShowRename:     b.showRename,
 		cmdShowStats:      b.showStats,
 		// Button's commands (callbacks)
-		"list":          b.showList,
-		"rename_file":   b.showRenameFile,
-		"task":          b.showTask,
-		"doc":           b.showDoc,
-		"checklist":     b.showChecklist,
-		"to_day":        b.showChooseDay,
-		"to_note":       b.showToNote,
-		"to_doc":        b.showToDoc,
-		"to_checklist":  b.showToChecklist,
-		"mv":            b.move,
-		"mv_to_new_dir": b.moveToNewDir,
-		"mv_to_doc":     b.moveToDoc,
-		"mv_to_new_doc": b.moveToNewDoc,
-		"mv_to_chk":     b.moveToChecklist,
-		"mv_to_new_chk": b.moveToNewChecklist,
-		"sc":            b.schedule,
-		cmdComplete:     b.complete,
-		cmdPostpone:     b.postpone,
+		cmdRenameFile:        b.showRenameFile,
+		cmdShowMultilineTask: b.showTask,
+		cmdShowDoc:           b.showDoc,
+		cmdShowChecklist:     b.showChecklist,
+		cmdShowChooseDay:     b.showChooseDay,
+		cmdShowToNote:        b.showToNote,
+		cmdShowToDoc:         b.showToDoc,
+		"to_checklist":       b.showToChecklist,
+		"mv":                 b.move,
+		"mv_to_new_dir":      b.moveToNewDir,
+		"mv_to_doc":          b.moveToDoc,
+		"mv_to_new_doc":      b.moveToNewDoc,
+		"mv_to_chk":          b.moveToChecklist,
+		"mv_to_new_chk":      b.moveToNewChecklist,
+		"sc":                 b.schedule,
+		cmdComplete:          b.complete,
+		cmdPostpone:          b.postpone,
 	}
 }
 
@@ -332,12 +338,12 @@ func (b *Bot) showMove(params []string) error {
 		tg.NewRow(
 			tg.NewBtn(b.tr("For tmrw"), tg.NewCmd("sc", []string{filenameHash, str.I64(sched.Tomorrow()), ""})),
 			tg.NewBtn(b.tr("For later"), tg.NewCmd("mv", []string{fs.DirToday, filenameHash, "later"})),
-			tg.NewBtn(b.tr("For a day"), tg.NewCmd("to_day", []string{filenameHash})),
+			tg.NewBtn(b.tr("For a day"), tg.NewCmd(cmdShowChooseDay, []string{filenameHash})),
 		),
 		tg.NewRow(
-			tg.NewBtn(b.tr("To Note"), tg.NewCmd("to_note", []string{filenameHash})),
+			tg.NewBtn(b.tr("To Note"), tg.NewCmd(cmdShowToNote, []string{filenameHash})),
 			tg.NewBtn(b.tr("To Checklist"), tg.NewCmd("to_checklist", []string{filenameHash})),
-			tg.NewBtn(b.tr("To Doc"), tg.NewCmd("to_doc", []string{filenameHash})),
+			tg.NewBtn(b.tr("To Doc"), tg.NewCmd(cmdShowToDoc, []string{filenameHash})),
 		),
 		tg.NewRow(
 			tg.NewBtn(b.tr("Today"), tg.NewCmd(cmdShowToday, nil)),
@@ -374,7 +380,7 @@ func (b *Bot) showList(params []string) error {
 	for _, file := range files {
 		var btn tg.Btn
 		if file.IsMultiline {
-			cmd := tg.NewCmd("task", []string{dir, fs.Hash(file.Name)})
+			cmd := tg.NewCmd(cmdShowMultilineTask, []string{dir, fs.Hash(file.Name)})
 			btn = tg.NewBtn(str.Emoji("👀", file.Title), cmd)
 		} else {
 			cmd := tg.NewCmd(cmdComplete, []string{dir, fs.Hash(file.Name)})
@@ -438,7 +444,7 @@ func (b *Bot) showDocs(params []string) error {
 
 	var kb tg.Keyboard
 	for _, file := range files {
-		cmd := tg.NewCmd("doc", []string{fs.Hash(file.Name)})
+		cmd := tg.NewCmd(cmdShowDoc, []string{fs.Hash(file.Name)})
 		btn := tg.NewBtn(file.Title, cmd)
 
 		kb.AddRow(btn)
@@ -463,7 +469,7 @@ func (b *Bot) showChecklists(params []string) error {
 
 	var kb tg.Keyboard
 	for _, checklist := range checklists {
-		cmd := tg.NewCmd("checklist", []string{fs.Hash(checklist.Name)})
+		cmd := tg.NewCmd(cmdShowChecklist, []string{fs.Hash(checklist.Name)})
 		btn := tg.NewBtn(checklist.Title, cmd)
 
 		kb.AddRow(btn)
@@ -540,7 +546,7 @@ func (b *Bot) showRename(params []string) error {
 	var kb tg.Keyboard
 	for _, file := range files {
 		var btn tg.Btn
-		cmd := tg.NewCmd("rename_file", []string{dir, fs.Hash(file.Name)})
+		cmd := tg.NewCmd(cmdRenameFile, []string{dir, fs.Hash(file.Name)})
 		btn = tg.NewBtn(str.Emoji("👀", file.Title), cmd)
 
 		kb.AddRow(btn)
