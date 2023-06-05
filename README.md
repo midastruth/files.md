@@ -1,6 +1,8 @@
 ![Gopher](https://github.com/zakirullin/stuff-bot/raw/main/assets/_img_/gopherv3.png)
 
 ### Spin it up 🌱
+Copy your personal bot token ([@BotFather](https://t.me/BotFather)) to `.env` file (see `.env.example`)
+
 ```bash
 make install && make run
 ```
