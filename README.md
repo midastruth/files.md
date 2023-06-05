@@ -13,7 +13,7 @@ make install && make run
 - `Simplicity`: The code accomplishes its goal in the simplest way possible.
 - `Concision`: The code is easy to discern the relevant details, and the naming and structure guide the reader through these details.  
 - `Maintainability`: The code is easy for a future programmer to modify correctly.  
-- `Consistency`: The code is consistent across the database  
+- `Consistency`: The code is consistent across the codebase  
 Refer to [developer's handbook](https://github.com/zakirullin/cognitive-load) for more comprehensive guiding rules.
 
 ### Guidelines
