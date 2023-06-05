@@ -35,6 +35,7 @@ Refer to [developer's handbook](https://github.com/zakirullin/cognitive-load) fo
 - We wrap errors all the time, we should add method's context
 - We prefer fakes/real implementations over mocks and stubs
 - Imports should only be renamed to avoid a name collision with other imports
+- [Project Layout](https://github.com/golang-standards/project-layout)
 
 ### Glossary
 - `filename` - a filename with extension, like "note.md" (USE THIS AS ID)
