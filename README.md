@@ -28,18 +28,18 @@ Refer to [developer's handbook](https://github.com/zakirullin/cognitive-load) fo
 - Imports should only be renamed to avoid a name collision with other imports
 
 ### Glossary
-- filename - a filename with extension, like "note.md" (USE THIS AS ID)
-- title - an extension-stripped and capitalized filename, like "Note"
-- content - note's content (body/text)
-- dir - a dir that is meant to store notes under some category, like "happiness"
-- userID - chatID. For the most part we're only using chatID as userID (PM with the bot)
-- mtime - modification time (content only, renaming doesn't affect)
-- ctime - change time (parent folder rename won't affect)
-- atime - access time
+- `filename` - a filename with extension, like "note.md" (USE THIS AS ID)
+- `title` - an extension-stripped and capitalized filename, like "Note"
+- `content` - note's content (body/text)
+- `dir` - a dir that is meant to store notes under some category, like "happiness"
+- `userID` - chatID. For the most part we're only using chatID as userID (PM with the bot)
+- `mtime` - modification time (content only, renaming doesn't affect)
+- `ctime` - change time (parent folder rename won't affect)
+- `atime` - access time
 
 ### ADRs (Architecture Decision Records)
-- everywhere where we have user input - we should use fs.hash, otherwise we get long filenames, and tg returns INVALID_DATA error (callbackData max 64 bytes)
-- introduced db.go. We had to abstract away Redis anyway (otherwise it's hard to write tests)
+- everywhere where we have user input - we should use fs.hash, otherwise we get long filenames, and tg returns `INVALID_DATA` error (callbackData max 64 bytes)
+- introduced `db.go`. We had to abstract away Redis anyway (otherwise it's hard to write tests)
 - db.go doesn't store userID (we often use it separately...) Do we?
 - we can't ucfist filename in fs.Put - what if that was user-created file (outside the bot), i.e. it comes with lowercase
 
