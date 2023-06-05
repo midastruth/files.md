@@ -9,11 +9,11 @@ make install && make run
 ```
 
 ### Overarching design principles
-- Clarity: The code’s purpose and rationale is clear to the reader.
-- Simplicity: The code accomplishes its goal in the simplest way possible.
-- Concision: The code has a high signal-to-noise ratio.
-- Maintainability: The code is written such that it can be easily maintained.
-- Consistency: The code is consistent across the database  
+- `Clarity`: The code’s purpose and rationale is clear to the reader.
+- `Simplicity`: The code accomplishes its goal in the simplest way possible.
+- `Concision`: The code is easy to discern the relevant details, and the naming and structure guide the reader through these details.  
+- `Maintainability`: The code is easy for a future programmer to modify correctly.  
+- `Consistency`: The code is consistent across the database  
 Refer to [developer's handbook](https://github.com/zakirullin/cognitive-load) for more comprehensive guiding rules.
 
 ### Guidelines
