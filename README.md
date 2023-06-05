@@ -11,7 +11,8 @@ make install && make run
 or
 
 ```bash
-go get ./.. && go run ./cmd
+go get ./..
+go run ./cmd
 ```
 
 ### Overarching design principles

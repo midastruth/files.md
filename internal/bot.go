@@ -26,14 +26,14 @@ const (
 	cmdShowStart      = "start"
 	cmdShowLater      = "later"
 	cmdShowToday      = "today"
-	cmdComplete       = "comp"
-	cmdPostpone       = "post"
 	cmdShowNotes      = "notes"
 	cmdShowPostpone   = "postpone"
 	cmdShowDocs       = "docs"
 	cmdShowRename     = "rename"
 	cmdShowChecklists = "checklists"
 	cmdShowStats      = "stats"
+	cmdComplete       = "comp"
+	cmdPostpone       = "post"
 )
 
 // TGInterface provides a simple interface to telegram API
@@ -183,12 +183,8 @@ func (b *Bot) allowedTextCmds() []string {
 		cmdShowRename,
 		cmdShowChecklists,
 		cmdShowStats,
-		//"help",
-		//"err",
-		//"b",
-		//"m",
-		//"u",
-		//"o",
+		//"help" TODO,
+		//"err" TODO,
 	}
 }
 
