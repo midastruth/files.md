@@ -18,12 +18,12 @@ Refer to [developer's handbook](https://github.com/zakirullin/cognitive-load) fo
 
 ### Guidelines
 - With portability in mind, everything is stored in **plain text files**
-- Write tests!
-- Don't use get* prefix for methods
-- Dont use panics, errors are part of business logic
-- If you're ignoring an error - leave a WHY comment
-- Wrap errors all the time, we should add method's context
-- Prefer fakes/real implementations over mocks and stubs
+- We write **tests**
+- We don't use get* prefix for methods
+- We don't use panics, errors are part of business logic
+- If we are ignoring an error - we leave a WHY comment
+- We wrap errors all the time, we should add method's context
+- We prefer fakes/real implementations over mocks and stubs
 - Imports should only be renamed to avoid a name collision with other imports
 
 ### Glossary
