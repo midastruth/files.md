@@ -17,19 +17,24 @@ import (
 	"zakirullin/dumpbot/pkg/tg"
 )
 
-const (
-	maxTitleLength = 100
-
-	cmdStart    = "start"
-	cmdLater    = "later"
-	cmdToday    = "today"
-	cmdComplete = "comp"
-	cmdPostpone = "post"
-)
-
 var now = func() time.Time {
 	return time.Now()
 }
+
+const (
+	maxTitleLength    = 100
+	cmdShowStart      = "start"
+	cmdShowLater      = "later"
+	cmdShowToday      = "today"
+	cmdComplete       = "comp"
+	cmdPostpone       = "post"
+	cmdShowNotes      = "notes"
+	cmdShowPostpone   = "postpone"
+	cmdShowDocs       = "docs"
+	cmdShowRename     = "rename"
+	cmdShowChecklists = "checklists"
+	cmdShowStats      = "stats"
+)
 
 // TGInterface provides a simple interface to telegram API
 type TGInterface interface {
@@ -101,15 +106,15 @@ func (b *Bot) Reply(u UpdInterface) error {
 func (b *Bot) handlers() map[string]func([]string) error {
 	return map[string]func([]string) error{
 		// Direct user commands
-		cmdStart:     b.showStart,
-		cmdToday:     b.showToday,
-		cmdLater:     b.showLater,
-		"notes":      b.showNotes,
-		"docs":       b.showDocs,
-		"checklists": b.showChecklists,
-		"postpone":   b.showPostpone,
-		"rename":     b.showRename,
-		"stats":      b.showStats,
+		cmdShowStart:      b.showStart,
+		cmdShowToday:      b.showToday,
+		cmdShowLater:      b.showLater,
+		cmdShowNotes:      b.showNotes,
+		cmdShowDocs:       b.showDocs,
+		cmdShowChecklists: b.showChecklists,
+		cmdShowPostpone:   b.showPostpone,
+		cmdShowRename:     b.showRename,
+		cmdShowStats:      b.showStats,
 		// Button's commands (callbacks)
 		"list":          b.showList,
 		"rename_file":   b.showRenameFile,
@@ -163,21 +168,21 @@ func (b *Bot) cmd(u UpdInterface) (*tg.Cmd, error) {
 
 func (b *Bot) cmdsOnlyNotes() map[string]func([]string) error {
 	return map[string]func([]string) error{
-		cmdStart: b.showStart,
+		cmdShowStart: b.showStart,
 	}
 }
 
 func (b *Bot) allowedTextCmds() []string {
 	return []string{
-		cmdStart,
-		cmdToday,
-		cmdLater,
-		"notes",
-		"postpone",
-		"docs",
-		"rename",
-		"checklists",
-		"stats",
+		cmdShowStart,
+		cmdShowToday,
+		cmdShowLater,
+		cmdShowNotes,
+		cmdShowPostpone,
+		cmdShowDocs,
+		cmdShowRename,
+		cmdShowChecklists,
+		cmdShowStats,
 		//"help",
 		//"err",
 		//"b",
@@ -437,7 +442,7 @@ func (b *Bot) showDocs(params []string) error {
 		kb.AddRow(btn)
 	}
 
-	kb.AddRow(tg.NewBtn(b.tr("Back to docs"), tg.NewCmd("docs", nil)))
+	kb.AddRow(tg.NewBtn(b.tr("Back to docs"), tg.NewCmd(cmdShowDocs, nil)))
 
 	err = b.show(b.tr("📝 Your docs:"), &kb, tg.MarkupHTML)
 	if err != nil {
@@ -461,7 +466,7 @@ func (b *Bot) showChecklists(params []string) error {
 
 		kb.AddRow(btn)
 	}
-	kb.AddRow(tg.NewBtn(b.tr("🏠 Today"), tg.NewCmd(cmdToday, nil)))
+	kb.AddRow(tg.NewBtn(b.tr("🏠 Today"), tg.NewCmd(cmdShowToday, nil)))
 
 	err = b.show(b.tr("☑️ Checklists"), &kb, tg.MarkupHTML)
 	if err != nil {
@@ -484,8 +489,8 @@ func (b *Bot) showPostpone(params []string) error {
 	}
 
 	kb.AddRow(tg.NewRow(
-		tg.NewBtn(b.tr("Rename"), tg.NewCmd("rename", []string{})),
-		tg.NewBtn(b.tr("OK"), tg.NewCmd(cmdToday, []string{})),
+		tg.NewBtn(b.tr(cmdShowRename), tg.NewCmd(cmdShowRename, []string{})),
+		tg.NewBtn(b.tr("OK"), tg.NewCmd(cmdShowToday, []string{})),
 	))
 
 	err = b.show(b.tr("🦥 Select a task to postpone:"), &kb, tg.MarkupHTML)
@@ -641,7 +646,7 @@ func (b *Bot) showDoc(params []string) error {
 	}
 
 	kb := tg.NewKeyboard([]tg.Row{
-		tg.NewRow(tg.NewBtn("back", tg.NewCmd("docs", nil))),
+		tg.NewRow(tg.NewBtn("back", tg.NewCmd(cmdShowDocs, nil))),
 	})
 
 	err = b.show(fmt.Sprintf("%s\n%s", fs.Title(filename), content), kb, tg.MarkupHTML)
@@ -669,7 +674,7 @@ func (b *Bot) showChecklist(params []string) error {
 	for _, item := range items {
 		kb.AddRow(tg.NewBtn(item.Title, tg.NewCmd(cmdComplete, []string{})))
 	}
-	kb.AddRow(tg.NewRow(tg.NewBtn("back", tg.NewCmd("docs", nil))))
+	kb.AddRow(tg.NewRow(tg.NewBtn("back", tg.NewCmd(cmdShowDocs, nil))))
 
 	err = b.show(fs.Title(checklist), kb, tg.MarkupHTML)
 	if err != nil {
@@ -1109,7 +1114,7 @@ func (b *Bot) toChecklistKeyboard(filenameHash string) (*tg.Keyboard, error) {
 }
 
 func (b *Bot) todayLabel() (string, error) {
-	tasks, err := b.fs.FilesAndDirs(cmdToday)
+	tasks, err := b.fs.FilesAndDirs(cmdShowToday)
 	if err != nil {
 		return "", fmt.Errorf("b.todayLabel: can't get today label: %w", err)
 	}

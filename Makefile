@@ -1,5 +1,5 @@
 run:
-	cd cmd && go run .
+	go run ./cmd
 
 test:
 	go test ./...

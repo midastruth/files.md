@@ -11,7 +11,7 @@ make install && make run
 or
 
 ```bash
-go get ./.. && cd cmd && go run .
+go get ./.. && go run ./cmd
 ```
 
 
