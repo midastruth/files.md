@@ -1,7 +1,8 @@
 ![Gopher](https://github.com/zakirullin/stuff-bot/raw/main/assets/_img_/gopherv3.png)
 
 ### Spin it up 🌱
-Copy your personal bot token ([@BotFather](https://t.me/BotFather)) to `.env` file (see `.env.example`)
+1) Create new telegram bot via [@BotFather](https://t.me/BotFather)
+2) Copy your bot token to `.env` file (see `.env.example`)
 
 ```bash
 make install && make run
