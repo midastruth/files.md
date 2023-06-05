@@ -10,5 +10,9 @@ func Emojify(str string) string {
 		return "🍅 Took a break"
 	}
 
+	if str == "Today" {
+		return "🏠 Today"
+	}
+
 	return str
 }
