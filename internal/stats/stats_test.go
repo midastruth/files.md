@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 	"time"
+
 	dbpkg "zakirullin/dumpbot/internal/db"
 	fs2 "zakirullin/dumpbot/internal/fs"
 
@@ -33,7 +34,7 @@ func TestDoneToday(t *testing.T) {
 	}
 
 	fs, _ := fs2.NewFS(-1, afero.NewMemMapFs())
-	err := fs.Put("_bin_", "a.md", "")
+	err := fs.Put("_trash_", "a.md", "")
 	r.Nil(err)
 
 	redis, err := miniredis.Run()
@@ -73,7 +74,7 @@ func TestDoneTodayExcludeScheduled(t *testing.T) {
 	}
 
 	fs, _ := fs2.NewFS(-1, afero.NewMemMapFs())
-	err := fs.Put("_bin_", "a.md", "")
+	err := fs.Put("_trash_", "a.md", "")
 	r.Nil(err)
 
 	redis, err := miniredis.Run()
@@ -114,9 +115,9 @@ func TestDoneTodayScheduled(t *testing.T) {
 	}
 
 	fs, _ := fs2.NewFS(-1, afero.NewMemMapFs())
-	err := fs.Put("_bin_", "a.md", "")
+	err := fs.Put("_trash_", "a.md", "")
 	r.Nil(err)
-	err = fs.Put("_bin_", "b.md", "")
+	err = fs.Put("_trash_", "b.md", "")
 	r.Nil(err)
 
 	redis, err := miniredis.Run()
