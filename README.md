@@ -1,4 +1,4 @@
-![Gopher](https://newrelic.com/sites/default/files/2021-04/golang-gopher.jpg)
+![Gopher](https://media.licdn.com/dms/image/C511BAQG_UWHeDkmt9A/company-background_10000/0/1586588533445?e=1686168000&v=beta&t=K3C3TUzHPCNIHKJdJ9KnPtLNdVEd0QslsTPhcoeA1Lo)
 ### Spin it up 🌱
 ```bash
 make install && make run
