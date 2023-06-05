@@ -20,26 +20,32 @@ func TodayReport(fsys *fs.FS, db *db.DB, userID int64) (string, error) {
 		return "", fmt.Errorf("stats.TodayReport: %w", err)
 	}
 
-	var list = ""
+	var stats []string
 	for _, file := range files {
 		ico := icon(file)
-		list += fmt.Sprintf("%s <b>%s</b>", ico, fs.Title(file))
+		stats = append(stats, fmt.Sprintf("%s <b>%s</b>", ico, fs.Title(file)))
+		//	if (preg_match('/-read-_.*/', $task)) {
+		//	$list .=
+		//	} elseif (preg_match('/-watch-_.*/', $task)) {
+		//	$list .= '📺 <b>' . preg_replace('/-.*?-_/', '', $this->toTitle($task)) . "</b>\n";
+		//	} elseif (preg_match('/-shop-_.*/', $task)) {
+		//	$list .= '🛒 <b>' . preg_replace('/-.*?-_/', '', $this->toTitle($task)) . "</b>\n";
+		//	} elseif (preg_match('/-.*?-_.*/', $task)) {
+		//	$list .= '☑️ <b>' . preg_replace('/-.*?-_/', '', $this->toTitle($task)) . "</b>\n";
+		//	} else {
+		//	$list .= '✅ <b>' . $this->toTitle($task) . "</b>\n";
+		//	}
+		//}
 	}
-	//
-	//	if (preg_match('/-read-_.*/', $task)) {
-	//	$list .=
-	//	} elseif (preg_match('/-watch-_.*/', $task)) {
-	//	$list .= '📺 <b>' . preg_replace('/-.*?-_/', '', $this->toTitle($task)) . "</b>\n";
-	//	} elseif (preg_match('/-shop-_.*/', $task)) {
-	//	$list .= '🛒 <b>' . preg_replace('/-.*?-_/', '', $this->toTitle($task)) . "</b>\n";
-	//	} elseif (preg_match('/-.*?-_.*/', $task)) {
-	//	$list .= '☑️ <b>' . preg_replace('/-.*?-_/', '', $this->toTitle($task)) . "</b>\n";
-	//	} else {
-	//	$list .= '✅ <b>' . $this->toTitle($task) . "</b>\n";
-	//	}
-	//}
 
-	return list, nil
+	trashedFiles, err := fsys.FilesAndDirs(fs.DirTrash)
+	if err != nil {
+		return "", fmt.Errorf("stats.TodayReport: can't get trashed files: %w", err)
+	}
+	doneTotal := len(trashedFiles)
+	stats = append(stats, fmt.Sprintf("📊 %d tasks done in total", doneTotal))
+
+	return strings.Join(stats, "\n"), nil
 }
 
 func icon(filename string) string {
@@ -71,7 +77,7 @@ func DoneTodayScheduled(fsys *fs.FS, db *db.DB, userID int64) ([]string, error) 
 }
 
 func doneToday(fsys *fs.FS, db *db.DB, userID int64, withScheduled bool) ([]string, error) {
-	files, err := fsys.FilesAndDirs(fs.DirBin)
+	files, err := fsys.FilesAndDirs(fs.DirTrash)
 	if err != nil {
 		return nil, fmt.Errorf("stats.DoneTasks: %w", err)
 	}

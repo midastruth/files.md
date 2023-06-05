@@ -131,7 +131,7 @@ func moveDueTasksForToday(redis *miniredis.Miniredis, tg *tg.TG) {
 }
 
 func moveTaskForToday(filename string, fsys *fs.FS) error {
-	dirsToLookFor := []string{fs.DirLater, fs.DirBin}
+	dirsToLookFor := []string{fs.DirLater, fs.DirTrash}
 	for _, dir := range dirsToLookFor {
 		filenames, err := fsys.FilesAndDirs(dir)
 		fmt.Printf("%v\n", filenames)

@@ -482,7 +482,7 @@ func (b *Bot) showPostpone(params []string) error {
 		tg.NewBtn(b.tr("OK"), tg.NewCmd("today", []string{})),
 	))
 
-	err = b.show(b.tr("🦥 Select a task to showPostpone:"), &kb, tg.MarkupHTML)
+	err = b.show(b.tr("🦥 Select a task to postpone:"), &kb, tg.MarkupHTML)
 	if err != nil {
 		return fmt.Errorf("b.showPostpone: %w", err)
 	}
@@ -859,7 +859,7 @@ func (b *Bot) complete(params []string) error {
 
 	// TODO touch
 	// TODO multiline
-	err = b.fs.Rename(dir, filename, fs.DirBin, filename)
+	err = b.fs.Rename(dir, filename, fs.DirTrash, filename)
 	if err != nil {
 		return fmt.Errorf("b.complete: can't complete %s: %w", filename, err)
 	}
@@ -909,7 +909,6 @@ func (b *Bot) delAllKeyboards() {
 	}
 
 	// No worries if we fail - it will be cleaned up by the worker
-	//b.redis.Del(b.key(redisReplaceWithDefaultKeyboardMsgID))
 	for _, msgID := range msgIDs {
 		// If we fail to del - user would get a bunch
 		// of keyboards in one chat, which is messy but not critical
