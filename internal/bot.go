@@ -324,7 +324,7 @@ func (b *Bot) extractTitleAndContent(msg string) (string, string, error) {
 }
 
 func (b *Bot) tr(str string, args ...any) string {
-	str = i18n.Emojify(i18n.Tr(str))
+	str = i18n.Tr(str)
 
 	return fmt.Sprintf(str, args...)
 }
@@ -361,17 +361,17 @@ func (b *Bot) showMove(params []string) error {
 
 	kb := tg.NewKeyboard([]tg.Row{
 		tg.NewRow(
-			tg.NewBtn(b.tr("For tmrw"), tg.NewCmd(cmdSchedule, []string{filenameHash, str.I64(sched.Tomorrow()), ""})),
-			tg.NewBtn(b.tr("For later"), tg.NewCmd(cmdMove, []string{fs.DirToday, filenameHash, "later"})),
-			tg.NewBtn(b.tr("For a day"), tg.NewCmd(cmdShowChooseDay, []string{filenameHash})),
+			tg.NewBtn(b.tr("🌚 For tmrw"), tg.NewCmd(cmdSchedule, []string{filenameHash, str.I64(sched.Tomorrow()), ""})),
+			tg.NewBtn(b.tr("⏳ For later"), tg.NewCmd(cmdMove, []string{fs.DirToday, filenameHash, "later"})),
+			tg.NewBtn(b.tr("📆 For a day"), tg.NewCmd(cmdShowChooseDay, []string{filenameHash})),
 		),
 		tg.NewRow(
-			tg.NewBtn(b.tr("To Note"), tg.NewCmd(cmdShowToNote, []string{filenameHash})),
-			tg.NewBtn(b.tr("To Checklist"), tg.NewCmd(cmdShowToChecklist, []string{filenameHash})),
-			tg.NewBtn(b.tr("To Doc"), tg.NewCmd(cmdShowToDoc, []string{filenameHash})),
+			tg.NewBtn(b.tr("📌 To Note"), tg.NewCmd(cmdShowToNote, []string{filenameHash})),
+			tg.NewBtn(b.tr("☑️ To Checklist"), tg.NewCmd(cmdShowToChecklist, []string{filenameHash})),
+			tg.NewBtn(b.tr("📝 To Doc"), tg.NewCmd(cmdShowToDoc, []string{filenameHash})),
 		),
 		tg.NewRow(
-			tg.NewBtn(b.tr("Today"), tg.NewCmd(cmdShowToday, nil)),
+			tg.NewBtn(b.tr("➡️ Today"), tg.NewCmd(cmdShowToday, nil)),
 		),
 	})
 
@@ -419,8 +419,7 @@ func (b *Bot) showList(params []string) error {
 
 	msg, err := b.todayLabel()
 	if err != nil {
-		// TODO fix
-		msg = b.tr("Tasks for today:")
+		msg = b.tr("🏠 Tasks for today:")
 		return err
 	}
 	if dir == fs.DirLater {

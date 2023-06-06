@@ -16,6 +16,7 @@ import (
 	"zakirullin/dumpbot/internal/fs"
 	"zakirullin/dumpbot/internal/i18n"
 	"zakirullin/dumpbot/internal/sched"
+	"zakirullin/dumpbot/internal/userconfig"
 	"zakirullin/dumpbot/pkg/tg"
 )
 
@@ -89,6 +90,17 @@ func main() {
 				return
 			}
 			bot := internal.NewBot(userID, telegram, fsys, db.NewDB(redis))
+
+			conf := userconfig.NewConfig()
+			// TODO paths to envs
+			configPath := "cmd/testdata/config.json.md"
+			err = conf.LoadOrCreate(configPath)
+			if err != nil {
+				fmt.Printf("Bot's error: can't get or create config: %s\n", err)
+				return
+			}
+			defer conf.Save(configPath)
+
 			if err := bot.Reply(u); err != nil {
 				fmt.Printf("Bot's error: %s\n", err)
 			}
