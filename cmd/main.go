@@ -156,7 +156,6 @@ func moveTaskToToday(filename string, fsys *fs.FS) error {
 	dirsToLookFor := []string{fs.DirLater, fs.DirTrash}
 	for _, dir := range dirsToLookFor {
 		filenames, err := fsys.FilesAndDirs(dir)
-		fmt.Printf("%v\n", filenames)
 		if err != nil {
 			return fmt.Errorf("moveTaskForToday: %w", err)
 		}

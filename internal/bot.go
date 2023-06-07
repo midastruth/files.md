@@ -134,7 +134,7 @@ func (b *Bot) cmd(u UpdInterface) (*tg.Cmd, error) {
 		return cmd, nil
 	}
 
-	// Mostly used for renaming things
+	// Input expectation is mostly used for renaming things
 	cmd, err := b.db.InputExpectation(b.userID)
 	if err != nil {
 		return nil, fmt.Errorf("b.Reply: %w", err)

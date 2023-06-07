@@ -8,8 +8,10 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"os"
 	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -312,7 +314,12 @@ func (fs FS) RestoreText(dir, filename string) (string, error) {
 
 // TODO rewrite for tests?
 func AllUserIDs() ([]int64, error) {
-	return []int64{-1}, nil
+	adminUserID, err := strconv.ParseInt(os.Getenv("ADMIN_USER_ID"), 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("fs.AllUserIDs: can't cast ADMIN_USER_ID to int64 %w", err)
+	}
+
+	return []int64{-1, adminUserID}, nil
 }
 
 func IsChecklistItem(filename string) bool {
