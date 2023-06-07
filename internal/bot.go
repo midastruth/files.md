@@ -350,9 +350,11 @@ func (b *Bot) showList(params []string) error {
 	if len(params) > 0 {
 		dir = params[0]
 	}
-	otherDir := fs.DirLater
+	oppositeDir := fs.DirLater
+	oppositeLabel := strBtnLater
 	if dir == fs.DirLater {
-		otherDir = fs.DirToday
+		oppositeDir = fs.DirToday
+		oppositeLabel = strBtnToday
 	}
 
 	files, err := b.fs.FilesAndDirs(dir)
@@ -374,14 +376,16 @@ func (b *Bot) showList(params []string) error {
 		kb.AddRow(btn)
 	}
 
-	kb.AddRow(tg.NewBtn(otherDir, tg.NewCmd(otherDir, []string{otherDir})))
+	kb.AddRow(tg.NewBtn(oppositeLabel, tg.NewCmd(oppositeDir, []string{oppositeDir})))
 
-	msg, err := b.todayLabel()
-	if err != nil {
-		msg = b.tr("🏠 Tasks for today:")
-		return err
-	}
-	if dir == fs.DirLater {
+	var msg string
+	if dir == fs.DirToday {
+		msg, err = b.todayLabel()
+		if err != nil {
+			msg = b.tr("🏠 Tasks for today:")
+			return err
+		}
+	} else {
 		msg = b.tr("⏳ Your tasks for later:")
 	}
 
