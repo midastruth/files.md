@@ -3,6 +3,8 @@
 # Stuff Bot
 A telegram bot for your personal stuff.
 
+![Screenshot](https://i.vas3k.club/98f1edf6814cf95cc28b89392ed9d548479d83baeb9d59086dda2ddb70139fb6.jpg)
+
 ## Spin it up
 1) Register new telegram bot via [@BotFather](https://t.me/BotFather)
 2) Copy your bot token to `.env` file (see `.env.example`)
