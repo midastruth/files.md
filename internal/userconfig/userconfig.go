@@ -1,4 +1,4 @@
-// Package config stores user's configuration in file.
+// Package userconfig stores user's configuration in file.
 // It stores such settings for users as: language, home, quick buttons, schedule and so on.
 package userconfig
 
@@ -11,22 +11,22 @@ import (
 
 type Config struct {
 	Language            string   `json:"language"`
-	Home                string   `json:"home"`
+	HomeCmd             string   `json:"homeCmd"`
 	MoveToConfigButtons []string `json:"moveToButtons"`
 }
 
 var DefaultConfig = Config{
-	Home:                "today",
+	HomeCmd:             "today",
 	MoveToConfigButtons: []string{"tomorrow", "later", "day", "note", "checklist", "doc", "recent", "journal"},
 }
 
 var TasksOnlyConfig = Config{
-	Home:                "today",
+	HomeCmd:             "today",
 	MoveToConfigButtons: []string{"tomorrow", "later", "day"},
 }
 
 var NotesOnlyConfig = Config{
-	Home:                "notes",
+	HomeCmd:             "notes",
 	MoveToConfigButtons: []string{"##NOTE_DIRS##"},
 }
 
