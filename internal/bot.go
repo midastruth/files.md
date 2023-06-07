@@ -1231,16 +1231,25 @@ func (b *Bot) togglePomodoro(_ []string) error {
 	if err != nil {
 		return fmt.Errorf("b.togglePomodoro: failed to check if pomodoro is already running %w", err)
 	}
-	hasPomodoroInLater, err := b.fs.Exists(fs.DirLater, fs.FilePomodoro)
+	hasPomodoroInTrash, err := b.fs.Exists(fs.DirTrash, fs.FilePomodoro)
 	if err != nil {
 		return fmt.Errorf("b.togglePomodoro: failed to check if pomodoro is already running %w", err)
 	}
 
-	if hasPomodoroInToday || hasPomodoroInLater {
-		err = b.fs.Del(fs.FilePomodoro, fs.FilePomodoro)
+	if hasPomodoroInToday {
+		err = b.fs.Del(fs.DirToday, fs.FilePomodoro)
 		if err != nil {
 			return fmt.Errorf("b.togglePomodoro: failed to delete pomodoro file: %w", err)
 		}
+	}
+	if hasPomodoroInTrash {
+		err = b.fs.Del(fs.DirTrash, fs.FilePomodoro)
+		if err != nil {
+			return fmt.Errorf("b.togglePomodoro: failed to delete pomodoro file: %w", err)
+		}
+	}
+
+	if hasPomodoroInToday || hasPomodoroInTrash {
 		err := b.send(fmt.Sprintf("Pomodoro is stopped: no new \"%v\" tasks will appear automatially", fs.FilePomodoro))
 		if err != nil {
 			return fmt.Errorf("b.togglePomodoro: failed to show pomodoro hint message %w", err)

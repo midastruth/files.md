@@ -350,3 +350,44 @@ func TestAddMultipleItemsToChecklist(t *testing.T) {
 	r.Len(files, 3)
 	r.ElementsMatch([]string{"Item.md", "Item2.md", "Item3.md"}, []string{files[0].Name, files[1].Name, files[2].Name})
 }
+
+func TestBot_Pomodoro(t *testing.T) {
+	r := require.New(t)
+	b := initFakeBot(r)
+
+	pomodoroIn := func(dirName string) bool {
+		hasPomodoroInDir, err := b.fs.Exists(dirName, fs.FilePomodoro)
+		r.Nil(err)
+		return hasPomodoroInDir
+	}
+	r.False(pomodoroIn(fs.DirToday) || pomodoroIn(fs.DirTrash))
+
+	// Add pomodoro	to today
+	r.Nil(b.togglePomodoro(nil))
+	r.True(pomodoroIn(fs.DirToday) && !pomodoroIn(fs.DirTrash))
+	// and remove pomodoro from today
+	r.Nil(b.togglePomodoro(nil))
+	r.False(pomodoroIn(fs.DirToday) || pomodoroIn(fs.DirTrash))
+
+	// Add pomodoro	to today
+	r.Nil(b.togglePomodoro(nil))
+	r.True(pomodoroIn(fs.DirToday) && !pomodoroIn(fs.DirTrash))
+	// complete it
+	r.Nil(b.complete([]string{fs.DirToday, fs.FilePomodoro}))
+	r.True(!pomodoroIn(fs.DirToday) && pomodoroIn(fs.DirTrash))
+	// and remove pomodoro from trash
+	r.Nil(b.togglePomodoro(nil))
+	r.False(pomodoroIn(fs.DirToday) || pomodoroIn(fs.DirTrash))
+
+}
+
+func initFakeBot(r *require.Assertions) *Bot {
+	fsys, err := fs.NewFS(-1, afero.NewMemMapFs())
+	r.Nil(err)
+	tgram := fake.NewTG()
+	redis, err := miniredis.Run()
+	r.Nil(err)
+	defer redis.Close()
+	b := NewBot(-1, tgram, fsys, db.NewDB(redis))
+	return b
+}
