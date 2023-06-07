@@ -46,5 +46,12 @@ func Emojify(str string) string {
 		}
 	}
 
+	for _, word := range strings.Fields(str) {
+		icon, _ := emojisByKeyword[word]
+		if icon != "" {
+			return fmt.Sprintf("%s %s", icon, str)
+		}
+	}
+
 	return str
 }
