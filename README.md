@@ -1,5 +1,4 @@
 ![Gopher](https://github.com/zakirullin/stuff-bot/raw/main/cmd/testdata/_img_/gopherv3.svg)
-
 ---
 
 ## Spin it up
