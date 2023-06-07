@@ -40,12 +40,16 @@ func (m *Upd) MsgEntities() []tgbotapi.MessageEntity {
 	return nil
 }
 
-func (m *Upd) IsCallbackQuery() bool {
-	return false
+func (m *Upd) CallbackQueryID() (string, error) {
+	return "", nil
 }
 
-func (m *Upd) CallbackQueryID() string {
-	return ""
+func (m *Upd) InlineQueryID() (string, error) {
+	return "", nil
+}
+
+func (m *Upd) InlineQuery() (string, error) {
+	return "", nil
 }
 
 func (m *Upd) IsForwarded() bool {

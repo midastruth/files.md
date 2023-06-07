@@ -3,6 +3,7 @@ package tg
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"unicode/utf16"
 
@@ -10,6 +11,7 @@ import (
 )
 
 var errNoUserID = errors.New("update should always have at least one userID")
+var errNoSuchKey = errors.New("update doesn't have a value under requested key")
 
 // Upd is a simple wrapper over Telegram Update object
 type Upd struct {
@@ -68,16 +70,28 @@ func (u *Upd) MsgEntities() []tgbotapi.MessageEntity {
 	return nil
 }
 
-func (u *Upd) IsCallbackQuery() bool {
-	return u.raw.CallbackQuery != nil
-}
-
-func (u *Upd) CallbackQueryID() string {
+func (u *Upd) CallbackQueryID() (string, error) {
 	if u.raw.CallbackQuery == nil {
-		panic("GetCallbackQueryID is called on nil callback")
+		return "", fmt.Errorf("b.CallbackQueryID: %w", errNoSuchKey)
 	}
 
-	return u.raw.CallbackQuery.ID
+	return u.raw.CallbackQuery.ID, nil
+}
+
+func (u *Upd) InlineQueryID() (string, error) {
+	if u.raw.CallbackQuery == nil {
+		return "", fmt.Errorf("b.InlineQueryID: %w", errNoSuchKey)
+	}
+
+	return u.raw.CallbackQuery.ID, nil
+}
+
+func (u *Upd) InlineQuery() (string, error) {
+	if u.raw.InlineQuery == nil {
+		return "", fmt.Errorf("b.InlineQuery: %w", errNoSuchKey)
+	}
+
+	return u.raw.InlineQuery.Query, nil
 }
 
 func (u *Upd) IsForwarded() bool {

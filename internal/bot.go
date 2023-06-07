@@ -41,9 +41,10 @@ type UpdInterface interface {
 	UserID() int64
 	Cmd() *tg.Cmd
 	MsgEntities() []tgbotapi.MessageEntity
-	IsCallbackQuery() bool
 	IsForwarded() bool
-	CallbackQueryID() string
+	CallbackQueryID() (string, error)
+	InlineQueryID() (string, error)
+	InlineQuery() (string, error)
 }
 
 // Bot provides commands that can be invoked by a user so to query
@@ -62,7 +63,11 @@ func NewBot(userID int64, tg TGInterface, fs *fs.FS, db *db.DB) *Bot {
 
 // Reply to incoming text message or command (inline queries aren't supported yet)
 func (b *Bot) Reply(u UpdInterface) error {
-	if !u.IsCallbackQuery() {
+	if _, err := u.InlineQueryID(); err != nil {
+		return b.replyToInlineQuery(u)
+	}
+
+	if _, err := u.CallbackQueryID(); err != nil {
 		b.delAllKeyboards()
 	}
 
@@ -77,12 +82,16 @@ func (b *Bot) Reply(u UpdInterface) error {
 		}
 
 		err = handler(cmd.Params)
-		if err == nil && u.IsCallbackQuery() {
-			// We can tolerate an error here, that won't affect UX
-			_ = b.tg.AnswerCallbackQuery(u.CallbackQueryID(), "")
+		if err != nil {
+			return err
 		}
 
-		return err
+		if callbackQueryID, err := u.CallbackQueryID(); err != nil {
+			// We can tolerate an error here, that won't affect UX
+			_ = b.tg.AnswerCallbackQuery(callbackQueryID, "")
+		}
+
+		return nil
 	}
 
 	if u.IsForwarded() {
@@ -234,6 +243,69 @@ func (b *Bot) saveForward(u UpdInterface) error {
 	}
 
 	return b.showMove([]string{fs.Hash(filename)})
+}
+
+func (b *Bot) replyToInlineQuery(u UpdInterface) error {
+	query, err := u.InlineQuery()
+	if err != nil {
+		return fmt.Errorf("b.replyToIlineQuery: %w", err)
+	}
+	query = strings.TrimSpace(query)
+
+	// Check for directory traversal attack
+	if strings.Contains(query, "/") {
+		return nil
+	}
+
+	if len(query) == 0 {
+		return nil
+	}
+
+	// Query maybe be either:
+	// - directory, we return all notes from directories prefixed by this directory
+	// - directory note_name, we search for this note_name in all matching directories
+	// - note_name, we search for this note_name across all directories
+	var supposedDir, search string
+	isExists, err := b.fs.Exists("", query)
+	if err != nil {
+		return fmt.Errorf("b.replyToIlineQuery: %w", err)
+	}
+	if !isExists {
+		parts := strings.SplitN(query, " ", 2)
+		supposedDir = parts[0]
+		if len(parts) > 1 {
+			search = parts[1]
+		}
+	}
+
+	// Find all similar notes directories
+	var searchInDirs []string
+	notesDirs, err := b.fs.FilesAndDirs("")
+	if err != nil {
+		return fmt.Errorf("b.replyToInlineQuery: %w", err)
+	}
+	notesDirs = fs.OnlyNotes(notesDirs)
+	for _, noteDir := range notesDirs {
+		if strings.HasPrefix(noteDir.Name, supposedDir) {
+			searchInDirs = append(searchInDirs, noteDir.Name)
+		}
+	}
+
+	// If no matching directories are found, we search through all directories
+	if len(searchInDirs) == 0 {
+		for _, noteDir := range notesDirs {
+			searchInDirs = append(searchInDirs, noteDir.Name)
+		}
+		search = query
+	}
+
+	_ = search
+
+	// TODO move to config
+	//imgUrl := "http://inmind.tech/img/notev14.png"
+
+	return nil
+
 }
 
 func (b *Bot) createOrAdd(dir, filename, content string) error {
