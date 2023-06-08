@@ -68,13 +68,13 @@ func NewFS(userID int64, backend afero.Fs) (*FS, error) {
 		path := fmt.Sprintf("%s/%s", rootDir, dir)
 		exists, err := afero.Exists(backend, path)
 		if err != nil {
-			return nil, fmt.Errorf("NewFS: can't check whether base dirs exist: %w", err)
+			return nil, fmt.Errorf("newfs: can't check whether base dirs exist: %w", err)
 		}
 
 		if !exists {
 			err = backend.Mkdir(path, 0755)
 			if err != nil {
-				return nil, fmt.Errorf("NewFS: can't create base dirs: %w", err)
+				return nil, fmt.Errorf("newfs: can't create base dirs: %w", err)
 			}
 		}
 	}
@@ -85,12 +85,12 @@ func NewFS(userID int64, backend afero.Fs) (*FS, error) {
 func (fs FS) Exists(dir, filename string) (bool, error) {
 	path := fs.path(dir, filename)
 	if !fs.isSafe(path) {
-		return false, fmt.Errorf("fs.exists: unsafe path '%s': %w", path, errUnsafePath)
+		return false, fmt.Errorf("exists: unsafe path '%s': %w", path, errUnsafePath)
 	}
 
 	exists, err := afero.Exists(fs.backend, path)
 	if err != nil {
-		return false, fmt.Errorf("fs.exists: can't check whether the file '%s'/'%s' exists: %w", dir, filename, err)
+		return false, fmt.Errorf("exists: can't check whether the file '%s'/'%s' exists: %w", dir, filename, err)
 	}
 
 	return exists, nil
@@ -99,12 +99,12 @@ func (fs FS) Exists(dir, filename string) (bool, error) {
 func (fs FS) Content(dir, filename string) (string, error) {
 	path := fs.path(dir, filename)
 	if !fs.isSafe(path) {
-		return "", fmt.Errorf("fs.get: unsafe path '%s': %w", path, errUnsafePath)
+		return "", fmt.Errorf("get content: unsafe path '%s': %w", path, errUnsafePath)
 	}
 
 	content, err := afero.ReadFile(fs.backend, path)
 	if err != nil {
-		return "", fmt.Errorf("fs.get can't read file '%s': %w", path, err)
+		return "", fmt.Errorf("get content: can't read file '%s': %w", path, err)
 	}
 
 	return string(content), nil
@@ -113,11 +113,11 @@ func (fs FS) Content(dir, filename string) (string, error) {
 func (fs FS) Put(dir, filename, content string) error {
 	path := fs.path(dir, filename)
 	if !fs.isSafe(path) {
-		return fmt.Errorf("fs.Put: unsafe path '%s': %w", path, errUnsafePath)
+		return fmt.Errorf("put: unsafe path '%s': %w", path, errUnsafePath)
 	}
 
 	if err := afero.WriteFile(fs.backend, path, []byte(content), 0644); err != nil {
-		return fmt.Errorf("fs.put to '%s/%s': %w", dir, filename, err)
+		return fmt.Errorf("put to '%s/%s': %w", dir, filename, err)
 	}
 
 	return nil
@@ -126,12 +126,12 @@ func (fs FS) Put(dir, filename, content string) error {
 func (fs FS) MakeDir(dir string) error {
 	path := fs.path(dir, "")
 	if !fs.isSafe(path) {
-		return fmt.Errorf("fs.MakeDir: unsafe path '%s': %w", path, errUnsafePath)
+		return fmt.Errorf("make dir: unsafe path '%s': %w", path, errUnsafePath)
 	}
 
 	err := fs.backend.Mkdir(path, 0755)
 	if err != nil {
-		return fmt.Errorf("b.MakeDir: can't create dir: %w", err)
+		return fmt.Errorf("make dir: %w", err)
 	}
 
 	return nil
@@ -140,12 +140,12 @@ func (fs FS) MakeDir(dir string) error {
 func (fs FS) Del(dir, filename string) error {
 	path := fs.path(dir, filename)
 	if !fs.isSafe(path) {
-		return fmt.Errorf("fs.Del: unsafe path '%s': %w", path, errUnsafePath)
+		return fmt.Errorf("delete file: unsafe path '%s': %w", path, errUnsafePath)
 	}
 
 	err := fs.backend.Remove(path)
 	if err != nil {
-		return fmt.Errorf("fs.Del: can't remove '%s': %w", path, err)
+		return fmt.Errorf("delete file: can't remove '%s': %w", path, err)
 	}
 
 	return nil
@@ -154,17 +154,17 @@ func (fs FS) Del(dir, filename string) error {
 func (fs FS) Rename(oldDir, oldFilename, newDir, newFilename string) error {
 	oldPath := fs.path(oldDir, oldFilename)
 	if !fs.isSafe(oldPath) {
-		return fmt.Errorf("fs.rename: can't rename from '%s': %w", oldPath, errUnsafePath)
+		return fmt.Errorf("can't rename from '%s': %w", oldPath, errUnsafePath)
 	}
 
 	newPath := fs.path(newDir, newFilename)
 	if !fs.isSafe(newPath) {
-		return fmt.Errorf("fs.rename: can't rename to '%s': %w", newPath, errUnsafePath)
+		return fmt.Errorf("can't rename to '%s': %w", newPath, errUnsafePath)
 	}
 
 	err := fs.backend.Rename(oldPath, newPath)
 	if err != nil {
-		return fmt.Errorf("fs.rename: can't rename from '%s' to '%s': %w", oldPath, newPath, err)
+		return fmt.Errorf("can't rename from '%s' to '%s': %w", oldPath, newPath, err)
 	}
 
 	return nil
@@ -179,7 +179,7 @@ func (fs FS) Unhash(dir, filenameHash string) (string, error) {
 
 	filenames, err := fs.FilesAndDirs(dir)
 	if err != nil {
-		return "", fmt.Errorf("fs.unhash: can't get filenames in '%s': %w", dir, err)
+		return "", fmt.Errorf("can't unhash: %w", err)
 	}
 	for _, file := range filenames {
 		if strings.HasPrefix(fs.md5(file.Name), filenameHash) {
@@ -201,18 +201,18 @@ func (fs FS) Unhash(dir, filenameHash string) (string, error) {
 		}
 	}
 
-	return "", fmt.Errorf("fs.unhash: can't unhash '%s' in '%s': %w", filenameHash, dir, errCannotUnhash)
+	return "", fmt.Errorf("can't unhash '%s' in '%s': %w", filenameHash, dir, errCannotUnhash)
 }
 
 func (fs FS) FilesAndDirs(dir string) ([]File, error) {
 	path := fs.path(dir, "")
 	if !fs.isSafe(path) {
-		return nil, fmt.Errorf("fs.getFilenames: %w", errUnsafePath)
+		return nil, fmt.Errorf("can't get files: %w", errUnsafePath)
 	}
 
 	entries, err := afero.ReadDir(fs.backend, path)
 	if err != nil {
-		return nil, fmt.Errorf("fs.getFilenames: can't read dir: %w", err)
+		return nil, fmt.Errorf("can't get files: %w", err)
 	}
 
 	var files []File
@@ -241,14 +241,14 @@ func (fs FS) FilesAndDirs(dir string) ([]File, error) {
 func (fs FS) Dirs() ([]File, error) {
 	files, err := fs.FilesAndDirs("")
 	if err != nil {
-		return nil, fmt.Errorf("fs.GetDirs: %w", err)
+		return nil, fmt.Errorf("can't get dirs: %w", err)
 	}
 
 	var dirs []File
 	for _, file := range files {
 		isDir, err := afero.IsDir(fs.backend, fs.path("", file.Name))
 		if err != nil {
-			return nil, fmt.Errorf("fs.GetDirs: can't check whether '%s' is a dir: %w", file.Name, err)
+			return nil, fmt.Errorf("can't get dirs: %w", err)
 		}
 		if !isDir {
 			continue
@@ -281,7 +281,7 @@ func (fs FS) IsMultiline(dir, filename string) (bool, error) {
 	path := fs.path(dir, filename)
 	stat, err := fs.backend.Stat(path)
 	if err != nil {
-		return false, fmt.Errorf("fs.IsMultiline: can't check filesize for '%s': %w", path, err)
+		return false, fmt.Errorf("can't check for multiline: %w", err)
 	}
 
 	return stat.Size() > 0, nil
@@ -291,13 +291,13 @@ func (fs FS) IsMultiline(dir, filename string) (bool, error) {
 func (fs FS) RestoreText(dir, filename string) (string, error) {
 	path := fs.path(dir, filename)
 	if !fs.isSafe(path) {
-		return "", fmt.Errorf("fs.RestoreMsgText: unsafe path '%s': %w", path, errUnsafePath)
+		return "", fmt.Errorf("can't restore text: unsafe path '%s': %w", path, errUnsafePath)
 	}
 
 	title := Title(filename)
 	content, err := fs.Content(dir, filename)
 	if err != nil {
-		return "", fmt.Errorf("fs.RestoreMsgText: can't get content: %w", err)
+		return "", fmt.Errorf("can't restore text: %w", err)
 	}
 	content = strings.TrimSpace(content)
 
@@ -320,7 +320,7 @@ func (fs FS) RestoreText(dir, filename string) (string, error) {
 func AllUserIDs() ([]int64, error) {
 	adminUserID, err := strconv.ParseInt(os.Getenv("ADMIN_USER_ID"), 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("fs.AllUserIDs: can't cast ADMIN_USER_ID to int64 %w", err)
+		return nil, fmt.Errorf("can't get user ids: can't cast ADMIN_USER_ID to int64 %w", err)
 	}
 
 	return []int64{-1, adminUserID}, nil
@@ -364,7 +364,7 @@ func (fs FS) SearchNotes(query string) ([]File, error) {
 	var supposedDir, search string
 	exists, err := fs.Exists("", query)
 	if err != nil {
-		return nil, fmt.Errorf("fs.SearchNotes: %w", err)
+		return nil, fmt.Errorf("search notes: %w", err)
 	}
 	if exists {
 		supposedDir = query
@@ -380,7 +380,7 @@ func (fs FS) SearchNotes(query string) ([]File, error) {
 	var searchInDirs []string
 	notesDirs, err := fs.FilesAndDirs("")
 	if err != nil {
-		return nil, fmt.Errorf("b.replyToInlineQuery: %w", err)
+		return nil, fmt.Errorf("search notes: %w", err)
 	}
 	notesDirs = OnlyNotes(notesDirs)
 	for _, noteDir := range notesDirs {
@@ -538,18 +538,18 @@ func SortByCtime(entries []File) []File {
 func (fs FS) Touch(dir, filename string) error {
 	exists, err := fs.Exists(dir, filename)
 	if err != nil {
-		return fmt.Errorf("fs.Touch: can't check if file exists: %w", err)
+		return fmt.Errorf("touch: %w", err)
 	}
 	if exists {
 		err = fs.backend.Chtimes(fs.path(dir, filename), time.Now(), time.Now())
 		if err != nil {
-			return fmt.Errorf("fs.Touch: can't update file's ctime: %w", err)
+			return fmt.Errorf("touch: can't update file's ctime: %w", err)
 		}
 		return nil
 	}
 	err = fs.Put(dir, filename, "")
 	if err != nil {
-		return fmt.Errorf("fs.Touch: can't create empty file: %w", err)
+		return fmt.Errorf("touch: can't create empty file: %w", err)
 	}
 	return nil
 }

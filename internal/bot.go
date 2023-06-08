@@ -490,7 +490,7 @@ func (b *Bot) showDocs(params []string) error {
 func (b *Bot) showChecklists(params []string) error {
 	checklists, err := b.fs.FilesAndDirs("")
 	if err != nil {
-		return fmt.Errorf("b.showDocs: can't get dirs: %w", err)
+		return fmt.Errorf("can't show checklists: %w", err)
 	}
 	checklists = fs.OnlyChecklists(checklists)
 
@@ -590,7 +590,7 @@ func (b *Bot) showRename(params []string) error {
 
 	err = b.show(msg, &kb, tg.MarkupHTML)
 	if err != nil {
-		return fmt.Errorf("b.showRename: %w", err)
+		return fmt.Errorf("can't show rename: %w", err)
 	}
 
 	return nil
@@ -647,12 +647,12 @@ func (b *Bot) showTask(params []string) error {
 
 	filename, err := b.fs.Unhash(dir, filenameHash)
 	if err != nil {
-		return fmt.Errorf("b.task: can't unhash filename %s in %s: %w", filenameHash, dir, err)
+		return fmt.Errorf("can't show task: %w", err)
 	}
 
 	content, err := b.fs.Content(dir, filename)
 	if err != nil {
-		return fmt.Errorf("b.task: can't get content for %s: %w", filename, err)
+		return fmt.Errorf("can't show task: %w", err)
 	}
 
 	kb := tg.NewKeyboard([]tg.Row{
@@ -661,7 +661,7 @@ func (b *Bot) showTask(params []string) error {
 
 	err = b.show(fmt.Sprintf("%s\n%s", fs.Title(filename), content), kb, tg.MarkupHTML)
 	if err != nil {
-		return fmt.Errorf("b.showTask: %w", err)
+		return fmt.Errorf("can't show task: %w", err)
 	}
 
 	return nil
