@@ -1185,7 +1185,7 @@ func (b *Bot) todayLabel() (string, error) {
 	// TODO add short labels
 	icons := []string{"🌴"}
 	label := "You don't have any tasks!"
-	if todo > 1 {
+	if todo > 0 {
 		label = b.tr("<b>%d</b> left", todo)
 		icons = nil
 	}
