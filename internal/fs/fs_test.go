@@ -399,3 +399,16 @@ func TestFS_GetAllNotesInAllDirsForEmptyQuery(t *testing.T) {
 
 	r.ElementsMatch([]string{"a.md", "b.md"}, noteFilenames)
 }
+
+func TestFS_PathTraversalAttack(t *testing.T) {
+	r := require.New(t)
+
+	fs, _ := NewFS(-1, afero.NewMemMapFs())
+	fs.rootPath = ""
+
+	path := fs.path("../root/.ssh/", "authorized_keys")
+	r.Equal("/..|root|.ssh|/authorized_keys", path)
+
+	path = fs.path("note", "../root/.ssh/authorized_keys")
+	r.Equal("/note/..|root|.ssh|authorized_keys", path)
+}
