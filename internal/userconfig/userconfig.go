@@ -10,7 +10,7 @@ import (
 )
 
 type Config struct {
-	Language            string   `json:"language"`
+	Language         string   `json:"language"`
 	HomeCmd          string   `json:"homeCmd"`
 	RawMoveToButtons []string `json:"moveToButtons"`
 	PomodoroDuration string   `json:"pomodoroDuration"`
