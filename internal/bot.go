@@ -10,9 +10,9 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"golang.org/x/exp/slog"
 
+	"zakirullin/dumpbot/i18n"
 	"zakirullin/dumpbot/internal/db"
 	"zakirullin/dumpbot/internal/fs"
-	"zakirullin/dumpbot/internal/i18n"
 	"zakirullin/dumpbot/internal/sched"
 	"zakirullin/dumpbot/internal/stats"
 	"zakirullin/dumpbot/internal/userconfig"
@@ -390,10 +390,10 @@ func (b *Bot) showList(params []string) error {
 		dir = params[0]
 	}
 	oppositeDir := fs.DirLater
-	oppositeLabel := strBtnLater
+	oppositeLabel := i18n.StrBtnLater
 	if dir == fs.DirLater {
 		oppositeDir = fs.DirToday
-		oppositeLabel = strBtnToday
+		oppositeLabel = i18n.StrBtnToday
 	}
 
 	files, err := b.fs.FilesAndDirs(dir)
@@ -610,7 +610,7 @@ func (b *Bot) showRenameFile(params []string) error {
 	}
 
 	kb := tg.NewKeyboard([]tg.Row{
-		tg.NewRow(tg.NewBtn(strBtnBack, tg.NewCmd(dir, []string{dir}))),
+		tg.NewRow(tg.NewBtn(i18n.StrBtnBack, tg.NewCmd(dir, []string{dir}))),
 	})
 
 	err = b.db.SetInputExpectation(b.userID, tg.NewCmd(cmdMove, []string{dir, filename, dir, "%s"}))
@@ -656,16 +656,16 @@ func (b *Bot) showTask(params []string) error {
 
 	var moveToBtn tg.Btn
 	if dir == fs.DirToday {
-		moveToBtn = tg.NewBtn(strBtnMoveToLater, tg.NewCmd(cmdMove, []string{dir, filenameHash, fs.DirLater}))
+		moveToBtn = tg.NewBtn(i18n.StrBtnMoveToLater, tg.NewCmd(cmdMove, []string{dir, filenameHash, fs.DirLater}))
 	} else {
-		moveToBtn = tg.NewBtn(strBtnMoveToToday, tg.NewCmd(cmdMove, []string{dir, filenameHash, fs.DirToday}))
+		moveToBtn = tg.NewBtn(i18n.StrBtnMoveToToday, tg.NewCmd(cmdMove, []string{dir, filenameHash, fs.DirToday}))
 	}
 
 	kb := tg.NewKeyboard([]tg.Row{
 		tg.NewRow(moveToBtn),
 		tg.NewRow(
-			tg.NewBtn(strBtnBack, tg.NewCmd(dir, []string{dir})),
-			tg.NewBtn(strBtnComplete, tg.NewCmd(cmdComplete, []string{dir, filenameHash})),
+			tg.NewBtn(i18n.StrBtnBack, tg.NewCmd(dir, []string{dir})),
+			tg.NewBtn(i18n.StrBtnComplete, tg.NewCmd(cmdComplete, []string{dir, filenameHash})),
 		),
 	})
 
@@ -691,7 +691,7 @@ func (b *Bot) showDoc(params []string) error {
 	}
 
 	kb := tg.NewKeyboard([]tg.Row{
-		tg.NewRow(tg.NewBtn(strBtnBack, tg.NewCmd(cmdShowDocs, nil))),
+		tg.NewRow(tg.NewBtn(i18n.StrBtnBack, tg.NewCmd(cmdShowDocs, nil))),
 	})
 
 	err = b.show(fmt.Sprintf("%s\n%s", fs.Title(filename), content), kb, tg.MarkupHTML)
@@ -719,7 +719,7 @@ func (b *Bot) showChecklist(params []string) error {
 	for _, item := range items {
 		kb.AddRow(tg.NewBtn(item.Title, tg.NewCmd(cmdComplete, []string{})))
 	}
-	kb.AddRow(tg.NewRow(tg.NewBtn(strBtnBack, tg.NewCmd(cmdShowDocs, nil))))
+	kb.AddRow(tg.NewRow(tg.NewBtn(i18n.StrBtnBack, tg.NewCmd(cmdShowDocs, nil))))
 
 	err = b.show(fs.Title(checklist), kb, tg.MarkupHTML)
 	if err != nil {

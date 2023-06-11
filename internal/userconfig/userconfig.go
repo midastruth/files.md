@@ -5,10 +5,13 @@ package userconfig
 import (
 	"encoding/json"
 	"fmt"
-	"golang.org/x/exp/slog"
 	"io"
 	"os"
 	"time"
+
+	"golang.org/x/exp/slog"
+
+	"zakirullin/dumpbot/i18n"
 )
 
 var DefaultConfig = Config{
@@ -80,12 +83,12 @@ func (c *Config) Save(path string) {
 
 func mapConfigButtonNamesToRealNames(configNames []string) []string {
 	configToReal := map[string]string{
-		"tomorrow":  "🌚 For tmrw",
-		"later":     "⏳ For later",
-		"day":       "📆 For a day",
-		"note":      "📌 To Note",
-		"checklist": "☑️ To Checklist",
-		"doc":       "📝 To Doc",
+		"tomorrow":  i18n.StrForTomorrow,
+		"later":     i18n.StrForLater,
+		"day":       i18n.StrForDay,
+		"note":      i18n.StrToNote,
+		"checklist": i18n.StrToChecklist,
+		"doc":       i18n.StrToDoc,
 	}
 
 	var realNames []string

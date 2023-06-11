@@ -11,10 +11,10 @@ import (
 	"github.com/spf13/afero"
 	"golang.org/x/exp/slog"
 
+	"zakirullin/dumpbot/i18n"
 	"zakirullin/dumpbot/internal"
 	"zakirullin/dumpbot/internal/db"
 	"zakirullin/dumpbot/internal/fs"
-	"zakirullin/dumpbot/internal/i18n"
 	"zakirullin/dumpbot/internal/sched/worker"
 	"zakirullin/dumpbot/internal/userconfig"
 	"zakirullin/dumpbot/pkg/tg"
@@ -32,11 +32,11 @@ func main() {
 		panic(fmt.Sprintf("Error loading .env file: %s\n", err))
 	}
 
-	err = i18n.LoadLangFile("assets/i18n/ru.json")
+	err = i18n.LoadLangFile("i18n/ru.json")
 	if err != nil {
 		panic(fmt.Sprintf("Error loading i18n: %s\n", err))
 	}
-	err = i18n.LoadEmojiFile("assets/emojis.json")
+	err = i18n.LoadEmojiFile("i18n/emojis.json")
 	if err != nil {
 		panic(fmt.Sprintf("Error loading emoji: %s\n", err))
 	}
