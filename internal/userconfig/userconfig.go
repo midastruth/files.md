@@ -4,8 +4,8 @@ package userconfig
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
+	"golang.org/x/exp/slog"
 	"io"
 	"os"
 	"time"
@@ -13,10 +13,10 @@ import (
 
 var DefaultConfig = Config{
 	config: config{
-		Language:         "en",
-		HomeCmd:          "today",
-		MoveToButtons:    []string{"tomorrow", "later", "day", "note", "checklist", "doc", "recent", "journal"},
-		PomodoroDuration: strDuration(25 * time.Minute),
+		Language:               "en",
+		HomeCmd:                "today",
+		MoveToButtons:          []string{"tomorrow", "later", "day", "note", "checklist", "doc", "recent", "journal"},
+		PomodoroDurationMinute: 25,
 	},
 }
 
@@ -39,10 +39,10 @@ type Config struct {
 }
 
 type config struct {
-	Language         string      `json:"language"`
-	HomeCmd          string      `json:"homeCmd"`
-	MoveToButtons    []string    `json:"moveToButtons"`
-	PomodoroDuration strDuration `json:"pomodoroDuration"`
+	Language               string   `json:"language"`
+	HomeCmd                string   `json:"homeCmd"`
+	MoveToButtons          []string `json:"moveToButtons"`
+	PomodoroDurationMinute float64  `json:"pomodoroDurationMinute"`
 }
 
 func NewConfig() *Config {
@@ -115,31 +115,21 @@ func mapConfigButtonNamesToRealNames(configNames []string) []string {
 
 type strDuration time.Duration
 
-func (d *strDuration) UnmarshalJSON(b []byte) error {
-	dd := (*time.Duration)(d)
-	var v interface{}
-	if err := json.Unmarshal(b, &v); err != nil {
-		return err
+func (c *Config) SetPomodoroDuration(value time.Duration) error {
+	if value <= 0 || value > 24*time.Hour {
+		return fmt.Errorf("config.SetPomodoroDuration: value is invalid: %v", value)
 	}
-	switch value := v.(type) {
-	case float64:
-		*dd = time.Duration(value)
-		return nil
-	case string:
-		var err error
-		*dd, err = time.ParseDuration(value)
-		if err != nil {
-			return err
-		}
-		return nil
-	default:
-		return errors.New("invalid duration")
-	}
-}
-func (c *Config) SetPomodoroDuration(value time.Duration) {
-	c.config.PomodoroDuration = strDuration(value)
+	c.config.PomodoroDurationMinute = value.Minutes()
+	return nil
 }
 
 func (c *Config) PomodoroDuration() time.Duration {
-	return time.Duration(c.config.PomodoroDuration)
+	minutes := c.config.PomodoroDurationMinute
+	if minutes <= 0 {
+		slog.Error("Pomodoro duration is invalid. Using default value", "duration",
+			c.config.PomodoroDurationMinute, "default", DefaultConfig.config.PomodoroDurationMinute)
+		//I don't use DefaultConfig.PomodoroDuration() because it may cause infinite recursion
+		minutes = DefaultConfig.config.PomodoroDurationMinute
+	}
+	return time.Duration(minutes * float64(time.Minute))
 }
