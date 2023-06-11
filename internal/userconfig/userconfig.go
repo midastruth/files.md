@@ -72,18 +72,6 @@ func (c *Config) LoadOrCreate(path string) error {
 	return nil
 }
 
-func (c *Config) MoveToButtons() {
-
-}
-
-func (c *Config) Schedule() {
-
-}
-
-func (c *Config) Merge(config Config) {
-
-}
-
 func (c *Config) Save(path string) {
 
 }
