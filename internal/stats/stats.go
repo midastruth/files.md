@@ -28,7 +28,7 @@ func TodayReport(fsys *fs.FS, db *db.DB, userID int64) (string, error) {
 		stats = append(stats, fmt.Sprintf("%s <b>%s</b>", ico, fs.Title(file)))
 	}
 
-	trashedFiles, err := fsys.FilesAndDirs(fs.DirTrash)
+	trashedFiles, err := fsys.FilesAndDirs(fs.DirArchive)
 	if err != nil {
 		return "", fmt.Errorf("stats.TodayReport: can't get trashed files: %w", err)
 	}
@@ -67,7 +67,7 @@ func DoneTodayScheduled(fsys *fs.FS, db *db.DB, userID int64) ([]string, error) 
 }
 
 func doneToday(fsys *fs.FS, db *db.DB, userID int64, withScheduled bool) ([]string, error) {
-	files, err := fsys.FilesAndDirs(fs.DirTrash)
+	files, err := fsys.FilesAndDirs(fs.DirArchive)
 	if err != nil {
 		return nil, fmt.Errorf("stats.DoneTasks: %w", err)
 	}

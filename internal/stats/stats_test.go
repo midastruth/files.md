@@ -34,7 +34,7 @@ func TestDoneToday(t *testing.T) {
 	}
 
 	fs, _ := fs2.NewFS(-1, afero.NewMemMapFs())
-	err := fs.Put("_trash_", "a.md", "")
+	err := fs.Put("_archive_", "a.md", "")
 	r.Nil(err)
 
 	redis, err := miniredis.Run()
@@ -74,7 +74,7 @@ func TestDoneTodayExcludeScheduled(t *testing.T) {
 	}
 
 	fs, _ := fs2.NewFS(-1, afero.NewMemMapFs())
-	err := fs.Put("_trash_", "a.md", "")
+	err := fs.Put("_archive_", "a.md", "")
 	r.Nil(err)
 
 	redis, err := miniredis.Run()
@@ -115,9 +115,9 @@ func TestDoneTodayScheduled(t *testing.T) {
 	}
 
 	fs, _ := fs2.NewFS(-1, afero.NewMemMapFs())
-	err := fs.Put("_trash_", "a.md", "")
+	err := fs.Put("_archive_", "a.md", "")
 	r.Nil(err)
-	err = fs.Put("_trash_", "b.md", "")
+	err = fs.Put("_archive_", "b.md", "")
 	r.Nil(err)
 
 	redis, err := miniredis.Run()

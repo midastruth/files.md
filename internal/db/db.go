@@ -72,7 +72,7 @@ func (db *DB) Schedule(userID int64) (map[string]sched.Cron, error) {
 	return schedules, nil
 }
 
-// AddToSchedule task from _trash_ or later at runAt (Unix timestamp, sec). Tasks appear in today folder.
+// AddToSchedule task from _archive_ or later at runAt (Unix timestamp, sec). Tasks appear in today folder.
 // If cron is provided this task will be repeated. Other wise, it will be executed once.
 func (db *DB) AddToSchedule(userID int64, filename string, runAt int64, cron string) error {
 	sc, err := db.Schedule(userID)

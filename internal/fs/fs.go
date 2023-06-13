@@ -27,7 +27,7 @@ var (
 )
 
 const (
-	DirTrash     = "_trash_"
+	DirArchive   = "_archive_"
 	DirToday     = "today"
 	DirLater     = "later"
 	DirInbox     = "inbox"
@@ -64,7 +64,7 @@ type File struct {
 // TODO create Unsorted
 func NewFS(userID int64, backend afero.Fs) (*FS, error) {
 	rootDir := "./cmd/testdata"
-	for _, dir := range []string{DirTrash, DirToday, DirLater} {
+	for _, dir := range []string{DirArchive, DirToday, DirLater} {
 		path := fmt.Sprintf("%s/%s", rootDir, dir)
 		exists, err := afero.Exists(backend, path)
 		if err != nil {
@@ -339,7 +339,7 @@ func IsChecklistItem(filename string) bool {
 }
 
 func Title(filename string) string {
-	// Once we move our items from checklists to _trash_,
+	// Once we move our items from checklists to _archive_,
 	// they got named like -checklist-itemName
 	stripChecklistChars := regexp.MustCompile(`^-.*?-(.+)`)
 	title := stripChecklistChars.ReplaceAllString(filename, "$1")
@@ -442,7 +442,7 @@ func ExcludeChecklists(dirs []File) []File {
 func ExcludeSystemDirs(dirs []File) []File {
 	var newDirs []File
 	for _, dir := range dirs {
-		if slices.Contains([]string{DirImg, DirTrash, DirJournal}, dir.Name) {
+		if slices.Contains([]string{DirImg, DirArchive, DirJournal}, dir.Name) {
 			continue
 		}
 

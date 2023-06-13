@@ -935,7 +935,7 @@ func (b *Bot) complete(params []string) error {
 	}
 
 	// TODO multiline
-	err = b.fs.Rename(dir, filename, fs.DirTrash, filename)
+	err = b.fs.Rename(dir, filename, fs.DirArchive, filename)
 	if err != nil {
 		return fmt.Errorf("complete: can't complete %s: %w", filename, err)
 	}
@@ -1223,7 +1223,7 @@ func (b *Bot) togglePomodoro(_ []string) error {
 	if err != nil {
 		return fmt.Errorf("toggle pomodoro: failed to check if pomodoro is already running %w", err)
 	}
-	hasPomodoroInTrash, err := b.fs.Exists(fs.DirTrash, fs.FilePomodoro)
+	hasPomodoroInTrash, err := b.fs.Exists(fs.DirArchive, fs.FilePomodoro)
 	if err != nil {
 		return fmt.Errorf("toggle pomodoro: failed to check if pomodoro is already running %w", err)
 	}
@@ -1235,7 +1235,7 @@ func (b *Bot) togglePomodoro(_ []string) error {
 		}
 	}
 	if hasPomodoroInTrash {
-		err = b.fs.Del(fs.DirTrash, fs.FilePomodoro)
+		err = b.fs.Del(fs.DirArchive, fs.FilePomodoro)
 		if err != nil {
 			return fmt.Errorf("toggle pomodoro: failed to delete pomodoro file: %w", err)
 		}

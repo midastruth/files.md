@@ -58,7 +58,7 @@ func MoveDueTasksToToday(redis *miniredis.Miniredis, fsBackend afero.Fs) error {
 }
 
 func moveTaskToToday(filename string, fsys *fs.FS) error {
-	dirsToLookFor := []string{fs.DirLater, fs.DirTrash}
+	dirsToLookFor := []string{fs.DirLater, fs.DirArchive}
 	for _, dir := range dirsToLookFor {
 		filenames, err := fsys.FilesAndDirs(dir)
 		if err != nil {

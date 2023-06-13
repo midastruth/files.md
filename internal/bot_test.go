@@ -1,12 +1,14 @@
 package internal
 
 import (
-	"github.com/alicebob/miniredis/v2"
-	"github.com/spf13/afero"
-	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/alicebob/miniredis/v2"
+	"github.com/spf13/afero"
+	"github.com/stretchr/testify/require"
+
 	"zakirullin/dumpbot/internal/sched/worker"
 	"zakirullin/dumpbot/internal/userconfig"
 
@@ -153,7 +155,7 @@ func TestCompleteTask(t *testing.T) {
 	r.Nil(err)
 	r.Len(todayTasks, 0)
 
-	completedTasks, err := bot.fs.FilesAndDirs("_trash_")
+	completedTasks, err := bot.fs.FilesAndDirs("_archive_")
 	r.Nil(err)
 	r.Len(completedTasks, 1)
 	r.Equal("First task.md", completedTasks[0].Name)
@@ -369,24 +371,24 @@ func TestBot_togglePomodoro(t *testing.T) {
 		r.Nil(err)
 		return hasPomodoroInDir
 	}
-	r.False(pomodoroIn(fs.DirToday) || pomodoroIn(fs.DirTrash))
+	r.False(pomodoroIn(fs.DirToday) || pomodoroIn(fs.DirArchive))
 
 	// Add pomodoro	to today
 	r.Nil(b.togglePomodoro(nil))
-	r.True(pomodoroIn(fs.DirToday) && !pomodoroIn(fs.DirTrash))
+	r.True(pomodoroIn(fs.DirToday) && !pomodoroIn(fs.DirArchive))
 	// and remove pomodoro from today
 	r.Nil(b.togglePomodoro(nil))
-	r.False(pomodoroIn(fs.DirToday) || pomodoroIn(fs.DirTrash))
+	r.False(pomodoroIn(fs.DirToday) || pomodoroIn(fs.DirArchive))
 
 	// Add pomodoro	to today
 	r.Nil(b.togglePomodoro(nil))
-	r.True(pomodoroIn(fs.DirToday) && !pomodoroIn(fs.DirTrash))
+	r.True(pomodoroIn(fs.DirToday) && !pomodoroIn(fs.DirArchive))
 	// complete it
 	r.Nil(b.complete([]string{fs.DirToday, fs.FilePomodoro}))
-	r.True(!pomodoroIn(fs.DirToday) && pomodoroIn(fs.DirTrash))
+	r.True(!pomodoroIn(fs.DirToday) && pomodoroIn(fs.DirArchive))
 	// and remove pomodoro from trash
 	r.Nil(b.togglePomodoro(nil))
-	r.False(pomodoroIn(fs.DirToday) || pomodoroIn(fs.DirTrash))
+	r.False(pomodoroIn(fs.DirToday) || pomodoroIn(fs.DirArchive))
 }
 
 func TestBot_pomodoroCompletion(t *testing.T) {
@@ -406,28 +408,28 @@ func TestBot_pomodoroCompletion(t *testing.T) {
 		r.Nil(err)
 		return hasPomodoroInDir
 	}
-	r.False(pomodoroIn(fs.DirToday) || pomodoroIn(fs.DirTrash))
+	r.False(pomodoroIn(fs.DirToday) || pomodoroIn(fs.DirArchive))
 
 	// Add pomodoro	to today
 	r.Nil(b.togglePomodoro(nil))
-	r.True(pomodoroIn(fs.DirToday) && !pomodoroIn(fs.DirTrash))
+	r.True(pomodoroIn(fs.DirToday) && !pomodoroIn(fs.DirArchive))
 	// set pomodoro duration to 100ms
 	b.conf.SetPomodoroDuration(time.Second)
 	// complete it
 	r.Nil(b.complete([]string{fs.DirToday, fs.FilePomodoro}))
-	r.True(!pomodoroIn(fs.DirToday) && pomodoroIn(fs.DirTrash))
+	r.True(!pomodoroIn(fs.DirToday) && pomodoroIn(fs.DirArchive))
 
 	// wait less than pomodoro duration
 	time.Sleep(100 * time.Millisecond)
 	err = worker.MoveDueTasksToToday(redis, fsBackend)
 	r.Nil(err)
-	r.True(!pomodoroIn(fs.DirToday) && pomodoroIn(fs.DirTrash))
+	r.True(!pomodoroIn(fs.DirToday) && pomodoroIn(fs.DirArchive))
 
 	// wait until it gets back to today
 	time.Sleep(900 * time.Millisecond)
 	err = worker.MoveDueTasksToToday(redis, fsBackend)
 	r.Nil(err)
-	r.True(pomodoroIn(fs.DirToday) && !pomodoroIn(fs.DirTrash))
+	r.True(pomodoroIn(fs.DirToday) && !pomodoroIn(fs.DirArchive))
 }
 
 func TestBot_todayLabelIcons(t *testing.T) {
