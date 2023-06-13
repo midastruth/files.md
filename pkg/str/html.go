@@ -17,7 +17,7 @@ func MarkdownToHtml(md string) string {
 	doc := p.Parse([]byte(md))
 
 	htmlFlags := html.HrefTargetBlank
-	opts := html.RendererOptions{Flags: htmlFlags, RenderNodeHook: myRenderHook}
+	opts := html.RendererOptions{Flags: htmlFlags, RenderNodeHook: renderHook}
 	renderer := html.NewRenderer(opts)
 
 	return strings.TrimSpace(string(markdown.Render(doc, renderer)))
@@ -37,7 +37,7 @@ func renderHeader(w io.Writer, entering bool) {
 	}
 }
 
-func myRenderHook(w io.Writer, node ast.Node, entering bool) (ast.WalkStatus, bool) {
+func renderHook(w io.Writer, node ast.Node, entering bool) (ast.WalkStatus, bool) {
 	if _, ok := node.(*ast.Paragraph); ok {
 		renderParagraph()
 		return ast.GoToNext, true
