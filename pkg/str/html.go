@@ -27,9 +27,22 @@ func renderParagraph() {
 
 }
 
+// TG doesn't support headers, so we render them as bold text
+func renderHeader(w io.Writer, entering bool) {
+	if entering {
+		io.WriteString(w, "<b>")
+	} else {
+		io.WriteString(w, "</b>\n\n")
+	}
+}
+
 func myRenderHook(w io.Writer, node ast.Node, entering bool) (ast.WalkStatus, bool) {
 	if _, ok := node.(*ast.Paragraph); ok {
 		renderParagraph()
+		return ast.GoToNext, true
+	}
+	if _, ok := node.(*ast.Heading); ok {
+		renderHeader(w, entering)
 		return ast.GoToNext, true
 	}
 	return ast.GoToNext, false

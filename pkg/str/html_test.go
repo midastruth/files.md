@@ -12,7 +12,16 @@ func TestMarkdownToHtmlHeader(t *testing.T) {
 	md := `# Header`
 	html := MarkdownToHtml(md)
 
-	r.Equal("<h1>Header</h1>", html)
+	r.Equal("<b>Header</b>", html)
+}
+
+func TestMarkdownToHtmlHeaderAndText(t *testing.T) {
+	r := require.New(t)
+
+	md := "# Header\nText"
+	html := MarkdownToHtml(md)
+
+	r.Equal("<b>Header</b>\n\nText", html)
 }
 
 func TestMarkdownToHtmlBold(t *testing.T) {
