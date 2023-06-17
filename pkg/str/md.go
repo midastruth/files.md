@@ -2,12 +2,15 @@ package str
 
 import (
 	"fmt"
+	"unicode"
 	"unicode/utf16"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 var needEscape = make(map[rune]struct{})
+
+const RUNE_NEWLINE = '\n'
 
 func init() {
 	for _, r := range []rune{'_', '*', '~', '`'} { // '[', ']', '(', ')', '>', '#',  '+', '-', '=', '|', '{', '}', '.', '!'} {
@@ -18,6 +21,7 @@ func init() {
 // EntitiesToMarkdown converts plain text with Entities to Markdown and escapes Markdown special symbols (but it's not escapes those symbols in urls).
 // https://core.telegram.org/bots/api#messageentity
 func EntitiesToMarkdown(text string, messageEntities []tgbotapi.MessageEntity) string {
+	input := []rune(NormNewLines(text))
 	insertions := make(map[int]string)
 	noEscape := make(map[int]*struct{})
 	strct := struct{}{}
@@ -57,19 +61,40 @@ func EntitiesToMarkdown(text string, messageEntities []tgbotapi.MessageEntity) s
 		} else if e.IsURL() {
 			stopEscape(&e)
 		}
-		if before != "" {
-			insertions[e.Offset] += before
-			insertions[e.Offset+e.Length] += after
+		if before == "" {
+			continue
+		}
+
+		isOpen := false
+		spacesToEat := 0
+		for offset, c := range input[e.Offset : e.Offset+e.Length] {
+			if c == RUNE_NEWLINE && isOpen {
+				insertions[(e.Offset+offset)-spacesToEat] = after
+				isOpen = false
+				spacesToEat = 0
+				continue
+			}
+			if unicode.IsSpace(c) {
+				spacesToEat++
+				continue
+			}
+			if !isOpen {
+				insertions[e.Offset+offset] = before
+				isOpen = true
+			}
+			spacesToEat = 0
+		}
+		if isOpen {
+			insertions[(e.Offset+e.Length)-spacesToEat] += after
 		}
 	}
 
-	input := []rune(text)
 	var output []rune
 	utf16pos := 0
 	for _, c := range input {
 		output = append(output, []rune(insertions[utf16pos])...)
 		_, stopEscaping := noEscape[utf16pos]
-		if _, has := needEscape[c]; has && !stopEscaping {
+		if _, shouldEscape := needEscape[c]; shouldEscape && !stopEscaping {
 			output = append(output, '\\')
 		}
 		output = append(output, c)

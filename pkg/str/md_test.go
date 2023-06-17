@@ -9,17 +9,18 @@ import (
 
 func TestMultilineTextWithMarkdown(t *testing.T) {
 	r := require.New(t)
-	text := "header\nSome text with two italic paragraphs\n\nAlso italic\n\nheader2\nitalic\ncode\n\nheader3\njust text"
+	text := "header\nitalic\n\nAlso italic\n\nheader2\nitalic\ncode"
 
 	var messageEntities = []tgbotapi.MessageEntity{
-		{Type: "italic", Offset: 7, Length: 51},
-		{Type: "bold", Offset: 58, Length: 8},
-		{Type: "italic", Offset: 66, Length: 7},
-		{Type: "code", Offset: 73, Length: 6},
+		{Type: "bold", Offset: 0, Length: 7},
+		{Type: "italic", Offset: 7, Length: 21},
+		{Type: "bold", Offset: 28, Length: 8},
+		{Type: "italic", Offset: 36, Length: 7},
+		{Type: "code", Offset: 43, Length: 4},
 	}
 
 	markdown := EntitiesToMarkdown(text, messageEntities)
-	expectedMarkdown := "header\n*Some text with two italic paragraphs\n\nAlso italic\n\n***header2\n***italic\n*`code\n\n`header3\njust text"
+	expectedMarkdown := "**header**\n*italic*\n\n*Also italic*\n\n**header2**\n*italic*\n`code`"
 	r.Equal(expectedMarkdown, markdown)
 }
 
