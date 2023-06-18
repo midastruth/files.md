@@ -122,7 +122,7 @@ func TestRestoreMsgTextFromFilename(t *testing.T) {
 	err := fs.Put("", "File.md", "")
 	r.Nil(err)
 
-	msg, err := fs.RestoreText("", "File.md")
+	msg, err := fs.RestoreContent("", "File.md")
 	r.Nil(err)
 	r.Equal("File", msg)
 }
@@ -134,7 +134,7 @@ func TestRestoreMsgTextFromFilenameAndContent(t *testing.T) {
 	err := fs.Put("", "Title.md", "Content")
 	r.Nil(err)
 
-	msg, err := fs.RestoreText("", "Title.md")
+	msg, err := fs.RestoreContent("", "Title.md")
 	r.Nil(err)
 	r.Equal("Title\nContent", msg)
 }
@@ -146,7 +146,7 @@ func TestRestoreMsgTextFromLongFilenameAndContent(t *testing.T) {
 	err := fs.Put("", "Title....md", "Title and Content")
 	r.Nil(err)
 
-	msg, err := fs.RestoreText("", "Title....md")
+	msg, err := fs.RestoreContent("", "Title....md")
 	r.Nil(err)
 	r.Equal("Title and Content", msg)
 }
@@ -158,7 +158,7 @@ func TestRestoreMsgTextFromFilenameWithSpaces(t *testing.T) {
 	err := fs.Put("", " File.md ", "")
 	r.Nil(err)
 
-	msg, err := fs.RestoreText("", " File.md ")
+	msg, err := fs.RestoreContent("", " File.md ")
 	r.Nil(err)
 	r.Equal("File", msg)
 }

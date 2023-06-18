@@ -2,7 +2,8 @@ package sched
 
 import (
 	"testing"
-	"zakirullin/dumpbot/pkg/str"
+
+	"zakirullin/dumpbot/pkg/text"
 
 	"github.com/stretchr/testify/require"
 )
@@ -10,7 +11,7 @@ import (
 func TestUcfirst(t *testing.T) {
 	r := require.New(t)
 
-	res := str.Ucfirst("abc")
+	res := text.Ucfirst("abc")
 
 	r.Equal("Abc", res)
 }
@@ -18,7 +19,7 @@ func TestUcfirst(t *testing.T) {
 func TestUcfirstRu(t *testing.T) {
 	r := require.New(t)
 
-	res := str.Ucfirst("абв")
+	res := text.Ucfirst("абв")
 
 	r.Equal("Абв", res)
 }

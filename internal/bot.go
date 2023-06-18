@@ -17,7 +17,7 @@ import (
 	"zakirullin/dumpbot/internal/stats"
 	"zakirullin/dumpbot/internal/userconfig"
 	"zakirullin/dumpbot/pkg/slice"
-	"zakirullin/dumpbot/pkg/str"
+	"zakirullin/dumpbot/pkg/text"
 	"zakirullin/dumpbot/pkg/tg"
 )
 
@@ -197,8 +197,8 @@ func (b *Bot) allowedTextCmds() []string {
 }
 
 func (b *Bot) save(u UpdInterface) error {
-	msg := str.EntitiesToMarkdown(u.MsgText(), u.MsgEntities())
-	msg = strings.TrimSpace(str.NormNewLines(msg))
+	msg := text.EntitiesToMarkdown(u.MsgText(), u.MsgEntities())
+	msg = strings.TrimSpace(text.NormNewLines(msg))
 
 	title, content, err := b.extractTitleAndContent(msg)
 	if err != nil {
@@ -215,8 +215,8 @@ func (b *Bot) save(u UpdInterface) error {
 }
 
 func (b *Bot) saveForward(u UpdInterface) error {
-	msg := str.EntitiesToMarkdown(u.MsgText(), u.MsgEntities())
-	msg = strings.TrimSpace(str.NormNewLines(msg))
+	msg := text.EntitiesToMarkdown(u.MsgText(), u.MsgEntities())
+	msg = strings.TrimSpace(text.NormNewLines(msg))
 
 	title, content, err := b.extractTitleAndContent(msg)
 	if err != nil {
@@ -307,7 +307,7 @@ func (b *Bot) extractTitleAndContent(msg string) (string, string, error) {
 
 	parts := strings.SplitN(msg, "\n", 2)
 
-	title := str.Ucfirst(strings.TrimSpace(parts[0]))
+	title := text.Ucfirst(strings.TrimSpace(parts[0]))
 	content := ""
 	if len(parts) > 1 {
 		content = strings.TrimSpace(parts[1])
@@ -318,7 +318,7 @@ func (b *Bot) extractTitleAndContent(msg string) (string, string, error) {
 		} else {
 			content = fmt.Sprintf("%s\n\n%s", title, content)
 		}
-		title = str.Substr(title, 0, 100)
+		title = text.Substr(title, 0, 100)
 	}
 
 	return title, content, nil
@@ -361,7 +361,7 @@ func (b *Bot) showMove(params []string) error {
 	filenameHash := params[0]
 
 	availableCmds := map[string]tg.Cmd{
-		i18n.StrForTomorrow: tg.NewCmd(cmdSchedule, []string{filenameHash, str.I64(sched.Tomorrow()), ""}),
+		i18n.StrForTomorrow: tg.NewCmd(cmdSchedule, []string{filenameHash, text.I64(sched.Tomorrow()), ""}),
 		i18n.StrForLater:    tg.NewCmd(cmdMove, []string{fs.DirToday, filenameHash, "later"}),
 		i18n.StrForDay:      tg.NewCmd(cmdShowChooseDay, []string{filenameHash}),
 		i18n.StrToNote:      tg.NewCmd(cmdShowToNote, []string{filenameHash}),
@@ -420,7 +420,7 @@ func (b *Bot) showList(params []string) error {
 		var btn tg.Btn
 		if file.IsMultiline {
 			cmd := tg.NewCmd(cmdShowMultilineTask, []string{dir, fs.Hash(file.Name)})
-			btn = tg.NewBtn(str.Emoji("👀", file.Title), cmd)
+			btn = tg.NewBtn(text.Emoji("👀", file.Title), cmd)
 		} else {
 			cmd := tg.NewCmd(cmdComplete, []string{dir, fs.Hash(file.Name)})
 			btn = tg.NewBtn(i18n.Emojify(file.Title), cmd)
@@ -587,7 +587,7 @@ func (b *Bot) showRename(params []string) error {
 	for _, file := range files {
 		var btn tg.Btn
 		cmd := tg.NewCmd(cmdRenameFile, []string{dir, fs.Hash(file.Name)})
-		btn = tg.NewBtn(str.Emoji("👀", file.Title), cmd)
+		btn = tg.NewBtn(text.Emoji("👀", file.Title), cmd)
 
 		kb.AddRow(btn)
 	}
@@ -825,7 +825,7 @@ func (b *Bot) moveToDoc(params []string) error {
 		return fmt.Errorf("move to doc: can't unhash doc '%s' in today: %w", filenameHash, err)
 	}
 
-	fileContent, err := b.fs.RestoreText(fs.DirToday, filename)
+	fileContent, err := b.fs.RestoreContent(fs.DirToday, filename)
 	if err != nil {
 		return fmt.Errorf("move to dc: can't restore file content of '%s': %w", filename, err)
 	}
@@ -871,13 +871,13 @@ func (b *Bot) moveToChecklist(params []string) error {
 	}
 
 	if isMultiline && shouldSplitChecklist(checklist) {
-		text, err := b.fs.RestoreText(fs.DirToday, filename)
+		content, err := b.fs.RestoreContent(fs.DirToday, filename)
 		if err != nil {
 			return fmt.Errorf("move to checklist: %w", err)
 		}
 
-		text = strings.TrimSpace(str.NormNewLines(text))
-		lines := strings.Split(text, "\n")
+		content = strings.TrimSpace(text.NormNewLines(content))
+		lines := strings.Split(content, "\n")
 		for _, line := range lines {
 			err = b.fs.Put(checklist, fs.Filename(line), "")
 			if err != nil {
@@ -901,7 +901,7 @@ func (b *Bot) moveToNewDoc(params []string) error {
 	filenameHash := params[0]
 	doc := params[1]
 
-	err := b.fs.Put("", str.Ucfirst(doc), "")
+	err := b.fs.Put("", text.Ucfirst(doc), "")
 	if err != nil {
 		return fmt.Errorf("move to doc: can't create empty doc: %w", err)
 	}
@@ -913,7 +913,7 @@ func (b *Bot) moveToNewChecklist(params []string) error {
 	filenameHash := params[0]
 	doc := params[1]
 
-	err := b.fs.Put("", str.Ucfirst(doc), "")
+	err := b.fs.Put("", text.Ucfirst(doc), "")
 	if err != nil {
 		return fmt.Errorf("move to doc: can't create empty doc: %w", err)
 	}
@@ -1022,7 +1022,7 @@ func (b *Bot) showChooseDay(params []string) error {
 
 func (b *Bot) forADayKeyboard(filenameHash string) (*tg.Keyboard, error) {
 	newBtn := func(name, cron string) tg.Btn {
-		return tg.NewBtn(name, tg.NewCmd(cmdSchedule, []string{filenameHash, str.I64(sched.Next(cron)), ""}))
+		return tg.NewBtn(name, tg.NewCmd(cmdSchedule, []string{filenameHash, text.I64(sched.Next(cron)), ""}))
 	}
 
 	kb := tg.NewKeyboard([]tg.Row{
@@ -1044,7 +1044,7 @@ func (b *Bot) forADayKeyboard(filenameHash string) (*tg.Keyboard, error) {
 		row := tg.NewRow()
 		for i := iAndj[0]; i <= iAndj[1]; i++ {
 			cron := fmt.Sprintf("0 0 %d * *", i)
-			row = append(row, newBtn(str.I64(int64(i)), cron))
+			row = append(row, newBtn(text.I64(int64(i)), cron))
 		}
 		kb.AddRow(row)
 	}
@@ -1271,7 +1271,7 @@ func (b *Bot) showRecurringKeyBoard(params []string) error {
 	filenameHash := params[0]
 
 	newBtn := func(name, cron string) tg.Btn {
-		return tg.NewBtn(name, tg.NewCmd(cmdSchedule, []string{filenameHash, str.I64(sched.Next(cron)), cron}))
+		return tg.NewBtn(name, tg.NewCmd(cmdSchedule, []string{filenameHash, text.I64(sched.Next(cron)), cron}))
 	}
 
 	kb := tg.NewKeyboard([]tg.Row{
@@ -1298,7 +1298,7 @@ func (b *Bot) showRecurringKeyBoard(params []string) error {
 		for day := 1; day < 8; day++ {
 			i := week*7 + day
 			cron := fmt.Sprintf("0 0 %d * *", i)
-			row = append(row, newBtn(str.I64(int64(i)), cron))
+			row = append(row, newBtn(text.I64(int64(i)), cron))
 		}
 		kb.AddRow(row)
 	}

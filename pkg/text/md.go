@@ -1,4 +1,4 @@
-package str
+package text
 
 import (
 	"fmt"
@@ -69,7 +69,7 @@ func EntitiesToMarkdown(text string, messageEntities []tgbotapi.MessageEntity) s
 		spacesToEat := 0
 		for offset, c := range input[e.Offset : e.Offset+e.Length] {
 			if c == RUNE_NEWLINE && isOpen {
-				insertions[(e.Offset+offset)-spacesToEat] = after
+				insertions[(e.Offset+offset)-spacesToEat] += after
 				isOpen = false
 				spacesToEat = 0
 				continue
@@ -79,7 +79,7 @@ func EntitiesToMarkdown(text string, messageEntities []tgbotapi.MessageEntity) s
 				continue
 			}
 			if !isOpen {
-				insertions[e.Offset+offset] = before
+				insertions[e.Offset+offset] += before
 				isOpen = true
 			}
 			spacesToEat = 0

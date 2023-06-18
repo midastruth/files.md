@@ -18,7 +18,7 @@ import (
 	"github.com/spf13/afero"
 	"golang.org/x/exp/slices"
 
-	"zakirullin/dumpbot/pkg/str"
+	"zakirullin/dumpbot/pkg/text"
 )
 
 var (
@@ -171,7 +171,7 @@ func (fs FS) Rename(oldDir, oldFilename, newDir, newFilename string) error {
 }
 
 func Filename(title string) string {
-	return str.Ucfirst(title) + ".md"
+	return text.Ucfirst(title) + ".md"
 }
 
 func (fs FS) Unhash(dir, filenameHash string) (string, error) {
@@ -293,8 +293,8 @@ func (fs FS) IsMultiline(dir, filename string) (bool, error) {
 	return stat.Size() > 0, nil
 }
 
-// RestoreText restores original user's message text by given file
-func (fs FS) RestoreText(dir, filename string) (string, error) {
+// RestoreContent restores original user's message text by given file
+func (fs FS) RestoreContent(dir, filename string) (string, error) {
 	path := fs.path(dir, filename)
 	if !fs.isSafe(path) {
 		return "", fmt.Errorf("can't restore text: unsafe path '%s': %w", path, errUnsafePath)
@@ -344,7 +344,7 @@ func Title(filename string) string {
 	stripChecklistChars := regexp.MustCompile(`^-.*?-(.+)`)
 	title := stripChecklistChars.ReplaceAllString(filename, "$1")
 	title = strings.TrimPrefix(strings.TrimSuffix(title, "-"), "-")
-	title = str.Ucfirst(strings.TrimSuffix(strings.TrimSpace(title), ".md"))
+	title = text.Ucfirst(strings.TrimSuffix(strings.TrimSpace(title), ".md"))
 
 	return title
 }
@@ -416,7 +416,7 @@ func (fs FS) SearchNotes(query string) ([]File, error) {
 	for _, note := range notes {
 		isWildcard := len(search) == 0
 		isSubstring := strings.Contains(strings.ToLower(note.Title), search)
-		isSimilar := str.Similar(strings.ToLower(note.Title), search) > minSearchSimilarity
+		isSimilar := text.Similar(strings.ToLower(note.Title), search) > minSearchSimilarity
 		if isWildcard || isSubstring || isSimilar {
 			matchedNotes = append(matchedNotes, note)
 		}
