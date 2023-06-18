@@ -10,6 +10,23 @@ import (
 	"github.com/yuin/goldmark/util"
 )
 
+// MarkdownToHtml converts user's markdown to Telegram-supported subset of HTML
+func MarkdownToHtml(markdown string) string {
+	r := renderer.NewRenderer(renderer.WithNodeRenderers(util.Prioritized(newHtmlRenderer(), 1000)))
+	md := goldmark.New(
+		goldmark.WithRenderer(r),
+	)
+
+	var buf bytes.Buffer
+	if err := md.Convert([]byte(markdown), &buf); err != nil {
+		// We won't face any panics as long as we use default
+		// renderers and in-memory io.Writer
+		panic(err)
+	}
+
+	return buf.String()
+}
+
 type htmlRenderer struct {
 	renderer.NodeRenderer
 }
@@ -41,21 +58,4 @@ func (r *htmlRenderer) renderHeading(w util.BufWriter, source []byte, node ast.N
 		_, _ = w.WriteString("</strong>\n")
 	}
 	return ast.WalkContinue, nil
-}
-
-// MarkdownToHtml converts user's markdown to Telegram supported subset of HTML
-func MarkdownToHtml(markdown string) string {
-	r := renderer.NewRenderer(renderer.WithNodeRenderers(util.Prioritized(newHtmlRenderer(), 1000)))
-	md := goldmark.New(
-		goldmark.WithRenderer(r),
-	)
-
-	var buf bytes.Buffer
-	if err := md.Convert([]byte(markdown), &buf); err != nil {
-		// We won't face any panics as long as we use default
-		// renderers and in-memory io.Writer
-		panic(err)
-	}
-
-	return buf.String()
 }

@@ -670,11 +670,13 @@ func (b *Bot) showTask(params []string) error {
 	content = text.MarkdownToHtml(content)
 
 	var moveToBtn tg.Btn
-	if dir == fs.DirToday {
-		moveToBtn = tg.NewBtn(i18n.StrBtnMoveToLater, tg.NewCmd(cmdMove, []string{dir, filenameHash, fs.DirLater}))
-	} else {
-		moveToBtn = tg.NewBtn(i18n.StrBtnMoveToToday, tg.NewCmd(cmdMove, []string{dir, filenameHash, fs.DirToday}))
+	btnLabel := i18n.StrBtnMoveToLater
+	toDir := fs.DirLater
+	if dir == fs.DirLater {
+		btnLabel = i18n.StrBtnMoveToToday
+		toDir = fs.DirToday
 	}
+	moveToBtn = tg.NewBtn(btnLabel, tg.NewCmd(cmdMove, []string{dir, filenameHash, toDir}))
 
 	kb := tg.NewKeyboard([]tg.Row{
 		tg.NewRow(moveToBtn),
