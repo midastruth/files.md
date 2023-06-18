@@ -667,6 +667,7 @@ func (b *Bot) showTask(params []string) error {
 	if err != nil {
 		return fmt.Errorf("show task: %w", err)
 	}
+	content = text.MarkdownToHtml(content)
 
 	var moveToBtn tg.Btn
 	if dir == fs.DirToday {
