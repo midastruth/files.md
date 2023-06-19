@@ -1278,7 +1278,7 @@ func (b *Bot) showRecurringKeyBoard(params []string) error {
 		// Cron format: Minute Hour DayOfMonth Month DayOfWeek
 		tg.NewRow(
 			newBtn(i18n.StrWeekdays, "0 0 * * 1-5"),
-			newBtn(i18n.StrEveryday, "0 0 * * 1-5"),
+			newBtn(i18n.StrEveryday, "0 0 * * *"),
 		),
 		tg.NewRow(
 			newBtn(i18n.StrMonday, "0 0 * * 1"),
