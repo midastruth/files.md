@@ -101,7 +101,11 @@ func main() {
 			u := tg.NewUpd(upd)
 			userID := u.UserID()
 			userPath := fs.UserPath(config.StoragePath, userID)
-			fsys := fs.NewFS(userPath, afero.NewOsFs())
+			fsys, err := fs.NewFS(userPath, afero.NewOsFs())
+			if err != nil {
+				slog.Error("Bot error: can't create fs", "err", err)
+				return
+			}
 			err = fsys.CreateUserDirs()
 			if err != nil {
 				slog.Error("Bot error: can't create user dirs", "err", err)

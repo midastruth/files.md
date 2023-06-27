@@ -14,7 +14,7 @@ import (
 )
 
 func MoveDueTasksToToday(storagePath string, fsBackend afero.Fs) error {
-	rootFS := fs.NewFS(storagePath, fsBackend)
+	rootFS, _ := fs.NewFS(storagePath, fsBackend)
 
 	userDirs, err := rootFS.FilesAndDirs("")
 	if err != nil {
@@ -28,14 +28,15 @@ func MoveDueTasksToToday(storagePath string, fsBackend afero.Fs) error {
 		if err != nil {
 			return fmt.Errorf("schedule worker: can't parse user ID: %s", err)
 		}
-		err = userconf.LoadOrCreate(fs.UserPath(storagePath, userID))
+		userPath := fs.UserPath(storagePath, userID)
+		err = userconf.LoadOrCreate(userPath)
 		if err != nil {
 			return fmt.Errorf("schedule worker: can't load user config: %s", err)
 		}
 
 		sch := userconf.Schedules()
 
-		fsys := fs.NewFS(id, fsBackend)
+		fsys, err := fs.NewFS(userPath, fsBackend)
 		if err != nil {
 			return fmt.Errorf("schedule worker: can't create FS: %s", err)
 		}
@@ -48,15 +49,16 @@ func MoveDueTasksToToday(storagePath string, fsBackend afero.Fs) error {
 				slog.Debug("Scheduled task moved to today", schedule.Filename, "filename")
 				if len(schedule.Cron) != 0 {
 					runAt := sched.Next(schedule.Cron)
-					config.AddToSchedule(schedule.Filename, runAt, schedule.Cron)
+					userconf.AddToSchedule(schedule.Filename, runAt, schedule.Cron)
 					slog.Debug("Task was rescheduled", "filename", schedule.Filename, "schedule", schedule.Cron, "runAt", runAt)
 					continue
 				}
 
-				config.DelFromSchedule(schedule.Filename)
+				userconf.DelFromSchedule(schedule.Filename)
 			}
 		}
 	}
+
 	return nil
 }
 

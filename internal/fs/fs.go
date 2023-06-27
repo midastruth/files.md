@@ -60,8 +60,19 @@ type File struct {
 	ParentDir   string
 }
 
-func NewFS(rootPath string, backend afero.Fs) *FS {
-	return &FS{rootPath, backend}
+func NewFS(rootPath string, backend afero.Fs) (*FS, error) {
+	exists, err := afero.Exists(backend, rootPath)
+	if err != nil {
+		return nil, fmt.Errorf("new fs: %w", err)
+	}
+	if !exists {
+		err = backend.Mkdir(rootPath, 0755)
+		if err != nil {
+			return nil, fmt.Errorf("new fs: %w", err)
+		}
+	}
+
+	return &FS{rootPath, backend}, nil
 }
 
 func (fs FS) CreateUserDirs() error {
