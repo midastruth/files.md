@@ -79,17 +79,17 @@ func doneToday(fsys *fs.FS, db *db.DB, userID int64, withScheduled bool) ([]stri
 		}
 	}
 
-	sch, err := db.Schedule(userID)
-	if err != nil {
-		return nil, fmt.Errorf("stats.DoneTasks: %w", err)
-	}
+	//sch, err := db.Schedule(userID)
+	//if err != nil {
+	//	return nil, fmt.Errorf("stats.DoneTasks: %w", err)
+	//}
 
 	var todayFiltered []string
-	for _, todayFile := range todayFiles {
-		if _, scheduled := sch[todayFile.Name]; scheduled == withScheduled {
-			todayFiltered = append(todayFiltered, todayFile.Title)
-		}
-	}
+	//for _, todayFile := range todayFiles {
+	//	if _, scheduled := sch[todayFile.Name]; scheduled == withScheduled {
+	//		todayFiltered = append(todayFiltered, todayFile.Title)
+	//	}
+	//}
 
 	return todayFiltered, nil
 }
