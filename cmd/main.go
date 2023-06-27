@@ -70,7 +70,7 @@ func main() {
 		for {
 			select {
 			case <-ticker.C:
-				err := worker.MoveDueTasksToToday(redis, fsBackend)
+				err := worker.MoveDueTasksToToday(config.StoragePath, fsBackend)
 				if err != nil {
 					fmt.Printf("Worker's error: %s\n", err)
 				}
@@ -101,9 +101,10 @@ func main() {
 			u := tg.NewUpd(upd)
 			userID := u.UserID()
 			userPath := fs.UserPath(config.StoragePath, userID)
-			fsys, err := fs.NewFS(userPath, afero.NewOsFs())
+			fsys := fs.NewFS(userPath, afero.NewOsFs())
+			err = fsys.CreateUserDirs()
 			if err != nil {
-				slog.Error("Bot error: can't create FS", "err", err)
+				slog.Error("Bot error: can't create user dirs", "err", err)
 				return
 			}
 

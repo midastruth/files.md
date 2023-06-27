@@ -60,26 +60,27 @@ type File struct {
 	ParentDir   string
 }
 
-// TODO create Unsorted
-// Root path
-func NewFS(rootPath string, backend afero.Fs) (*FS, error) {
-	rootDir := "./cmd/testdata"
-	for _, dir := range []string{DirArchive, DirToday, DirLater} {
-		path := fmt.Sprintf("%s/%s", rootDir, dir)
-		exists, err := afero.Exists(backend, path)
+func NewFS(rootPath string, backend afero.Fs) *FS {
+	return &FS{rootPath, backend}
+}
+
+func (fs FS) CreateUserDirs() error {
+	for _, dir := range []string{DirArchive, DirToday, DirLater, DirInbox, DirImg, DirRead, DirWatch, DirShop} {
+		path := fmt.Sprintf("%s/%s", fs.rootPath, dir)
+		exists, err := afero.Exists(fs.backend, path)
 		if err != nil {
-			return nil, fmt.Errorf("newfs: can't check whether base dirs exist: %w", err)
+			return fmt.Errorf("create default dirs: %w", err)
 		}
 
 		if !exists {
-			err = backend.Mkdir(path, 0755)
+			err = fs.backend.Mkdir(path, 0755)
 			if err != nil {
-				return nil, fmt.Errorf("newfs: can't create base dirs: %w", err)
+				return fmt.Errorf("create default dirs: %w", err)
 			}
 		}
 	}
 
-	return &FS{rootDir, backend}, nil
+	return nil
 }
 
 func (fs FS) Exists(dir, filename string) (bool, error) {

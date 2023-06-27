@@ -2,6 +2,7 @@ package worker
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/spf13/afero"
@@ -12,24 +13,37 @@ import (
 	"zakirullin/dumpbot/internal/userconfig"
 )
 
-func MoveDueTasksToToday(config userconfig.Config, fsBackend afero.Fs) error {
-	ids, err := fs.AllUserIDs()
+func MoveDueTasksToToday(storagePath string, fsBackend afero.Fs) error {
+	rootFS := fs.NewFS(storagePath, fsBackend)
+
+	userDirs, err := rootFS.FilesAndDirs("")
 	if err != nil {
-		return fmt.Errorf("moveDueTasksForToday: %s\n", err)
+		return fmt.Errorf("schedule worker: %w", err)
 	}
+	userDirs = fs.OnlyUserDirs(userDirs)
 
-	for _, id := range ids {
-		sch := config.Schedules()
-
-		fsys, err := fs.NewFS(id, fsBackend)
+	for _, userDir := range userDirs {
+		userconf := userconfig.NewConfig()
+		userID, err := strconv.ParseInt(userDir.Name, 10, 64)
 		if err != nil {
-			return fmt.Errorf("moveDueTasksForToday: can't create FS: %s", err)
+			return fmt.Errorf("schedule worker: can't parse user ID: %s", err)
+		}
+		err = userconf.LoadOrCreate(fs.UserPath(storagePath, userID))
+		if err != nil {
+			return fmt.Errorf("schedule worker: can't load user config: %s", err)
+		}
+
+		sch := userconf.Schedules()
+
+		fsys := fs.NewFS(id, fsBackend)
+		if err != nil {
+			return fmt.Errorf("schedule worker: can't create FS: %s", err)
 		}
 		for _, schedule := range sch {
 			if time.Now().Unix() >= schedule.ScheduleAt {
 				err = moveTaskToToday(schedule.Filename, fsys)
 				if err != nil {
-					slog.Error("moveDueTasksForToday: can't move", "err", err)
+					slog.Error("schedule worker: can't move", "err", err)
 				}
 				slog.Debug("Scheduled task moved to today", schedule.Filename, "filename")
 				if len(schedule.Cron) != 0 {
