@@ -409,6 +409,12 @@ func TestBot_pomodoroCompletion1(t *testing.T) {
 	defer redis.Close()
 	b := NewBot(-1, tgram, fsys, db.NewDB(redis), &userconfig.DefaultConfig)
 
+	currentBackend := userconfig.DefaultBackend
+	userconfig.DefaultBackend = fsBackend
+	defer func() {
+		userconfig.DefaultBackend = currentBackend
+	}()
+
 	pomodoroIn := func(dirName string) bool {
 		hasPomodoroInDir, err := b.fs.Exists(dirName, fs.FilePomodoro)
 		r.NoError(err)
@@ -442,6 +448,12 @@ func TestBot_pomodoroCompletion2(t *testing.T) {
 	defer redis.Close()
 	b := NewBot(-1, tgram, fsys, db.NewDB(redis), &userconfig.DefaultConfig)
 
+	currentBackend := userconfig.DefaultBackend
+	userconfig.DefaultBackend = fsBackend
+	defer func() {
+		userconfig.DefaultBackend = currentBackend
+	}()
+
 	pomodoroIn := func(dirName string) bool {
 		hasPomodoroInDir, err := b.fs.Exists(dirName, fs.FilePomodoro)
 		r.NoError(err)
@@ -455,7 +467,7 @@ func TestBot_pomodoroCompletion2(t *testing.T) {
 	r.NoError(b.complete([]string{fs.DirToday, fs.FilePomodoro}))
 	r.True(!pomodoroIn(fs.DirToday) && pomodoroIn(fs.DirArchive))
 	// trigger due tasks processing
-	r.NoError(worker.MoveDueTasksToToday("", "", fsBackend))
+	r.NoError(worker.MoveDueTasksToToday("", "conf", fsBackend))
 	// pomodoro is not returned back to today
 	r.True(!pomodoroIn(fs.DirToday) && pomodoroIn(fs.DirArchive))
 }
