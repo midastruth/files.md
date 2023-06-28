@@ -100,7 +100,7 @@ func (c *Config) Save(path string) error { // TODO add lazy saving, save only if
 		return fmt.Errorf("config save: can't marshal config: %w", err)
 	}
 
-	err = os.WriteFile(path, bytes, 0644)
+	err = afero.WriteFile(DefaultBackend, path, bytes, 0644)
 	if err != nil {
 		return fmt.Errorf("config save: can't write config file: %w", err)
 	}
