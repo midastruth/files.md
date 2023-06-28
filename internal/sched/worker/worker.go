@@ -54,7 +54,16 @@ func MoveDueTasksToToday(storagePath, configFilename string, fsBackend afero.Fs)
 					continue
 				}
 
+				err = userconf.LoadOrCreate(userconfPath)
+				if err != nil {
+					return fmt.Errorf("schedule worker: can't load user config before save: %s", err)
+				}
+
 				userconf.DelFromSchedule(schedule.Filename)
+				err = userconf.Save(userconfPath)
+				if err != nil {
+					return fmt.Errorf("schedule worker: can't save user config: %s", err)
+				}
 			}
 		}
 	}
