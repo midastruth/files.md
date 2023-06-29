@@ -937,7 +937,7 @@ func (b *Bot) moveToJournal(params []string) error {
 	if err != nil {
 		return fmt.Errorf("failed to move to journal: can't get note content: %w", err)
 	}
-	err = b.AddDailyNote(note)
+	err = b.AddDailyNote(fs.Title(filename) + "\n" + note)
 	if err != nil {
 		return fmt.Errorf("failed to move to journal: can't add note: %w", err)
 	}
