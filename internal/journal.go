@@ -23,8 +23,15 @@ func (b *Bot) AddDailyNote(dir, noteFilename string) error {
 	if err != nil {
 		return fmt.Errorf("failed to move to journal: can't get note content: %w", err)
 	}
-	note := fs.Title(noteFilename) + intraNoteSeparator + strings.Replace(content, "\n", intraNoteSeparator, -1)
-
+	note := fs.Title(noteFilename)
+	if strings.TrimSpace(content) != "" {
+		for _, line := range strings.Split(content, "\n") {
+			line = strings.TrimSpace(line)
+			if line != "" {
+				note += intraNoteSeparator + line
+			}
+		}
+	}
 	journalFilename := b.journalFilename()
 	exists, err := b.fs.Exists(fs.DirJournal, journalFilename)
 	if err != nil {
