@@ -130,7 +130,7 @@ func (fs FS) Put(dir, filename, content string) error {
 
 	dirs := strings.Split(path, string(os.PathSeparator))
 	dirs = dirs[:len(dirs)-1]
-	os.MkdirAll(strings.Join(dirs, string(os.PathSeparator)), 0755)
+	fs.backend.MkdirAll(strings.Join(dirs, string(os.PathSeparator)), 0755)
 
 	if err := afero.WriteFile(fs.backend, path, []byte(content), 0644); err != nil {
 		return fmt.Errorf("put to '%s/%s': %w", dir, filename, err)
