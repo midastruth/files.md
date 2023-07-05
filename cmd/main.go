@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"time"
+	"zakirullin/stuffbot/internal/sync"
 
 	"github.com/alicebob/miniredis/v2"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -87,6 +88,9 @@ func main() {
 	tgConfig := tgbotapi.NewUpdate(0)
 	tgConfig.Timeout = 60
 	updates := api.GetUpdatesChan(tgConfig)
+
+	// Initiate per-user locks
+	locks := sync.NewPerUserLocker()
 	for upd := range updates {
 		go func(upd tgbotapi.Update) {
 			defer func() {
@@ -96,12 +100,15 @@ func main() {
 				}
 			}()
 
+			u := tg.NewUpd(upd)
+			userID := u.UserID()
+			locks.Lock(userID)
+			defer locks.Unlock(userID)
+
 			var updJSON []byte
 			updJSON, _ = json.Marshal(upd)
 			slog.Debug("Bot update: ", "upd", updJSON)
 
-			u := tg.NewUpd(upd)
-			userID := u.UserID()
 			userPath := fs.UserPath(conf.StoragePath, userID)
 			userFS, err := fs.NewFS(userPath, afero.NewOsFs())
 			if err != nil {
