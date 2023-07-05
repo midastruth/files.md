@@ -129,6 +129,13 @@ func (fs FS) Put(dir, filename, content string) error {
 		return fmt.Errorf("put: unsafe path '%s': %w", path, errUnsafePath)
 	}
 
+	dirs := strings.Split(path, string(os.PathSeparator))
+	dirs = dirs[:len(dirs)-1]
+	pathToDir := strings.Join(dirs, string(os.PathSeparator))
+	if err := fs.backend.MkdirAll(pathToDir, 0755); err != nil {
+		return fmt.Errorf("put: can't create dirs '%s': %w", pathToDir, err)
+	}
+
 	if err := afero.WriteFile(fs.backend, path, []byte(content), 0644); err != nil {
 		return fmt.Errorf("put to '%s/%s': %w", dir, filename, err)
 	}

@@ -1,24 +1,56 @@
-package text
+package journal
 
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/Kunde21/markdownfmt/v3/markdown"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/text"
-)
-
-const (
-	dateFormat  = "02, Monday"
-	headerLevel = 4
+	"zakirullin/stuffbot/internal/fs"
 )
 
 var now = time.Now // to be replaced in tests
 
-func AddDailyNote(mdContent, note string) string {
+const (
+	headerLevel        = 4
+	intraNoteSeparator = "; "
+)
+
+func AddDailyNote(dir, noteFilename string, botFs *fs.FS, journalFilenameFormat, journalHeaderFormat string) error {
+	content, err := botFs.Content(dir, noteFilename)
+	if err != nil {
+		return fmt.Errorf("failed to move to journal: can't get note content: %w", err)
+	}
+	note := fs.Title(noteFilename)
+	if strings.TrimSpace(content) != "" {
+		for _, line := range strings.Split(content, "\n") {
+			line = strings.TrimSpace(line)
+			if line != "" {
+				note += intraNoteSeparator + line
+			}
+		}
+	}
+	journalFilename := now().Format(journalFilenameFormat)
+	exists, err := botFs.Exists(fs.DirJournal, journalFilename)
+	if err != nil {
+		return err
+	}
+	if exists {
+		content, err = botFs.Content(fs.DirJournal, journalFilename)
+		if err != nil {
+			return err
+		}
+	}
+	content = insertDailyNote(content, journalHeaderFormat, note)
+	return botFs.Put(fs.DirJournal, journalFilename, content)
+}
+
+func insertDailyNote(mdContent, journalHeaderFormat, note string) string {
+	header := now().Format(journalHeaderFormat)
 	r := markdown.NewRenderer()
 	md := goldmark.New(
 		goldmark.WithRenderer(r),
@@ -28,13 +60,8 @@ func AddDailyNote(mdContent, note string) string {
 
 	source := []byte(mdContent)
 	root := md.Parser().Parse(text.NewReader(source))
-
-	date := now().Format(dateFormat)
-	root = addListItemAftreHeader(source, root, date, note)
-
-	//root.Dump(source, 2)
+	root = addListItemAftreHeader(source, root, header, note)
 	r.Render(&buf, source, root)
-
 	return buf.String()
 }
 

@@ -9,6 +9,7 @@ import (
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"golang.org/x/exp/slog"
+	"zakirullin/stuffbot/internal/journal"
 
 	"zakirullin/stuffbot/i18n"
 	"zakirullin/stuffbot/internal/db"
@@ -137,6 +138,7 @@ func (b *Bot) handlers() map[string]func([]string) error {
 		cmdMoveToNewDoc:       b.moveToNewDoc,
 		cmdMoveToChecklist:    b.moveToChecklist,
 		cmdMoveToNewChecklist: b.moveToNewChecklist,
+		cmdMoveJournal:        b.moveToJournal,
 		cmdSchedule:           b.schedule,
 		cmdComplete:           b.complete,
 		cmdPostpone:           b.postpone,
@@ -367,6 +369,7 @@ func (b *Bot) showMove(params []string) error {
 		i18n.StrToNote:      tg.NewCmd(cmdShowToNote, []string{filenameHash}),
 		i18n.StrToChecklist: tg.NewCmd(cmdShowToChecklist, []string{filenameHash}),
 		i18n.StrToDoc:       tg.NewCmd(cmdShowToDoc, []string{filenameHash}),
+		i18n.StrToJournal:   tg.NewCmd(cmdMoveJournal, []string{fs.DirToday, filenameHash}),
 	}
 
 	var btns []tg.Btn
@@ -922,6 +925,25 @@ func (b *Bot) moveToNewChecklist(params []string) error {
 	}
 
 	return b.moveToDoc([]string{filenameHash, fs.Hash(doc)})
+}
+
+func (b *Bot) moveToJournal(params []string) error {
+	dir := params[0]
+	filenameHash := params[1]
+	filename, err := b.fs.Unhash(dir, filenameHash)
+	if err != nil {
+		return fmt.Errorf("failed to move to journal: can't unhash filename: %w", err)
+	}
+	err = journal.AddDailyNote(dir, filename, b.fs, b.conf.JournalFilenameFormat(), b.conf.JournalHeaderFormat())
+	if err != nil {
+		return fmt.Errorf("failed to move to journal: can't add note: %w", err)
+	}
+
+	err = b.fs.Del(dir, filename)
+	if err != nil {
+		return fmt.Errorf("failed to move to journal: can't delete note: %w", err)
+	}
+	return b.showList(nil)
 }
 
 func (b *Bot) complete(params []string) error {
