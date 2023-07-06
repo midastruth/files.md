@@ -63,8 +63,8 @@ func main() {
 	}
 	defer redis.Close()
 
-	// Initiate per-user locks
-	locks := sync.NewPerUserLocker()
+	// Initiate per-user locker
+	userLocker := sync.NewPerUserLocker()
 
 	// Workers
 	ticker := time.NewTicker(5 * time.Second)
@@ -83,7 +83,7 @@ func main() {
 				if err != nil {
 					fmt.Printf("Worker's error: %s\n", err)
 				}
-				reqs := locks.FrozenRequests(time.Second, lastFrozenRequestCheckAt.Add(-time.Second))
+				reqs := userLocker.FrozenRequests(time.Second, lastFrozenRequestCheckAt.Add(-time.Second))
 				lastFrozenRequestCheckAt = time.Now()
 				for userID, req := range reqs {
 					slog.Error("Frozen request", "userID", userID, "req", req)
@@ -116,8 +116,8 @@ func main() {
 			updJSON, _ = json.Marshal(upd)
 			slog.Debug("Bot update: ", "upd", string(updJSON))
 
-			locks.Lock(userID, string(updJSON))
-			defer locks.Unlock(userID)
+			userLocker.Lock(userID, string(updJSON))
+			defer userLocker.Unlock(userID)
 
 			userPath := fs.UserPath(conf.StoragePath, userID)
 			userFS, err := fs.NewFS(userPath, afero.NewOsFs())
