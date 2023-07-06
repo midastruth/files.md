@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/lmittmann/tint"
 	"zakirullin/stuffbot/internal/sync"
 
 	"github.com/alicebob/miniredis/v2"
@@ -24,10 +25,11 @@ import (
 )
 
 func main() {
-	opts := slog.HandlerOptions{
-		Level: slog.LevelDebug,
+	opts := &tint.Options{
+		Level:      slog.LevelDebug,
+		TimeFormat: time.Kitchen,
 	}
-	logger := slog.New(opts.NewTextHandler(os.Stderr))
+	logger := slog.New(tint.NewHandler(os.Stderr, opts))
 	slog.SetDefault(logger)
 
 	err := godotenv.Load()
@@ -108,9 +110,9 @@ func main() {
 
 			var updJSON []byte
 			updJSON, _ = json.Marshal(upd)
-			slog.Debug("Bot update: ", "upd", updJSON)
+			slog.Debug("Bot update: ", "upd", string(updJSON))
 
-			locks.Lock(userID, updJSON)
+			locks.Lock(userID, string(updJSON))
 			defer locks.Unlock(userID)
 
 			userPath := fs.UserPath(conf.StoragePath, userID)
