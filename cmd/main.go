@@ -75,6 +75,7 @@ func main() {
 
 	go func(redis *miniredis.Miniredis, tg *tg.TG) {
 		fsBackend := afero.NewOsFs()
+		var lastFrozenRequestCheckAt time.Time // We use this parameter to avoid logging the same frozen request many times
 		for {
 			select {
 			case <-ticker.C:
@@ -82,7 +83,11 @@ func main() {
 				if err != nil {
 					fmt.Printf("Worker's error: %s\n", err)
 				}
-				checkAndLogFrozenRequests(locks.FrozenRequests(time.Second))
+				reqs := locks.FrozenRequests(time.Second, lastFrozenRequestCheckAt.Add(-time.Second))
+				lastFrozenRequestCheckAt = time.Now()
+				for userID, req := range reqs {
+					slog.Error("Frozen request", "userID", userID, "req", req)
+				}
 			case <-quit:
 				ticker.Stop()
 				return
@@ -146,14 +151,5 @@ func main() {
 				slog.Error("Bot error", "err", err)
 			}
 		}(upd)
-	}
-}
-
-func checkAndLogFrozenRequests(reqs map[int64]interface{}) {
-	if len(reqs) == 0 {
-		return
-	}
-	for userID, req := range reqs {
-		slog.Error("Frozen request", "userID", userID, "req", req)
 	}
 }

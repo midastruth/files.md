@@ -70,11 +70,8 @@ func Test_Locker_FrozenRequests(t *testing.T) {
 	l.Lock(1, 11)
 	time.Sleep(10 * time.Millisecond)
 	l.Lock(2, 22)
-	r.Empty(l.FrozenRequests(time.Second))
-	fr := l.FrozenRequests(5 * time.Millisecond)
-	r.Len(fr, 1)
-	req, ok := fr[1]
-	r.True(ok)
-	r.Equal(11, req)
-	r.Len(l.FrozenRequests(0), 2)
+	r.Empty(l.FrozenRequests(20*time.Millisecond, time.Time{}))
+	r.Equal(map[int64]interface{}{1: 11}, l.FrozenRequests(5*time.Millisecond, time.Time{}))
+	r.Equal(map[int64]interface{}{2: 22}, l.FrozenRequests(0, time.Now().Add(-10*time.Millisecond)))
+	r.Equal(map[int64]interface{}{1: 11, 2: 22}, l.FrozenRequests(0, time.Time{}))
 }

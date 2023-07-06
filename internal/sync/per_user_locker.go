@@ -11,7 +11,7 @@ type PerUserLocker interface {
 	Lock(userID int64, request interface{})
 	Unlock(userID int64)
 	Len() int
-	FrozenRequests(threshold time.Duration) map[int64]interface{}
+	FrozenRequests(threshold time.Duration, since time.Time) map[int64]interface{}
 }
 
 type user struct {
@@ -75,14 +75,18 @@ func (l *locker) Len() int {
 	return len(l.users)
 }
 
-func (l *locker) FrozenRequests(threshold time.Duration) map[int64]interface{} {
+func (l *locker) FrozenRequests(threshold time.Duration, since time.Time) map[int64]interface{} {
 	l.mapLock.Lock()
 	defer l.mapLock.Unlock()
 	res := make(map[int64]interface{})
 	for userID, u := range l.users {
-		if time.Since(u.startedAt) > threshold {
-			res[userID] = u.lastRequest
+		if time.Since(u.startedAt) < threshold {
+			continue // the request is not frozen yet
 		}
+		if u.startedAt.Before(since) {
+			continue // the request is too old
+		}
+		res[userID] = u.lastRequest
 	}
 	return res
 }
