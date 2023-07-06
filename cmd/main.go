@@ -26,8 +26,7 @@ import (
 
 func main() {
 	opts := &tint.Options{
-		Level:      slog.LevelDebug,
-		TimeFormat: time.Kitchen,
+		Level: slog.LevelDebug,
 	}
 	logger := slog.New(tint.NewHandler(os.Stderr, opts))
 	slog.SetDefault(logger)
