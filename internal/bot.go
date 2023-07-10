@@ -14,6 +14,7 @@ import (
 	"zakirullin/stuffbot/i18n"
 	"zakirullin/stuffbot/internal/db"
 	"zakirullin/stuffbot/internal/fs"
+	"zakirullin/stuffbot/internal/plugins"
 	"zakirullin/stuffbot/internal/sched"
 	"zakirullin/stuffbot/internal/stats"
 	"zakirullin/stuffbot/internal/userconfig"
@@ -26,20 +27,13 @@ var now = func() time.Time {
 	return time.Now()
 }
 
+var botPlugins = []BotPluginInterface{}
+
 const (
 	maxTitleLength         = 100
 	inlineResultsCacheTime = 15 // seconds
 	btnsPerRow             = 3
 )
-
-// TGInterface provides a simple interface to telegram API
-type TGInterface interface {
-	Send(userID int64, text string, kb *tg.Keyboard, markup string) (int, error)
-	Edit(userID int64, msgID int, text string, kb *tg.Keyboard, markup string) error
-	Del(userID int64, msgID int) error
-	AnswerCallbackQuery(queryID string, text string) error
-	AnswerInlineQuery(queryID string, results []interface{}, cacheTime int, offset string) error
-}
 
 // UpdInterface represents incoming user updates
 type UpdInterface interface {
@@ -53,6 +47,15 @@ type UpdInterface interface {
 	InlineQuery() (string, bool)
 }
 
+// TGInterface provides a simple interface to telegram API
+type TGInterface interface {
+	Send(userID int64, text string, kb *tg.Keyboard, markup string) (int, error)
+	Edit(userID int64, msgID int, text string, kb *tg.Keyboard, markup string) error
+	Del(userID int64, msgID int) error
+	AnswerCallbackQuery(queryID string, text string) error
+	AnswerInlineQuery(queryID string, results []interface{}, cacheTime int, offset string) error
+}
+
 // Bot provides commands that can be invoked by a user so to query
 // server files and database. A user can also send all sort of things
 // to bot (texts, photos) - in that case we'd save everything.
@@ -64,7 +67,15 @@ type Bot struct {
 	conf   *userconfig.Config
 }
 
+type BotPluginInterface interface {
+	ExecutePlugin(string) bool
+}
+
 func NewBot(userID int64, tg TGInterface, fs *fs.FS, db *db.DB, conf *userconfig.Config) *Bot {
+	botPlugins = append(botPlugins,
+		plugins.NewWorldClockPlugin(userID, tg),
+	)
+
 	return &Bot{userID, tg, fs, db, conf}
 }
 
@@ -72,6 +83,12 @@ func NewBot(userID int64, tg TGInterface, fs *fs.FS, db *db.DB, conf *userconfig
 func (b *Bot) Reply(u UpdInterface) error {
 	if _, ok := u.InlineQueryID(); ok {
 		return b.replyToInlineQuery(u)
+	}
+
+	for _, plugin := range botPlugins {
+		if plugin.ExecutePlugin(u.MsgText()) {
+			return nil
+		}
 	}
 
 	cmd, err := b.extractCmd(u)
