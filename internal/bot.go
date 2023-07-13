@@ -75,22 +75,17 @@ type BotPluginInterface interface {
 // Quick panel (cmd => appropriate icon).
 // Key is a command on a quick panel (e.g = 'docs')
 // Value is a display icon on that panel (e.g = 📝)
-var panelCmdIconArray = [][2]string{
-	{cmdShowDoc, i18n.EmDocs},
-	{cmdShowChecklists, i18n.EmCheckList},
-	{cmdShowPostpone, i18n.EmPostpone},
+
+type CmdMeta struct {
+	cmd   string
+	desc  string
+	emoji string
 }
 
-var panelCmdIconMap = createPanelCmdIconMap()
-
-func createPanelCmdIconMap() map[string]string {
-	res := make(map[string]string)
-	for _, pair := range panelCmdIconArray {
-		key := pair[0]
-		value := pair[1]
-		res[key] = value
-	}
-	return res
+var panelCmdIconArray = []CmdMeta{
+	{cmdShowDoc, "Documents", i18n.EmDocs},
+	{cmdShowChecklists, "Checklists", i18n.EmCheckList},
+	{cmdShowPostpone, "Postpone", i18n.EmPostpone},
 }
 
 func NewBot(userID int64, tg TGInterface, fs *fs.FS, db *db.DB, conf *userconfig.Config) *Bot {
@@ -448,10 +443,10 @@ func (b *Bot) quickPanelRow() []tg.Btn {
 	var quickPanelRow = tg.NewRow()
 	// We iterate through hardcoded panel to preserve order of buttons in UI
 	for _, pair := range panelCmdIconArray {
-		var cmd = pair[0]
+		var cmd = pair.cmd
 		if b.conf.HasQuickPanelCmd(cmd) {
 			quickPanelRow = append(quickPanelRow, tg.NewBtn(
-				panelCmdIconMap[cmd],
+				pair.emoji,
 				tg.NewCmd(cmd, []string{})))
 		}
 	}
@@ -1369,11 +1364,12 @@ func (b *Bot) showConfigureQuickPanel(params []string) error {
 
 	// We iterate through hardcoded panel to preserve order of buttons in UI
 	for _, pair := range panelCmdIconArray {
-		var cmd = pair[0]
+		var cmd = pair.cmd
 		if b.conf.HasQuickPanelCmd(cmd) {
 			kb.AddRow(
 				tg.NewRow(
-					tg.NewBtn(panelCmdIconMap[cmd], tg.NewCmd("", nil)),
+					tg.NewBtn(pair.emoji, tg.NewCmd("", nil)),
+					tg.NewBtn(pair.desc, tg.NewCmd("", nil)),
 					tg.NewBtn("➖", tg.NewCmd(cmdDelFromPanel, []string{cmd}))))
 			enabled = append(enabled, cmd)
 		}
@@ -1384,7 +1380,7 @@ func (b *Bot) showConfigureQuickPanel(params []string) error {
 
 	// Step 3. Now, let's fill buttons that are not disabled...
 	for _, pair := range panelCmdIconArray {
-		var cmd = pair[0]
+		var cmd = pair.cmd
 		// Check if command is enabled
 		var cmdEnabled = false
 		for _, enabledCmd := range enabled {
@@ -1395,7 +1391,8 @@ func (b *Bot) showConfigureQuickPanel(params []string) error {
 		// Command is not enabled, so add it to disabled list
 		if !cmdEnabled {
 			kb.AddRow(tg.NewRow(
-				tg.NewBtn(panelCmdIconMap[cmd], tg.NewCmd("", nil)),
+				tg.NewBtn(pair.emoji, tg.NewCmd("", nil)),
+				tg.NewBtn(pair.desc, tg.NewCmd("", nil)),
 				tg.NewBtn("➕", tg.NewCmd(cmdAddToPanel, []string{cmd}))))
 		}
 	}
