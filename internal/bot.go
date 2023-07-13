@@ -1400,6 +1400,8 @@ func (b *Bot) showConfigureQuickPanel(params []string) error {
 		}
 	}
 
+	kb.AddRow(tg.NewRow(tg.NewBtn(i18n.StrBtnBack, tg.NewCmd(cmdShowSettings, nil))))
+
 	err := b.show("Configure quick panel (➕ = add to panel, ➖ = to remove): ", &kb, tg.MarkupHTML)
 	if err != nil {
 		return fmt.Errorf("configureQuickPanel : %w", err)
