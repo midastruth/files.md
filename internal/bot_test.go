@@ -513,3 +513,24 @@ func TestBot_todayLabelIcons(t *testing.T) {
 	r.Contains(label, "🌴")
 	r.NotContains(label, "🍅")
 }
+
+func TestSettingsMainPanel(t *testing.T) {
+	r := require.New(t)
+	fsys, err := fs.NewFS("/", afero.NewMemMapFs())
+	r.NoError(err)
+	redis, err := miniredis.Run()
+	r.NoError(err)
+	defer redis.Close()
+
+	tgram := fake.NewTG()
+
+	bot := NewBot(-1, tgram, fsys, db.NewDB(redis), &userconfig.DefaultConfig)
+	err = bot.Reply(fake.NewUpdCmdFake(-1, tg.NewCmd("settings", nil)))
+	r.NoError(err)
+	r.Equal("Settings: ", tgram.SentText)
+	r.Equal(tg.NewKeyboard([]tg.Row{
+		tg.NewBtn("🎛 Quick Panel", tg.NewCmd("configure_panel", nil)),
+		tg.NewBtn("🏠 Today", tg.NewCmd("today", nil))},
+	), tgram.SentKeyboard)
+
+}
