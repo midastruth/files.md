@@ -1369,9 +1369,7 @@ func (b *Bot) showConfigureQuickPanel(params []string) error {
 	for _, pair := range panelCmdIconArray {
 		var cmd = pair.cmd
 		if b.conf.HasQuickPanelCmd(cmd) {
-			kb.AddRow(
-				tg.NewRow(
-					tg.NewBtn(pair.emoji+" "+pair.desc+" ➖", tg.NewCmd(cmdDelFromPanel, []string{cmd}))))
+			kb.AddRow(tg.NewBtn(pair.emoji+" "+pair.desc+" ➖", tg.NewCmd(cmdDelFromPanel, []string{cmd})))
 			enabled = append(enabled, cmd)
 		}
 	}
@@ -1391,12 +1389,12 @@ func (b *Bot) showConfigureQuickPanel(params []string) error {
 		}
 		// Command is not enabled, so add it to disabled list
 		if !cmdEnabled {
-			kb.AddRow(tg.NewRow(
-				tg.NewBtn(pair.emoji+" "+pair.desc+" ➕", tg.NewCmd(cmdAddToPanel, []string{cmd}))))
+			kb.AddRow(
+				tg.NewBtn(pair.emoji+" "+pair.desc+" ➕", tg.NewCmd(cmdAddToPanel, []string{cmd})))
 		}
 	}
 
-	kb.AddRow(tg.NewRow(tg.NewBtn(i18n.StrBtnBack, tg.NewCmd(cmdShowSettings, nil))))
+	kb.AddRow(tg.NewBtn(i18n.StrBtnBack, tg.NewCmd(cmdShowSettings, nil)))
 
 	err := b.show("Configure quick panel (➕ = add to panel, ➖ = to remove): ", &kb, tg.MarkupHTML)
 	if err != nil {
