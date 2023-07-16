@@ -191,7 +191,7 @@ func TestToday(t *testing.T) {
 }
 
 func TestToday_QuickMenuFilled(t *testing.T) {
-	var cfg = &userconfig.DefaultConfig
+	var cfg = &userconfig.Config{}
 	cfg.AddPanelButton("doc")
 	cfg.AddPanelButton("checklists")
 	cfg.AddPanelButton("postpone")
@@ -240,7 +240,7 @@ func TestLater(t *testing.T) {
 }
 
 func TestLater_QuickMenuFilled(t *testing.T) {
-	var cfg = &userconfig.DefaultConfig
+	var cfg = &userconfig.Config{}
 	cfg.AddPanelButton("doc")
 	cfg.AddPanelButton("checklists")
 	cfg.AddPanelButton("postpone")
@@ -749,7 +749,7 @@ func TestConfigureQP_Empty_DelEmpty(t *testing.T) {
 	}, "No params suplied to delFromPanel", t)
 }
 func RunQuickPanelTc(tc PrefTableTestCase, t *testing.T) {
-	var cnf = &userconfig.DefaultConfig
+	var cnf = &userconfig.Config{}
 	for _, opt := range tc.initial_opts {
 		cnf.AddPanelButton(opt)
 	}
@@ -763,7 +763,7 @@ func RunQuickPanelTc(tc PrefTableTestCase, t *testing.T) {
 }
 
 func RunQuickPanelTc_Error(tc PrefTableTestCase, expectedErr string, t *testing.T) {
-	var cnf = &userconfig.DefaultConfig
+	var cnf = &userconfig.Config{}
 	for _, opt := range tc.initial_opts {
 		cnf.AddPanelButton(opt)
 	}
