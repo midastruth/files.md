@@ -33,4 +33,8 @@ const (
 	EmDocs      = "📝"
 	EmCheckList = "☑️"
 	EmPostpone  = "🦥"
+
+	QuickPanelDelimiter = "---"
+	QuickPanelAddButton = "➕"
+	QuickPanelDelButton = "➖"
 )

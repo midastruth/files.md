@@ -1364,20 +1364,20 @@ func (b *Bot) showConfigureQuickPanel(params []string) error {
 	var enabled []string
 
 	// We iterate through hardcoded panel to preserve order of buttons in UI
-	for _, pair := range quickPanelAvailableCmds {
-		var cmd = pair.cmd
+	for _, cmdDef := range quickPanelAvailableCmds {
+		var cmd = cmdDef.cmd
 		if b.conf.HasQuickPanelCmd(cmd) {
-			kb.AddRow(tg.NewBtn(pair.emoji+" "+pair.desc+" ➖", tg.NewCmd(constants.CmdDelFromPonel, []string{cmd})))
+			kb.AddRow(tg.NewBtn(fmt.Sprintf("%s %s %s", cmdDef.emoji, cmdDef.desc, i18n.QuickPanelDelButton), tg.NewCmd(constants.CmdDelFromPonel, []string{cmd})))
 			enabled = append(enabled, cmd)
 		}
 	}
 
 	// Step 2. Good, we're in the middle! Just a dummy delimiter column.
-	kb.AddRow(tg.NewBtn("---", tg.NewCmd("", nil)))
+	kb.AddRow(tg.NewBtn(i18n.QuickPanelDelimiter, tg.NewCmd("", nil)))
 
 	// Step 3. Now, let's fill buttons that are not disabled...
-	for _, pair := range quickPanelAvailableCmds {
-		var cmd = pair.cmd
+	for _, cmdDef := range quickPanelAvailableCmds {
+		var cmd = cmdDef.cmd
 		// Check if command is enabled
 		var cmdEnabled = false
 		for _, enabledCmd := range enabled {
@@ -1388,13 +1388,13 @@ func (b *Bot) showConfigureQuickPanel(params []string) error {
 		// Command is not enabled, so add it to disabled list
 		if !cmdEnabled {
 			kb.AddRow(
-				tg.NewBtn(pair.emoji+" "+pair.desc+" ➕", tg.NewCmd(constants.CmdAddToPanel, []string{cmd})))
+				tg.NewBtn(fmt.Sprintf("%s %s %s", cmdDef.emoji, cmdDef.desc, i18n.QuickPanelAddButton), tg.NewCmd(constants.CmdAddToPanel, []string{cmd})))
 		}
 	}
 
 	kb.AddRow(tg.NewBtn(i18n.StrBtnBack, tg.NewCmd(constants.CmdShowSettings, nil)))
 
-	err := b.show("Configure quick panel (➕ = add to panel, ➖ = to remove): ", &kb, tg.MarkupHTML)
+	err := b.show(fmt.Sprintf("Configure quick panel (%s = add to panel, %s = to remove): ", i18n.QuickPanelAddButton, i18n.QuickPanelDelButton), &kb, tg.MarkupHTML)
 	if err != nil {
 		return fmt.Errorf("configureQuickPanel : %w", err)
 	}
