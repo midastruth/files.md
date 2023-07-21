@@ -62,7 +62,7 @@ type raw struct {
 	JournalFilenameFormat  string     `json:"journalFilename"`
 	JournalHeaderFormat    string     `json:"journalHeaderFormat"`
 	Schedules              []Schedule `json:"schedules"`
-	QuickPanelCommands     []string   `json:"QuickPanelCommands"`
+	QuickPanelCommands     []string   `json:"quickPanelCommands"`
 }
 
 func NewConfig() *Config {
