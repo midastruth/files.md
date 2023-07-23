@@ -60,44 +60,63 @@ func insertDailyNote(mdContent, journalHeaderFormat, note string) string {
 
 	source := []byte(mdContent)
 	root := md.Parser().Parse(text.NewReader(source))
-	root = addListItemAftreHeader(source, root, header, note)
-	r.Render(&buf, source, root)
+	addJournalRecordAfterHeader(source, root, header, note)
+
+	err := r.Render(&buf, source, root)
+	if err != nil {
+		panic(err) // should never happen
+	}
 	return buf.String()
 }
 
-func addListItemAftreHeader(source []byte, root ast.Node, header, txt string) ast.Node {
+func addJournalRecordAfterHeader(source []byte, root ast.Node, headerText, txt string) {
 	listItem := ast.NewListItem(0)
 	listItem.AppendChild(listItem, ast.NewString([]byte(txt)))
-	var nodeInserted bool
+	var header ast.Node
+	var noteInserted bool
 
-	ast.Walk(root, func(node ast.Node, entering bool) (ast.WalkStatus, error) {
-		h, ok := node.(*ast.Heading)
-		if !ok || !entering {
-			return ast.WalkContinue, nil // skip all nodes except headings
+	walker := func(node ast.Node, entering bool) (ast.WalkStatus, error) {
+		if header != nil {
+			// we have already found the header, so we are looking for the end of the section:
+			// next header with the same or higher level to insert the note before it
+			if h, ok := node.(*ast.Heading); ok && entering && h.Level <= headerLevel {
+				if h.PreviousSibling() != header {
+					// If the note doesn't go right after the corresponding header, so we need to insert a separator
+					h.InsertBefore(root, h, newSeparator())
+				}
+
+				h.InsertBefore(root, h, newJournalRecord(txt))
+				noteInserted = true
+				return ast.WalkStop, nil
+			}
+			return ast.WalkContinue, nil
 		}
-		headerText := h.Text(source)
-		fmt.Println(string(headerText))
-		if header != string(headerText) {
-			return ast.WalkContinue, nil // it's not the header we are looking for
+
+		if h, ok := node.(*ast.Heading); ok && entering {
+			// if it is a header, let's check if it is the header we are looking for
+			if string(h.Text(source)) == headerText && h.Level == headerLevel {
+				header = h
+			}
 		}
-		nodeInserted = true
-		if list, ok := h.NextSibling().(*ast.List); ok {
-			list.AppendChild(list, newListItem(txt))
-		} else {
-			h.InsertAfter(root, h, newList(newListItem(txt)))
-		}
+
 		return ast.WalkContinue, nil
-	})
-	if !nodeInserted {
-		return appendNewSection(root, header, txt)
 	}
-	return root
-}
-
-func appendNewSection(root ast.Node, header, txt string) ast.Node {
-	root.AppendChild(root, newHeader(header))
-	root.AppendChild(root, newList(newListItem(txt)))
-	return root
+	err := ast.Walk(root, walker)
+	if err != nil {
+		// walker() doesn't return errors, so err must always be nil
+		panic(err)
+	}
+	if !noteInserted { // Insert the note at the end of the document
+		if header == nil {
+			header = newHeader(headerText)
+			root.AppendChild(root, header)
+		}
+		if root.LastChild() != header {
+			// If the note doesn't go right after the corresponding header, so we need to insert a separator
+			root.AppendChild(root, newSeparator())
+		}
+		root.AppendChild(root, newJournalRecord(txt))
+	}
 }
 
 func newHeader(header string) *ast.Heading {
@@ -106,14 +125,12 @@ func newHeader(header string) *ast.Heading {
 	return heading
 }
 
-func newList(listItem *ast.ListItem) *ast.List {
-	list := ast.NewList('*')
-	list.AppendChild(list, listItem)
-	return list
+func newJournalRecord(txt string) ast.Node {
+	record := ast.NewParagraph()
+	record.AppendChild(record, ast.NewString([]byte(txt)))
+	return record
 }
 
-func newListItem(txt string) *ast.ListItem {
-	listItem := ast.NewListItem(0)
-	listItem.AppendChild(listItem, ast.NewString([]byte(txt)))
-	return listItem
+func newSeparator() ast.Node {
+	return ast.NewThematicBreak()
 }
