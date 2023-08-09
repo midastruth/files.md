@@ -24,15 +24,14 @@ const (
 )
 
 func AddDailyNote(dir, noteFilename string, botFs *fs.FS, journalFilenameFormat, journalHeaderFormat string) error {
-	noteContent, err := botFs.Content(dir, noteFilename)
+	note, err := botFs.RestoreContent(dir, noteFilename)
 	if err != nil {
 		return fmt.Errorf("failed to move to journal: can't get note content: %w", err)
 	}
-	note := fs.Title(noteFilename)
+
 	dt := time.Now().Format("`15:04 MST`")
-	noteContent = strings.TrimSpace(noteContent)
-	if noteContent != "" {
-		note = dt + "\n" + note + "\n" + noteContent
+	if strings.Contains(note, "\n") {
+		note = dt + "\n" + note
 	} else {
 		note = dt + ": " + note
 	}

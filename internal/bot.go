@@ -357,7 +357,7 @@ func (b *Bot) extractTitleAndContent(msg string) (string, string, error) {
 		} else {
 			content = fmt.Sprintf("%s\n\n%s", title, content)
 		}
-		title = text.Substr(title, 0, 100)
+		title = text.Substr(title, 0, maxTitleLength) + "..."
 	}
 
 	return title, content, nil
