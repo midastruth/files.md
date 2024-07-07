@@ -52,6 +52,7 @@ $ git checkout -b feature/feature_name
 Any file can be uniquely identified by filename and dir. We only support one level of nesting.
 
 ## ADRs (Architecture Decision Records)
+- Usage of https://github.com/rivo/uniseg. In Go, strings are read-only slices of bytes. They can be turned into Unicode code points using the for loop or by casting: []rune(str). However, multiple code points may be combined into one user-perceived character or what the Unicode specification calls "grapheme cluster". For example, white circle "⚪" has two runes, but one grapheme cluster.
 - Markdown to HTML conversion. User can have invalid Markdown in his notes, and TG API would fail to send invalid Markdown directly. So, we need to convert user's Markdown to HTML first and then send it via Telegram as HTML.
 - File hashing. Everywhere where we have user input - we should use fs.hash, otherwise we get long filenames, and tg returns `INVALID_DATA` error (callbackData max 64 bytes)
 - Introduced `db.go`. We had to abstract away Redis anyway (otherwise it's hard to write tests)
