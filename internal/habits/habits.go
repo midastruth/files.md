@@ -170,16 +170,16 @@ func Write(userFS *fs.FS, year int, habits map[string]Year) error {
 		habitsForMonth := ""
 		for _, habitKey := range habitKeys {
 			dayOfMonth := day
-			month := dayOfMonth.Month()
 			statuses := ""
 			atLeastOneCompletion := false
-			for dayOfMonth.Month() < month+1 {
+			for dayOfMonth.Month() == day.Month() {
 				if status, ok := habits[habitKey][dayOfMonth.YearDay()]; ok {
 					statuses += strconv.Itoa(status)
 					atLeastOneCompletion = true
 				} else {
 					statuses += habitSkipped
 				}
+				dayOfMonth = dayOfMonth.AddDate(0, 0, 1)
 			}
 			if atLeastOneCompletion {
 				habitsForMonth += fmt.Sprintf("%s %s\n", statuses, habitKey)
@@ -189,6 +189,8 @@ func Write(userFS *fs.FS, year int, habits map[string]Year) error {
 		if len(habitsForMonth) != 0 {
 			content += fmt.Sprintf("### %s\n%s\n", day.Month(), habitsForMonth)
 		}
+
+		day = day.AddDate(0, 1, 0)
 	}
 
 	filename := fmt.Sprintf("%d Habits.md", year)
