@@ -25,7 +25,8 @@ func MoveDueTasksToToday(storagePath, configFilename string, fsBackend afero.Fs)
 	if err != nil {
 		return fmt.Errorf("schedule worker: %w", err)
 	}
-	userDirs = fs.OnlyUserDirs(userDirs)
+	// TODO release
+	//userDirs = fs.OnlyUserDirs(userDirs)
 
 	for _, userDir := range userDirs {
 		userID, err := strconv.ParseInt(userDir.Name, 10, 64)
@@ -46,29 +47,30 @@ func MoveDueTasksToToday(storagePath, configFilename string, fsBackend afero.Fs)
 		}
 
 		for _, schedule := range userconf.Schedules() {
-			if time.Now().Unix() >= schedule.ScheduleAt {
-				err = moveTaskToToday(schedule.Filename, userFS)
-				if err != nil {
-					slog.Error("schedule worker: can't move", "err", err)
-				}
-				slog.Debug("Scheduled task moved to today", schedule.Filename, "filename")
-				if len(schedule.Cron) != 0 {
-					runAt := sched.Next(schedule.Cron)
-					userconf.AddToSchedule(schedule.Filename, runAt, schedule.Cron)
-					slog.Debug("Task was rescheduled", "filename", schedule.Filename, "schedule", schedule.Cron, "runAt", runAt)
-					continue
-				}
+			if time.Now().Unix() < schedule.ScheduleAt {
+				continue
+			}
+			err = moveTaskToToday(schedule.Filename, userFS)
+			if err != nil {
+				slog.Error("schedule worker: can't move", "err", err)
+			}
+			slog.Debug("Scheduled task moved to today", schedule.Filename, "filename")
+			if len(schedule.Cron) != 0 {
+				runAt := sched.Next(schedule.Cron)
+				userconf.AddToSchedule(schedule.Filename, runAt, schedule.Cron)
+				slog.Debug("Task was rescheduled", "filename", schedule.Filename, "schedule", schedule.Cron, "runAt", runAt)
+				continue
+			}
 
-				err = userconf.LoadOrCreate(userconfPath)
-				if err != nil {
-					return fmt.Errorf("schedule worker: can't load user config before save: %s", err)
-				}
+			err = userconf.LoadOrCreate(userconfPath)
+			if err != nil {
+				return fmt.Errorf("schedule worker: can't load user config before save: %s", err)
+			}
 
-				userconf.DelFromSchedule(schedule.Filename)
-				err = userconf.Save(userconfPath)
-				if err != nil {
-					return fmt.Errorf("schedule worker: can't save user config: %s", err)
-				}
+			userconf.DelFromSchedule(schedule.Filename)
+			err = userconf.Save(userconfPath)
+			if err != nil {
+				return fmt.Errorf("schedule worker: can't save user config: %s", err)
 			}
 		}
 	}

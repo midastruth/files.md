@@ -1327,7 +1327,7 @@ func (b *Bot) toChecklistKeyboard(filenameHash string) (*tg.Keyboard, error) {
 	return kb, nil
 }
 
-func (b *Bot) togglePomodoro(_ []string) error {
+func (b *Bot) togglePomodoro(params []string) error {
 	// Check if Pomodoro is already running
 	hasPomodoroInToday, err := b.fs.Exists(fs.DirToday, fs.FilePomodoro)
 	if err != nil {

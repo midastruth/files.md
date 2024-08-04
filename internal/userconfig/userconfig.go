@@ -172,6 +172,7 @@ func (c *Config) DelFromSchedule(filename string) {
 			newSchedules = append(newSchedules, schedule)
 		}
 	}
+	c.raw.Schedules = newSchedules
 }
 
 func (c *Config) JournalFilenameFormat() string {
