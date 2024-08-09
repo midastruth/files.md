@@ -269,8 +269,13 @@ func (b *Bot) save(u UpdInterface) error {
 		return fmt.Errorf("save: %w", err)
 	}
 
-	title = fs.SanitizeFilename(title)
-	filename := fs.Filename(title)
+	sanitizedTitle := fs.SanitizeFilename(title)
+	// Store original title if it was sanitized
+	if title != sanitizedTitle && len(content) == 0 {
+		content = msg
+	}
+
+	filename := fs.Filename(sanitizedTitle)
 	err = b.createOrAdd(fs.DirToday, filename, content)
 	if err != nil {
 		return fmt.Errorf("save: %w", err)
@@ -428,11 +433,6 @@ func (b *Bot) extractTitleAndContent(msg string) (string, string, error) {
 	}
 
 	if len(title) > maxTitleLength {
-		if len(content) == 0 {
-			content = title
-		} else {
-			content = fmt.Sprintf("%s\n\n%s", title, content)
-		}
 		title = txt.Substr(title, 0, maxTitleLength) + "..."
 	}
 
@@ -536,10 +536,10 @@ func (b *Bot) ShowTodayTasks(params []string) error {
 		var btn tg.Btn
 		if file.IsMultiline {
 			cmd := tg.NewCmd(constants.CmdShowMultilineTask, []string{fs.DirToday, fs.Hash(file.Name)})
-			btn = tg.NewBtn(txt.Emoji("👀", file.Title), cmd)
+			btn = tg.NewBtn(txt.Emoji("👀", fs.UnsanitizeFilename(file.Title)), cmd)
 		} else {
 			cmd := tg.NewCmd(constants.CmdComplete, []string{fs.DirToday, fs.Hash(file.Name)})
-			btn = tg.NewBtn(i18n.Emojify(file.Title), cmd)
+			btn = tg.NewBtn(i18n.Emojify(fs.UnsanitizeFilename(file.Title)), cmd)
 		}
 
 		kb.AddRow(btn)
@@ -573,10 +573,10 @@ func (b *Bot) showLaterTasks(params []string) error {
 		var btn tg.Btn
 		if file.IsMultiline {
 			cmd := tg.NewCmd(constants.CmdShowMultilineTask, []string{fs.DirLater, fs.Hash(file.Name)})
-			btn = tg.NewBtn(txt.Emoji("👀", file.Title), cmd)
+			btn = tg.NewBtn(txt.Emoji("👀", fs.UnsanitizeFilename(file.Title)), cmd)
 		} else {
 			cmd := tg.NewCmd(constants.CmdComplete, []string{fs.DirLater, fs.Hash(file.Name)})
-			btn = tg.NewBtn(i18n.Emojify(file.Title), cmd)
+			btn = tg.NewBtn(i18n.Emojify(fs.UnsanitizeFilename(file.Title)), cmd)
 		}
 
 		kb.AddRow(btn)
@@ -645,7 +645,7 @@ func (b *Bot) showFiles(params []string) error {
 	var fileBtns []tg.Btn
 	for _, file := range files {
 		cmd := tg.NewCmd(constants.CmdShowFile, []string{fs.DirRoot, fs.Hash(file.Name)})
-		btn := tg.NewBtn(fmt.Sprintf("📄 %s", file.Title), cmd)
+		btn := tg.NewBtn(fmt.Sprintf("📄 %s", fs.UnsanitizeFilename(file.Title)), cmd)
 		fileBtns = append(fileBtns, btn)
 	}
 	fileBtnsByRows := slice.Chunk(fileBtns, btnsPerRow)

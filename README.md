@@ -37,7 +37,7 @@ $ git checkout -b feature/feature_name
 ```
 
 ## Bot's artifacts are plain files, yet we differentiate the following types:
-- Tasks: `/today/pay the bills.md` (`today/*.md`, `later/*.md`, `_archive_/*.md`)
+- Tasks: `/today/pay the bills.md` (`today/*.md`, `later/*.md`, `archive/*.md`)
 - Notes: `/brain/brain is the most complex object.md` (`/.*/*.md` also `/inbox/*`)
 - Documents: `/my big project.md` (`/*.md`)
 - Check list items: `/-shop-/cheese.md` (`-*-/*.md`)
@@ -48,7 +48,7 @@ $ git checkout -b feature/feature_name
 - `content` - note's content (body/text)
 - `dir` - a dir that is meant to store notes under some category, like "happiness"
 - `userID` - chatID. For the most part we're only using chatID as userID (PM with the bot)
-- `ctime` - file's ownership, location, file type and permission settings changed time (parent folder rename won't affect). We need this to track file's location changes, like to understand when it was moved to _archive_
+- `ctime` - file's ownership, location, file type and permission settings changed time (parent folder rename won't affect). We need this to track file's location changes, like to understand when it was moved to archive
 
 Any file can be uniquely identified by filename and dir. We only support one level of nesting.
 

@@ -31,7 +31,7 @@ var (
 
 const (
 	DirRoot      = ""
-	DirArchive   = "_archive_"
+	DirArchive   = "archive"
 	DirToday     = "today"
 	DirLater     = "later"
 	DirInbox     = "inbox"
@@ -528,7 +528,7 @@ func UnsanitizeFilename(filename string) string {
 }
 
 func Title(filename string) string {
-	// Once we move our items from checklists to _archive_,
+	// Once we move our items from checklists to archive,
 	// they got named like -checklist-itemName
 	stripChecklistChars := regexp.MustCompile(`^-.*?-(.+)`)
 	title := stripChecklistChars.ReplaceAllString(filename, "$1")

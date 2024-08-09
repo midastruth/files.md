@@ -134,7 +134,7 @@ func TestCompleteTask(t *testing.T) {
 	r.NoError(err)
 	r.Len(todayTasks, 0)
 
-	completedTasks, err := bot.fs.FilesAndDirs("_archive_")
+	completedTasks, err := bot.fs.FilesAndDirs("archive")
 	r.NoError(err)
 	r.Len(completedTasks, 1)
 	r.Equal("First task.md", completedTasks[0].Name)

@@ -159,7 +159,7 @@ func (c *Config) Schedules() []Schedule {
 	return c.raw.Schedules
 }
 
-// AddToSchedule task from _archive_ or later at scheduleAt (Unix timestamp, sec). Tasks appear in today folder.
+// AddToSchedule task from archive or later at scheduleAt (Unix timestamp, sec). Tasks appear in today folder.
 // If cron is provided this task will be repeated. Other wise, it will be executed once.
 func (c *Config) AddToSchedule(filename string, scheduleAt int64, cron string) {
 	c.raw.Schedules = append(c.raw.Schedules, Schedule{filename, scheduleAt, cron, ""})

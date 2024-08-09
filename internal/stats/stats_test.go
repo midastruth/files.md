@@ -20,7 +20,7 @@ package stats
 //	}
 //
 //	fs, _ := fs2.NewFS("/", afero.NewMemMapFs())
-//	err := fs.Put("_archive_", "a.md", "")
+//	err := fs.Put("archive", "a.md", "")
 //	r.NoError(err)
 //
 //	redis, err := miniredis.Run()
@@ -60,7 +60,7 @@ package stats
 //	}
 //
 //	fs, _ := fs2.NewFS("/", afero.NewMemMapFs())
-//	err := fs.Put("_archive_", "a.md", "")
+//	err := fs.Put("archive", "a.md", "")
 //	r.NoError(err)
 //
 //	redis, err := miniredis.Run()
@@ -101,9 +101,9 @@ package stats
 //	}
 //
 //	fs, _ := fs2.NewFS("/", afero.NewMemMapFs())
-//	err := fs.Put("_archive_", "a.md", "")
+//	err := fs.Put("archive", "a.md", "")
 //	r.NoError(err)
-//	err = fs.Put("_archive_", "b.md", "")
+//	err = fs.Put("archive", "b.md", "")
 //	r.NoError(err)
 //
 //	redis, err := miniredis.Run()
