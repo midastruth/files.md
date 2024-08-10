@@ -168,7 +168,8 @@ func (u *Upd) PhotoID() (string, bool) {
 		return "", false
 	}
 
-	// Pick the photo with the maximum size
+	// Pick the photo with the maximum size, as TG
+	// makes some small crops
 	photoSize := 0
 	photoID := ""
 	found := false

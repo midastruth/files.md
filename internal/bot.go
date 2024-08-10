@@ -186,6 +186,7 @@ func (b *Bot) Answer(u UpdInterface) error {
 		photoID, hasPhoto = u.ImageID()
 	}
 	if hasPhoto {
+		// Return handle media?
 		outFile, path, err := b.fs.TempFile()
 		if err != nil {
 			return fmt.Errorf("can't create temp file: %w", err)
@@ -198,7 +199,7 @@ func (b *Bot) Answer(u UpdInterface) error {
 		}
 
 		_, _ = path, extension
-	
+
 		return nil
 	}
 
@@ -458,13 +459,14 @@ func (b *Bot) extractTitleAndContent(msg string) (string, string, error) {
 	title := txt.Ucfirst(strings.TrimSpace(parts[0]))
 	content := ""
 
+	if len(title) > maxTitleLength {
+		title = txt.Substr(title, 0, maxTitleLength) + "..."
+		content = strings.TrimSpace(title)
+	}
+
 	isMultiline := len(parts) > 1
 	if isMultiline {
 		content = strings.TrimSpace(msg)
-	}
-
-	if len(title) > maxTitleLength {
-		title = txt.Substr(title, 0, maxTitleLength) + "..."
 	}
 
 	return title, content, nil
