@@ -12,7 +12,7 @@ func TestMarkdownToHtmlHeader(t *testing.T) {
 	md := `# Header`
 	html := MarkdownToHtml(md)
 
-	r.Equal("<strong>Header</strong>\n", html)
+	r.Equal("<b>Header</b>", html)
 }
 
 func TestMarkdownToHtmlHeaderAndText(t *testing.T) {
@@ -21,7 +21,7 @@ func TestMarkdownToHtmlHeaderAndText(t *testing.T) {
 	md := "# Header\nText"
 	html := MarkdownToHtml(md)
 
-	r.Equal("<strong>Header</strong>\nText\n", html)
+	r.Equal("<b>Header</b>\nText", html)
 }
 
 func TestMarkdownToHtmlBold(t *testing.T) {
@@ -30,7 +30,7 @@ func TestMarkdownToHtmlBold(t *testing.T) {
 	md := "**bold**"
 	html := MarkdownToHtml(md)
 
-	r.Equal("<strong>bold</strong>\n", html)
+	r.Equal("<b>bold</b>", html)
 }
 
 func TestMarkdownToHtmlItalic(t *testing.T) {
@@ -39,7 +39,7 @@ func TestMarkdownToHtmlItalic(t *testing.T) {
 	md := "*italic*"
 	html := MarkdownToHtml(md)
 
-	r.Equal("<em>italic</em>\n", html)
+	r.Equal("<i>italic</i>", html)
 }
 
 func TestMarkdownToHtmlInvalid(t *testing.T) {
@@ -48,14 +48,23 @@ func TestMarkdownToHtmlInvalid(t *testing.T) {
 	md := "__valid__**invalid"
 	html := MarkdownToHtml(md)
 
-	r.Equal("<strong>valid</strong>**invalid\n", html)
+	r.Equal("<b>valid</b>**invalid", html)
 }
 
 func TestMarkdownToHtmlMultiline(t *testing.T) {
 	r := require.New(t)
 
-	md := "line1 \n**line2**\nline3"
+	md := "line1\n**line2**\nline3"
 	html := MarkdownToHtml(md)
 
-	r.Equal("line1\n<strong>line2</strong>\nline3\n", html)
+	r.Equal("line1\n<b>line2</b>\nline3", html)
+}
+
+func TestMarkdownToHtmlNoLists(t *testing.T) {
+	r := require.New(t)
+
+	md := "list\n1) item1\n2) item2"
+	html := MarkdownToHtml(md)
+
+	r.Equal("list\n1) item1\n2) item2", html)
 }
