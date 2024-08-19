@@ -1623,7 +1623,9 @@ func (b *Bot) showRecurringKeyboard(params []string) error {
 	filenameHash := params[0]
 
 	newBtn := func(name, cron string) tg.Btn {
-		return tg.NewBtn(name, tg.NewCmd(consts.CmdSchedule, []string{txt.Substr(filenameHash, 0, 4), txt.I64(sched.Next(cron)), cron}))
+		// We need to shorten filehash, otherwise whole payload doesn't fit telegram's restrictions (64 bytes)
+		cmd := tg.NewCmd(consts.CmdSchedule, []string{txt.Substr(filenameHash, 0, 4), txt.I64(sched.Next(cron)), cron})
+		return tg.NewBtn(name, cmd)
 	}
 
 	kb := tg.NewKeyboard([]tg.Row{
@@ -1654,6 +1656,7 @@ func (b *Bot) showRecurringKeyboard(params []string) error {
 		}
 		kb.AddRow(row)
 	}
+	kb.AddRow(tg.NewBtn(i18n.StrToday, tg.NewCmd(consts.CmdShowToday, nil)))
 
 	err := b.show(i18n.Tr("Configure schedule"), kb, tg.MarkupHTML)
 	if err != nil {
