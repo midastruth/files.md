@@ -95,7 +95,7 @@ func MoveDueTasksToToday(
 
 			// Schedule a recurring task if cron is not empty
 			if len(schedule.Cron) != 0 {
-				scheduledAt := sched.Next(schedule.Cron)
+				scheduledAt := sched.NextExcludeToday(schedule.Cron)
 				userconf.AddToSchedule(schedule.Filename, scheduledAt, schedule.Cron)
 				slog.Debug("Task was rescheduled", "filename", schedule.Filename, "schedule", schedule.Cron, "scheduledAt", scheduledAt)
 				continue

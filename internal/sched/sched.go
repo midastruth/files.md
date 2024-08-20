@@ -35,8 +35,8 @@ func Tomorrow() int64 {
 	return BeginningOfTheDay(tomorrow).Unix()
 }
 
-// Next returns next unix time for cron expression
-func Next(crn string) int64 {
+// NextExcludeToday returns next unix time for cron expression
+func NextExcludeToday(crn string) int64 {
 	sched, err := cron.ParseStandard(crn)
 	// TODO release, we should not panic when a user provided bad config
 	if err != nil {
@@ -44,7 +44,7 @@ func Next(crn string) int64 {
 		panic(fmt.Errorf("invalid cron expression %s: %w", crn, err))
 	}
 
-	return sched.Next(now().UTC()).Unix()
+	return sched.Next(now().UTC().Add(24 * time.Hour)).Unix()
 }
 
 func ScheduleReport(conf *userconfig.Config) string {

@@ -1412,7 +1412,7 @@ func (b *Bot) showChooseDay(params []string) error {
 
 func (b *Bot) forADayKeyboard(filenameHash string) (*tg.Keyboard, error) {
 	newBtn := func(name, cron string) tg.Btn {
-		return tg.NewBtn(name, tg.NewCmd(consts.CmdSchedule, []string{filenameHash, txt.I64(sched.Next(cron)), ""}))
+		return tg.NewBtn(name, tg.NewCmd(consts.CmdSchedule, []string{filenameHash, txt.I64(sched.NextExcludeToday(cron)), ""}))
 	}
 
 	kb := tg.NewKeyboard([]tg.Row{
@@ -1624,7 +1624,7 @@ func (b *Bot) showRecurringKeyboard(params []string) error {
 
 	newBtn := func(name, cron string) tg.Btn {
 		// We need to shorten filehash, otherwise whole payload doesn't fit telegram's restrictions (64 bytes)
-		cmd := tg.NewCmd(consts.CmdSchedule, []string{txt.Substr(filenameHash, 0, 4), txt.I64(sched.Next(cron)), cron})
+		cmd := tg.NewCmd(consts.CmdSchedule, []string{txt.Substr(filenameHash, 0, 4), txt.I64(sched.NextExcludeToday(cron)), cron})
 		return tg.NewBtn(name, cmd)
 	}
 
