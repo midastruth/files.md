@@ -214,7 +214,7 @@ func (b *Bot) handlers() map[string]func([]string) error {
 		consts.CmdShowChecklist:               b.showChecklist,
 		consts.CmdCompleteChecklistItem:       b.completeChecklistItem,
 		consts.CmdShowChecklistItem:           b.showChecklistItem,
-		consts.CmdShowScheduleForDay:          b.showForADay,
+		consts.CmdShowScheduleForDay:          b.showToADay,
 		consts.CmdShowMoveToFile:              b.showMoveToFile,
 		consts.CmdShowMoveToChecklist:         b.showToChecklist,
 		consts.CmdMoveToDir:                   b.moveToDir,
@@ -233,7 +233,7 @@ func (b *Bot) handlers() map[string]func([]string) error {
 		consts.CmdComplete:                    b.complete,
 		consts.CmdPostpone:                    b.postpone,
 		consts.CmdPomodoro:                    b.togglePomodoro,
-		consts.CmdShowScheduleForDayRecurring: b.showForADayRecurring,
+		consts.CmdShowScheduleForDayRecurring: b.showToADayRecurring,
 		consts.CmdShowQuickBtnsSettings:       b.showQuickBtnsSettings,
 		consts.CmdShowMoveToBtnsSettings:      b.showMoveToBtnsSettings,
 		consts.CmdAddToQuickBtns:              b.addToQuickBtns,
@@ -1444,10 +1444,10 @@ func (b *Bot) key(key string) string {
 	return fmt.Sprintf("%s:%d", key, b.userID)
 }
 
-func (b *Bot) showForADay(params []string) error {
+func (b *Bot) showToADay(params []string) error {
 	filenameHash := params[0]
 
-	kb, err := b.forADayKeyboard(filenameHash)
+	kb, err := b.toADayKeyboard(filenameHash)
 	if err != nil {
 		return fmt.Errorf("show for a day: %w", err)
 	}
@@ -1460,7 +1460,7 @@ func (b *Bot) showForADay(params []string) error {
 	return nil
 }
 
-func (b *Bot) forADayKeyboard(filenameHash string) (*tg.Keyboard, error) {
+func (b *Bot) toADayKeyboard(filenameHash string) (*tg.Keyboard, error) {
 	newBtn := func(name, cron string) tg.Btn {
 		return tg.NewBtn(name, tg.NewCmd(consts.CmdSchedule, []string{filenameHash, txt.I64(sched.NextExcludeToday(cron)), ""}))
 	}
@@ -1488,6 +1488,7 @@ func (b *Bot) forADayKeyboard(filenameHash string) (*tg.Keyboard, error) {
 		}
 		kb.AddRow(row)
 	}
+	kb.AddRow(tg.NewBtn(i18n.StrToToday, tg.NewCmd(consts.CmdShowToday, nil)))
 
 	return kb, nil
 }
@@ -1669,7 +1670,7 @@ func (b *Bot) togglePomodoro(params []string) error {
 	return b.ShowTodayTasks(nil)
 }
 
-func (b *Bot) showForADayRecurring(params []string) error {
+func (b *Bot) showToADayRecurring(params []string) error {
 	filenameHash := params[0]
 
 	newBtn := func(name, cron string) tg.Btn {
@@ -1706,7 +1707,7 @@ func (b *Bot) showForADayRecurring(params []string) error {
 		}
 		kb.AddRow(row)
 	}
-	kb.AddRow(tg.NewBtn(i18n.StrToday, tg.NewCmd(consts.CmdShowToday, nil)))
+	kb.AddRow(tg.NewBtn(i18n.StrToToday, tg.NewCmd(consts.CmdShowToday, nil)))
 
 	err := b.show(i18n.Tr("Repeat the task"), kb, tg.MarkupHTML)
 	if err != nil {
