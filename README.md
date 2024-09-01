@@ -54,6 +54,7 @@ We differentiate the following types of files (with `/` denoting your root folde
 - Habits: `/habits/2 minute morning workout.md` (`/habits/*.md`)
 - Insights: `/insights/2024 Habits.md` (`/insights/<YEAR> Habits.md`)
 - Images: `/img/*`
+- Pomodoro: `/today/Took a break.md`
 - Archive: `/archive/*`
 
 ## ADRs (Architecture Decision Records)
@@ -74,7 +75,7 @@ We differentiate the following types of files (with `/` denoting your root folde
 
 ## Notes about Dropbox
 - Symlink created on server will be synced on client as is (without resolving)
-- Typical file operations usually resolve symlinks so it is vulnerable, and we should use isSafe every time
+- To prevent symlinks attack our storage path should be mounted via nosymfollow flag
 
 ## Overarching design principles
 - `Clarity`: The code’s purpose and rationale is clear to the reader.

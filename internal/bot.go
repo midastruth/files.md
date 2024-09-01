@@ -314,6 +314,8 @@ func (b *Bot) allowedTextCmds() []string {
 		consts.CmdShowStats,
 		consts.CmdShowSchedule,
 		consts.CmdShowMoveFromToday,
+		consts.CmdAddToJournalShortcut,
+		consts.CmdAddToRecentFileShortcut,
 		//"help" TODO,
 		//"err" TODO,
 	}
