@@ -92,10 +92,10 @@ func main() {
 		go habitsServer(config.Config.HabitsHost, config.Config.HabitsCertsPath)
 	}
 
-	// Main service loop.
+	// Main bot loop.
 	// Listen for updates from user and process them in separate goroutines.
 	tgConfig := tgbotapi.NewUpdate(0)
-	tgConfig.Timeout = 60 // TODO before release, check if it's enough
+	tgConfig.Timeout = 60 // TODO release, check if it's enough
 	updates := api.GetUpdatesChan(tgConfig)
 
 	for upd := range updates {
@@ -114,6 +114,7 @@ func main() {
 			updJSON, _ = json.Marshal(upd)
 			slog.Debug("Bot update: ", "upd", string(updJSON))
 
+			// TODO release one global lock or per-user lock?
 			userLocker.Lock(userID, string(updJSON))
 			defer userLocker.Unlock(userID)
 
