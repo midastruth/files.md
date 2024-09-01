@@ -1322,6 +1322,9 @@ func (b *Bot) addToJournalFromShortcut(params []string) error {
 		return fmt.Errorf("failed to move to journal: can't add note: %w", err)
 	}
 
+	msg := i18n.Tr("Saved to <b>Journal</b>")
+	_, _ = b.tg.Send(b.userID, msg, nil, tg.MarkupHTML)
+
 	return b.ShowTodayTasks(nil)
 }
 
