@@ -3,6 +3,8 @@ package db
 
 import (
 	"fmt"
+	"os"
+	"strconv"
 	"sync"
 
 	"zakirullin/stuffbot/pkg/tg"
@@ -25,16 +27,21 @@ func NewDB() *DB {
 }
 
 func (db *DB) LastKeyboardMsgID(userID int64) (int, bool) {
-	id, ok := lastKeyboardMsgIDs.Load(lastKeyboardMsgIDKey(userID))
-	if !ok {
+	msgIDStr, err := os.ReadFile(tmpFilePath(userID, "msgid"))
+	if err != nil {
 		return 0, false
 	}
 
-	return id.(int), true
+	msgID, err := strconv.Atoi(string(msgIDStr))
+	if err != nil {
+		return 0, false
+	}
+
+	return msgID, true
 }
 
 func (db *DB) SetLastKeyboardMsgID(userID int64, ID int) {
-	lastKeyboardMsgIDs.Store(lastKeyboardMsgIDKey(userID), ID)
+	_ = os.WriteFile(tmpFilePath(userID, "msgid"), []byte(strconv.Itoa(ID)), 0644)
 }
 
 func (db *DB) DelLastKeyboardMsgID(userID int64) {
@@ -130,4 +137,8 @@ func filenameByMsgIDKey(userID int64, msgID int) string {
 // User-namespaced db key
 func (db *DB) key(userID int64, key string) string {
 	return fmt.Sprintf("%s:%d", key, userID)
+}
+
+func tmpFilePath(userID int64, name string) string {
+	return fmt.Sprintf("%s/%d.%s", os.TempDir(), userID, name)
 }
