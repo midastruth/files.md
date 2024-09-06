@@ -771,18 +771,7 @@ func (b *Bot) showFiles(_ []string) error {
 	if shouldAddSeparator {
 		kb.AddRow(tg.NewBtn("-", tg.NewCmd(consts.CmdDoNothing, nil)))
 	}
-
-	// Add dirs
-	var dirBtns []tg.Btn
-	for _, dir := range dirs {
-		cmd := tg.NewCustomCmd("", []string{dir.Name}, tg.CmdTypeInlineQueryCurrentChat)
-		btn := tg.NewBtn(fmt.Sprintf("%s %s", i18n.Emoji("dir"), dir.Title), cmd)
-		dirBtns = append(dirBtns, btn)
-	}
-	dirBtnsByRows := slice.Chunk(dirBtns, btnsPerRow)
-	for _, row := range dirBtnsByRows {
-		kb.AddRow(row)
-	}
+	kb.AddRow(tg.NewBtn(i18n.Tr("🔎 Search"), tg.NewCmd(consts.CmdInlineQuerySearchEveryWhere, nil)))
 
 	if !b.cfg.FilesOnlyMode() {
 		kb.AddRow(tg.NewBtn(i18n.StrToday, tg.NewCmd(consts.CmdShowToday, nil)))
