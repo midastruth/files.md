@@ -65,9 +65,9 @@ We differentiate the following types of files (with `/` denoting your root folde
 - Archive: `/archive/*`
 
 ## Performance
-The app is  blazing fast :) If you're afraid of using files or mutexes unnecessarily for performance reasons, take a look at this:
-Mutex lock/unlock = `25 ns`
-Read 4K randomly from SSD = `150,000 ns`
+The app is  blazing fast :) If you're afraid of using files or mutexes unnecessarily for performance reasons, take a look at this:  
+Mutex lock/unlock = `25 ns`  
+Read 4K randomly from SSD = `150,000 ns`  
 `1 ms` = `1,000,000 ns`
 
 ## ADRs (Architecture Decision Records)
