@@ -168,12 +168,7 @@ func markdown() Parser {
 // <blockquote>Block quotation started\nBlock quotation continued\nThe last line of the block quotation</blockquote>
 // <blockquote expandable>Expandable block quotation started\nExpandable block quotation continued\nExpandable block quotation continued\nHidden by default part of the block quotation started\nExpandable block quotation continued\nThe last line of the block quotation</blockquote>
 func Html(md string) string {
-	var htmlEscaper = strings.NewReplacer(
-		`&`, "&amp;",
-		`<`, "&lt;",
-		`>`, "&gt;",
-	)
-	md = htmlEscaper.Replace(md)
+	md = EscapeHTMLInMarkdown(md)
 	// By this point our markdown is safe to send as HTML via Telegram.
 	// There won't be any issues like "missing closing HTML tag",
 	// for the cases when our markdown has some html tags.

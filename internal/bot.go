@@ -563,15 +563,16 @@ func (b *Bot) show(text string, kb *tg.Keyboard, markup string) error {
 	if !hasLastKeyboard || len(textChunks) > 1 {
 		b.delAllKeyboards()
 
-		// If our msg is too long, we send a few messages.
+		// If our msg is too long, we send maxMsgsToSendAtOnce first messages.
 		// Keyboard is attached to the last one
-		textChunks = textChunks[max(0, len(textChunks)-maxMsgsToSendAtOnce):]
-		lastText, textChunks := textChunks[len(textChunks)-1], textChunks[:len(textChunks)-1]
+		textChunks = textChunks[0:min(maxMsgsToSendAtOnce, len(textChunks))]
+		lastChunk := textChunks[len(textChunks)-1]
+		textChunks = textChunks[0 : len(textChunks)-1]
 		for _, textChunk := range textChunks {
 			_, _ = b.tg.Send(b.userID, textChunk, nil, markup)
 		}
 
-		mid, err := b.tg.Send(b.userID, lastText, kb, markup)
+		mid, err := b.tg.Send(b.userID, lastChunk, kb, markup)
 		if err != nil {
 			return fmt.Errorf("show: %w", err)
 		}
@@ -1064,7 +1065,9 @@ func (b *Bot) showFile(params []string) error {
 		tg.NewRow(tg.NewBtn(i18n.StrToday, tg.NewCmd(consts.CmdShowToday, nil))),
 	})
 
-	err = b.show(fmt.Sprintf("%s\n%s", fs.Title(filename), content), kb, tg.MarkupHTML)
+	md := fmt.Sprintf("%s\n%s", fs.Title(filename), content)
+	md = txt.EscapeHTMLInMarkdown(md)
+	err = b.show(md, kb, tg.MarkupHTML)
 	if err != nil {
 		return fmt.Errorf("show file: %w", err)
 	}

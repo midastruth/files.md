@@ -11,7 +11,9 @@ An application for your personal stuff:
 
 All these are stored as plain local `*.md` files.  
 
-It works like a regular chat, so it's easier to use because there's less resistance. We're used to sending memes to friends, now we're going to send notes to the bot. We repurpose all-too-familiar pattern for the greater good.  
+We're used to sending messages to friends, now we're going to send notes to the bot. It works like a regular chat, so it's easier to use because there's less resistance. An all too familiar habit.  
+
+First, unload your brain - send the bot whatever's on your mind. Then choose what to do with it. It can be a task, a note or a journal entry.  
 
 Can be used as a desktop/mobile app or as a Telegram bot.  
 

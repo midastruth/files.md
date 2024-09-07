@@ -1113,6 +1113,25 @@ func TestShowLongMessageSplitByNewLine(t *testing.T) {
 	r.Equal("abc", tgram.LastSentText)
 }
 
+func TestShowLongMessageAttachKeyboardToTheLast(t *testing.T) {
+	r := require.New(t)
+
+	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
+	r.NoError(err)
+
+	tgram := tg.NewFakeTG()
+
+	bot := NewBot(-1, tgram, userFS, db.NewFakeDB(), fakeConfig())
+	kb := tg.NewKeyboard([]tg.Row{tg.NewRow()})
+	err = bot.show(strings.Repeat("a", 4094)+"\nabc", kb, tg.MarkupHTML)
+	r.NoError(err)
+
+	r.Len(tgram.SentTexts, 2)
+	r.Equal("abc", tgram.LastSentText)
+	r.NotNil(tgram.SentKeyboard)
+	r.Len(tgram.SentKeyboard.Btns, 1)
+}
+
 func TestShowMultilineFile(t *testing.T) {
 	r := require.New(t)
 

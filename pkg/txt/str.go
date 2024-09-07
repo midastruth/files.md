@@ -106,3 +106,14 @@ func FirstWord(str string) string {
 	re := regexp.MustCompile(`^[^\s\p{P}]+`)
 	return re.FindString(str)
 }
+
+// TODO ignore html in code blocks
+func EscapeHTMLInMarkdown(str string) string {
+	var htmlEscaper = strings.NewReplacer(
+		`&`, "&amp;",
+		`<`, "&lt;",
+		`>`, "&gt;",
+	)
+
+	return htmlEscaper.Replace(str)
+}
