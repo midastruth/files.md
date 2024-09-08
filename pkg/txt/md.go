@@ -5,9 +5,8 @@ import (
 	"strings"
 )
 
-type Parser func(input string) []token
-
-type token struct {
+type parser func(input string) []result
+type result struct {
 	consumed string
 	left     string
 }
@@ -17,7 +16,6 @@ var openTags = map[string]string{
 	"**": "<b>",
 	"_":  "<i>",
 	"__": "<b>",
-	"`":  "<code>",
 }
 
 var closeTags = map[string]string{
@@ -25,7 +23,6 @@ var closeTags = map[string]string{
 	"**": "</b>",
 	"_":  "</i>",
 	"__": "</b>",
-	"`":  "</code>",
 }
 
 // MarkdownToHTML naively converts user's markdown to Telegram-supported subset of HTML.
@@ -84,71 +81,95 @@ func MarkdownToHTML(md string) string {
 	return mdWithCode
 }
 
-// Parser Combinators. Watch an amazing video here: https://youtu.be/dDtZLm7HIJs.
+// parser Combinators. Watch an amazing video here: https://youtu.be/dDtZLm7HIJs.
 // We only support one level of nesting for bold and italic.
-func markdown() Parser {
+func markdown() parser {
 	text := notMarkdown()
-
-	italicWithoutBold := or(
-		and(openTerm("*"), and(text, closeTerm("*"))),
-		and(openTerm("_"), and(text, closeTerm("_"))),
+	italicNoBold := or(
+		and(open("*"), text, close("*")),
+		and(open("_"), text, close("_")),
 	)
-
 	bold := or(
-		and(openTerm("**"), and(oneOrMore(or(text, italicWithoutBold)), closeTerm("**"))),
-		and(openTerm("__"), and(oneOrMore(or(text, italicWithoutBold)), closeTerm("__"))),
+		and(open("**"), some(or(text, italicNoBold)), close("**")),
+		and(open("__"), some(or(text, italicNoBold)), close("__")),
 	)
-
 	italic := or(
-		and(openTerm("*"), and(oneOrMore(or(text, bold)), closeTerm("*"))),
-		and(openTerm("_"), and(oneOrMore(or(text, bold)), closeTerm("_"))),
+		and(open("*"), some(or(text, bold)), close("*")),
+		and(open("_"), some(or(text, bold)), close("_")),
 	)
+	span := or(bold, italic, text)
 
-	span := or(bold, or(italic, text))
-
-	return oneOrMore(span)
+	return some(span)
 }
 
-func openTerm(t string) Parser {
-	return func(input string) []token {
+// open opens the tag
+func open(t string) parser {
+	return func(input string) []result {
 		if strings.HasPrefix(input, t) {
-			return []token{{openTags[t], input[len(t):]}}
+			return []result{{openTags[t], input[len(t):]}}
 		}
 		return nil
 	}
 }
 
-func closeTerm(t string) Parser {
-	return func(input string) []token {
+// close closes the tag
+func close(t string) parser {
+	return func(input string) []result {
 		if strings.HasPrefix(input, t) {
-			return []token{{closeTags[t], input[len(t):]}}
+			return []result{{closeTags[t], input[len(t):]}}
 		}
 		return nil
 	}
 }
 
-func or(lhs, rhs Parser) Parser {
-	return func(input string) []token {
-		return append(lhs(input), rhs(input)...)
-	}
-}
-
-func and(lhs, rhs Parser) Parser {
-	return func(input string) []token {
-		var results []token
-		for _, litem := range lhs(input) {
-			for _, ritem := range rhs(litem.left) {
-				if litem.consumed != "" && ritem.consumed != "" {
-					results = append(results, token{litem.consumed + ritem.consumed, ritem.left})
-				}
-			}
+// or applies multiple parsers and returns the result of the first successful parser.
+// If no parser succeeds, it returns an empty result.
+func or(parsers ...parser) parser {
+	return func(input string) []result {
+		var results []result
+		for _, p := range parsers {
+			results = append(results, p(input)...)
 		}
 		return results
 	}
 }
 
-func recursive(input string, parser Parser, depth int) []token {
-	var results []token
+// and applies multiple parsers in sequence.
+// Each parser must succeed in consuming part of the input.
+// If any parser fails, the whole parse fails.
+func and(parsers ...parser) parser {
+	return func(input string) []result {
+		results := []result{{"", input}}
+
+		for _, p := range parsers {
+			var newResults []result
+			for _, r := range results {
+				for _, parsed := range p(r.left) {
+					if parsed.consumed != "" {
+						newResults = append(newResults, result{r.consumed + parsed.consumed, parsed.left})
+					}
+				}
+			}
+			if len(newResults) == 0 {
+				return nil
+			}
+			results = newResults
+		}
+
+		return results
+	}
+}
+
+// some applies the parser one or more times. Each parse result is combined with the previous result.
+// And each parse can generate multiple results.
+func some(parser parser) parser {
+	return func(input string) []result {
+		return recursive(input, parser, 0)
+	}
+}
+
+func recursive(input string, parser parser, depth int) []result {
+	var results []result
 	empty := true
 	for _, item := range parser(input) {
 		if item.consumed == "" {
@@ -156,37 +177,29 @@ func recursive(input string, parser Parser, depth int) []token {
 		}
 		empty = false
 		for _, child := range recursive(item.left, parser, depth+1) {
-			results = append(results, token{item.consumed + child.consumed, child.left})
+			results = append(results, result{item.consumed + child.consumed, child.left})
 		}
 	}
 	if empty && depth != 0 {
-		results = append(results, token{"", input})
+		results = append(results, result{"", input})
 	}
 
 	return results
 }
 
-// oneOrMore applies the parser for more than one time. Each parse result is combined with the previous result.
-// And each parse can generate multiple results.
-func oneOrMore(parser Parser) Parser {
-	return func(input string) []token {
-		return recursive(input, parser, 0)
-	}
-}
-
 // notMarkdown incrementally yields when it encounters a *, **, _, __
-func notMarkdown() Parser {
-	return func(input string) []token {
+func notMarkdown() parser {
+	return func(input string) []result {
 		for i, ch := range input {
 			if ch == '*' || ch == '_' {
-				return []token{{input[:i], input[i:]}}
+				return []result{{input[:i], input[i:]}}
 			}
 		}
 		if len(input) > 0 && (input[len(input)-1] == '*' || input[len(input)-1] != '_' || input[len(input)-1] != '`') {
-			return []token{{input, ""}}
+			return []result{{input, ""}}
 		}
 		if len(input) > 0 {
-			return []token{{input, ""}}
+			return []result{{input, ""}}
 		}
 		return nil
 	}
