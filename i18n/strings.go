@@ -9,7 +9,7 @@ const (
 	StrMoveToLaterLong = "⏳ Move to Later"
 	StrToToday         = "➡️ Move to Today"
 	StrToTomorrow      = "🌚 To tmrw"
-	StrMoveToLater     = "⏳ To later"
+	StrToLater         = "⏳ To later"
 	StrToADay          = "📆 To a day"
 	StrToChecklist     = "☑️ To Checklist"
 	StrToFile          = "📄 To File"

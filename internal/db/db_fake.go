@@ -9,31 +9,40 @@ import (
 type FakeDB struct {
 	DirByMessageID      string
 	FilenameByMessageID string
+	InputExpectationCMD *tg.Cmd
+	LastKeyboardMID     int
 }
 
 func NewFakeDB() *FakeDB {
-	return &FakeDB{}
+	return &FakeDB{LastKeyboardMID: -1}
 }
 
 func (db *FakeDB) LastKeyboardMsgID(userID int64) (int, bool) {
-	return 0, false
+	if db.LastKeyboardMID == -1 {
+		return 0, false
+	}
+
+	return db.LastKeyboardMID, true
 }
 
-func (db *FakeDB) SetLastKeyboardMsgID(userID int64, ID int) {
-
+func (db *FakeDB) SetLastKeyboardMsgID(userID int64, msgID int) {
+	db.LastKeyboardMID = msgID
 }
 
 func (db *FakeDB) DelLastKeyboardMsgID(userID int64) {
+	db.LastKeyboardMID = -1
 }
 
 func (db *FakeDB) InputExpectation(userID int64) *tg.Cmd {
-	return nil
+	return db.InputExpectationCMD
 }
 
 func (db *FakeDB) SetInputExpectation(userID int64, cmd tg.Cmd) {
+	db.InputExpectationCMD = &cmd
 }
 
 func (db *FakeDB) DelInputExpectation(userID int64) {
+	db.InputExpectationCMD = nil
 }
 
 func (db *FakeDB) SetFilenameByMsgID(userID int64, msgID int, filename string) {

@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/afero"
 	"github.com/stretchr/testify/require"
 
+	"zakirullin/stuffbot/internal/consts"
 	"zakirullin/stuffbot/internal/journal"
 	"zakirullin/stuffbot/internal/sched"
 	"zakirullin/stuffbot/internal/userconfig"
@@ -98,11 +99,11 @@ func TestSaveFromTextMsgWithSanitize(t *testing.T) {
 	err = bot.Answer(tg.NewFakeUpdCmd(-1, tg.NewCmd("today", nil)))
 	r.NoError(err)
 
-	r.Equal("<b>1</b> left"+wideSpacer, tgram.LastSentText)
+	r.Equal("<b>1</b> left"+wideSpacer, tgram.LastEditedText)
 	r.Equal(tg.NewKeyboard([]tg.Row{
 		tg.NewBtn("👀 New task/", tg.NewCmd("task", []string{"today", "cd59b9e6546"})),
 	},
-	), tgram.SentKeyboard)
+	), tgram.LastEditedKeyboard)
 }
 
 func TestAddMultilineTaskToToday(t *testing.T) {
@@ -420,7 +421,7 @@ func TestToday(t *testing.T) {
 		tg.NewBtn("First task", tg.NewCmd("c", []string{"today", "0824149b387"})),
 		tg.NewBtn("🥈 Second task", tg.NewCmd("c", []string{"today", "4eb62f93b3e"})),
 	},
-	), tgram.SentKeyboard)
+	), tgram.LastSentKeyboard)
 }
 
 func TestLater(t *testing.T) {
@@ -461,7 +462,7 @@ func TestLater(t *testing.T) {
 		tg.NewBtn("🥈 Second task", tg.NewCmd("c", []string{"later", "2940ad40402"})),
 		tg.NewBtn("🏠 Today", tg.NewCmd("today", nil)),
 	},
-	), tgram.SentKeyboard)
+	), tgram.LastSentKeyboard)
 }
 
 func TestTodayQuickMenuFilled(t *testing.T) {
@@ -497,7 +498,7 @@ func TestTodayQuickMenuFilled(t *testing.T) {
 			tg.NewBtn("🦥", tg.NewCmd("postpone", nil)),
 		),
 	},
-	), tgram.SentKeyboard)
+	), tgram.LastSentKeyboard)
 }
 
 func TestTodayWithMultilineTasks(t *testing.T) {
@@ -538,7 +539,7 @@ func TestTodayWithMultilineTasks(t *testing.T) {
 		tg.NewBtn("👀 First task", tg.NewCmd("task", []string{"today", "0824149b387"})),
 		tg.NewBtn("🥈 Second task", tg.NewCmd("c", []string{"today", "4eb62f93b3e"})),
 	},
-	), tgram.SentKeyboard)
+	), tgram.LastSentKeyboard)
 }
 
 func TestFiles(t *testing.T) {
@@ -567,7 +568,7 @@ func TestFiles(t *testing.T) {
 			tg.NewBtn("🔎 Search", tg.NewCustomCmd("search", nil, "iq")),
 			tg.NewBtn("🏠 Today", tg.NewCmd("today", nil)),
 		},
-	}), tgram.SentKeyboard)
+	}), tgram.LastSentKeyboard)
 }
 
 func TestChecklists(t *testing.T) {
@@ -592,7 +593,7 @@ func TestChecklists(t *testing.T) {
 		tg.NewBtn("Checklist2", tg.NewCmd("checklist", []string{"8d3625e2e84"})),
 		tg.NewBtn("🏠 Today", tg.NewCmd("today", nil)),
 	},
-	), tgram.SentKeyboard)
+	), tgram.LastSentKeyboard)
 }
 
 func TestAddSingleItemToChecklist(t *testing.T) {
@@ -661,7 +662,7 @@ func TestShowChecklist(t *testing.T) {
 		tg.NewBtn("Item", tg.NewCmd("check_comp", []string{"8d2335b5ff3", "7b72407ca70"})),
 		tg.NewBtn("🏠 Today", tg.NewCmd("today", nil)),
 	},
-	), tgram.SentKeyboard)
+	), tgram.LastSentKeyboard)
 }
 
 func TestCompleteItemInChecklist(t *testing.T) {
@@ -683,7 +684,7 @@ func TestCompleteItemInChecklist(t *testing.T) {
 	r.Equal(tg.NewKeyboard([]tg.Row{
 		tg.NewBtn("🏠 Today", tg.NewCmd("today", nil)),
 	},
-	), tgram.SentKeyboard)
+	), tgram.LastSentKeyboard)
 
 	items, err := bot.fs.FilesAndDirs("-checklist1-")
 	r.NoError(err)
@@ -754,7 +755,7 @@ func TestSettingsMainPanel(t *testing.T) {
 		tg.NewBtn("➡️ Move to buttons", tg.NewCmd("c_move_btns", nil)),
 		tg.NewBtn("🏠 Today", tg.NewCmd("today", nil)),
 	},
-	), tgram.SentKeyboard)
+	), tgram.LastSentKeyboard)
 }
 
 // Quick Panel Data-driven tests
@@ -970,7 +971,7 @@ func RunQuickPanelTc(tc PrefTableTestCase, t *testing.T) {
 	err := bot.Answer(tc.updToAnswer)
 	r.NoError(err)
 	r.Equal("Configure quick buttons (➕ = add to quick buttons, ➖ = to remove from quick buttons):", tgram.LastSentText)
-	r.Equal(tg.NewKeyboard(tc.buttons), tgram.SentKeyboard)
+	r.Equal(tg.NewKeyboard(tc.buttons), tgram.LastSentKeyboard)
 }
 
 func RunQuickPanelTc_Error(tc PrefTableTestCase, expectedErr string, t *testing.T) {
@@ -1006,7 +1007,7 @@ func TestShowToFileNoDirs(t *testing.T) {
 	r.Equal(tg.NewKeyboard([]tg.Row{
 		tg.NewRow(tg.NewBtn("📄 Note", tg.NewCmd("mf", []string{"345fb", "", "345fb"}))),
 	},
-	), tgram.SentKeyboard)
+	), tgram.LastSentKeyboard)
 }
 
 func TestShowMoveToFile(t *testing.T) {
@@ -1030,7 +1031,7 @@ func TestShowMoveToFile(t *testing.T) {
 		tg.NewBtn("Or choose a dir:", tg.NewCustomCmd("search", nil, "iq")),
 		tg.NewRow(tg.NewBtn("🗂️ dir", tg.NewCmd("mv", []string{"73600", "", "345fbd7ab08"}))),
 	},
-	), tgram.SentKeyboard)
+	), tgram.LastSentKeyboard)
 }
 
 func TestShow(t *testing.T) {
@@ -1128,8 +1129,8 @@ func TestShowMDLongMessageAttachKeyboardToTheLast(t *testing.T) {
 
 	r.Len(tgram.SentTexts, 2)
 	r.Equal("abc", tgram.LastSentText)
-	r.NotNil(tgram.SentKeyboard)
-	r.Len(tgram.SentKeyboard.Btns, 1)
+	r.NotNil(tgram.LastSentKeyboard)
+	r.Len(tgram.LastSentKeyboard.Btns, 1)
 }
 
 func TestShowMultilineFile(t *testing.T) {
@@ -1236,7 +1237,7 @@ func TestShowMoveTo(t *testing.T) {
 			{Name: "➡️ Today", Cmd: tg.Cmd{Name: "today", Params: []string(nil), Type: "cmd"}},
 		}},
 	)
-	r.Equal(kb, tgram.SentKeyboard)
+	r.Equal(kb, tgram.LastSentKeyboard)
 }
 
 func TestShowScheduleEmpty(t *testing.T) {
@@ -1360,7 +1361,7 @@ func TestAngerInTodayTasks(t *testing.T) {
 	r.Equal(tg.NewKeyboard([]tg.Row{
 		tg.NewBtn("🙄 Angry task", tg.NewCmd("c", []string{"today", "9c556351f34"})),
 	},
-	), tgram.SentKeyboard)
+	), tgram.LastSentKeyboard)
 }
 
 func TestMoveToChecklistSplittable(t *testing.T) {
@@ -1486,7 +1487,7 @@ func TestMoveToJournal(t *testing.T) {
 
 	savedNow := journal.Now
 	defer func() {
-		now = savedNow
+		journal.Now = savedNow
 	}()
 	journal.Now = func() time.Time {
 		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
@@ -1553,7 +1554,7 @@ func TestAddToJournalFromShortcutRuCases(t *testing.T) {
 
 	savedNow := journal.Now
 	defer func() {
-		now = savedNow
+		journal.Now = savedNow
 	}()
 	journal.Now = func() time.Time {
 		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
@@ -1590,7 +1591,7 @@ func TestShowForADay(t *testing.T) {
 
 	savedNow := sched.Now
 	defer func() {
-		now = savedNow
+		sched.Now = savedNow
 	}()
 	sched.Now = func() time.Time {
 		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
@@ -1606,7 +1607,7 @@ func TestShowForADay(t *testing.T) {
 	err = bot.Answer(tg.NewFakeUpdCmd(-1, tg.NewCmd("sc_day", []string{"1c8f819d075"})))
 	r.NoError(err)
 
-	r.Equal(tg.NewKeyboard([]tg.Row{[]tg.Btn{tg.Btn{Name: "🔄️ Repeat the task", Cmd: tg.Cmd{Name: "sc_day_r", Params: []string{"1c8f819d075"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "Mon", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "345600", ""}, Type: "cmd"}}, tg.Btn{Name: "Tue", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "432000", ""}, Type: "cmd"}}, tg.Btn{Name: "Wed", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "518400", ""}, Type: "cmd"}}, tg.Btn{Name: "Thu", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "604800", ""}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "Fri", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "691200", ""}, Type: "cmd"}}, tg.Btn{Name: "Sat", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "172800", ""}, Type: "cmd"}}, tg.Btn{Name: "Sun", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "259200", ""}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "1", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2678400", ""}, Type: "cmd"}}, tg.Btn{Name: "2", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2764800", ""}, Type: "cmd"}}, tg.Btn{Name: "3", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "172800", ""}, Type: "cmd"}}, tg.Btn{Name: "4", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "259200", ""}, Type: "cmd"}}, tg.Btn{Name: "5", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "345600", ""}, Type: "cmd"}}, tg.Btn{Name: "6", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "432000", ""}, Type: "cmd"}}, tg.Btn{Name: "7", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "518400", ""}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "9", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "691200", ""}, Type: "cmd"}}, tg.Btn{Name: "10", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "777600", ""}, Type: "cmd"}}, tg.Btn{Name: "11", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "864000", ""}, Type: "cmd"}}, tg.Btn{Name: "12", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "950400", ""}, Type: "cmd"}}, tg.Btn{Name: "13", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1036800", ""}, Type: "cmd"}}, tg.Btn{Name: "14", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1123200", ""}, Type: "cmd"}}, tg.Btn{Name: "15", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1209600", ""}, Type: "cmd"}}, tg.Btn{Name: "16", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1296000", ""}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "17", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1382400", ""}, Type: "cmd"}}, tg.Btn{Name: "18", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1468800", ""}, Type: "cmd"}}, tg.Btn{Name: "19", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1555200", ""}, Type: "cmd"}}, tg.Btn{Name: "20", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1641600", ""}, Type: "cmd"}}, tg.Btn{Name: "21", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1728000", ""}, Type: "cmd"}}, tg.Btn{Name: "22", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1814400", ""}, Type: "cmd"}}, tg.Btn{Name: "23", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1900800", ""}, Type: "cmd"}}, tg.Btn{Name: "24", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1987200", ""}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "25", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2073600", ""}, Type: "cmd"}}, tg.Btn{Name: "26", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2160000", ""}, Type: "cmd"}}, tg.Btn{Name: "27", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2246400", ""}, Type: "cmd"}}, tg.Btn{Name: "28", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2332800", ""}, Type: "cmd"}}, tg.Btn{Name: "29", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2419200", ""}, Type: "cmd"}}, tg.Btn{Name: "30", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2505600", ""}, Type: "cmd"}}, tg.Btn{Name: "31", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2592000", ""}, Type: "cmd"}}}, tg.Btn{Name: "➡️ Move to Today", Cmd: tg.Cmd{Name: "today", Params: []string(nil), Type: "cmd"}}}), tgram.SentKeyboard)
+	r.Equal(tg.NewKeyboard([]tg.Row{[]tg.Btn{tg.Btn{Name: "🔄️ Repeat the task", Cmd: tg.Cmd{Name: "sc_day_r", Params: []string{"1c8f819d075"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "Mon", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "345600", ""}, Type: "cmd"}}, tg.Btn{Name: "Tue", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "432000", ""}, Type: "cmd"}}, tg.Btn{Name: "Wed", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "518400", ""}, Type: "cmd"}}, tg.Btn{Name: "Thu", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "604800", ""}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "Fri", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "691200", ""}, Type: "cmd"}}, tg.Btn{Name: "Sat", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "172800", ""}, Type: "cmd"}}, tg.Btn{Name: "Sun", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "259200", ""}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "1", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2678400", ""}, Type: "cmd"}}, tg.Btn{Name: "2", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2764800", ""}, Type: "cmd"}}, tg.Btn{Name: "3", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "172800", ""}, Type: "cmd"}}, tg.Btn{Name: "4", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "259200", ""}, Type: "cmd"}}, tg.Btn{Name: "5", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "345600", ""}, Type: "cmd"}}, tg.Btn{Name: "6", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "432000", ""}, Type: "cmd"}}, tg.Btn{Name: "7", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "518400", ""}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "9", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "691200", ""}, Type: "cmd"}}, tg.Btn{Name: "10", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "777600", ""}, Type: "cmd"}}, tg.Btn{Name: "11", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "864000", ""}, Type: "cmd"}}, tg.Btn{Name: "12", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "950400", ""}, Type: "cmd"}}, tg.Btn{Name: "13", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1036800", ""}, Type: "cmd"}}, tg.Btn{Name: "14", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1123200", ""}, Type: "cmd"}}, tg.Btn{Name: "15", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1209600", ""}, Type: "cmd"}}, tg.Btn{Name: "16", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1296000", ""}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "17", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1382400", ""}, Type: "cmd"}}, tg.Btn{Name: "18", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1468800", ""}, Type: "cmd"}}, tg.Btn{Name: "19", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1555200", ""}, Type: "cmd"}}, tg.Btn{Name: "20", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1641600", ""}, Type: "cmd"}}, tg.Btn{Name: "21", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1728000", ""}, Type: "cmd"}}, tg.Btn{Name: "22", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1814400", ""}, Type: "cmd"}}, tg.Btn{Name: "23", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1900800", ""}, Type: "cmd"}}, tg.Btn{Name: "24", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "1987200", ""}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "25", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2073600", ""}, Type: "cmd"}}, tg.Btn{Name: "26", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2160000", ""}, Type: "cmd"}}, tg.Btn{Name: "27", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2246400", ""}, Type: "cmd"}}, tg.Btn{Name: "28", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2332800", ""}, Type: "cmd"}}, tg.Btn{Name: "29", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2419200", ""}, Type: "cmd"}}, tg.Btn{Name: "30", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2505600", ""}, Type: "cmd"}}, tg.Btn{Name: "31", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f819d075", "2592000", ""}, Type: "cmd"}}}, tg.Btn{Name: "➡️ Move to Today", Cmd: tg.Cmd{Name: "today", Params: []string(nil), Type: "cmd"}}}), tgram.LastSentKeyboard)
 }
 
 func TestShowForADayRecurring(t *testing.T) {
@@ -1614,7 +1615,7 @@ func TestShowForADayRecurring(t *testing.T) {
 
 	savedNow := sched.Now
 	defer func() {
-		now = savedNow
+		sched.Now = savedNow
 	}()
 	sched.Now = func() time.Time {
 		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
@@ -1630,7 +1631,7 @@ func TestShowForADayRecurring(t *testing.T) {
 	err = bot.Answer(tg.NewFakeUpdCmd(-1, tg.NewCmd("sc_day_r", []string{"1c8f819d075"})))
 	r.NoError(err)
 
-	r.Equal(tg.NewKeyboard([]tg.Row{[]tg.Btn{tg.Btn{Name: "Weekdays", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "345600", "0 0 * * 1-5"}, Type: "cmd"}}, tg.Btn{Name: "Every day", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "172800", "0 0 * * *"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "Mon", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "345600", "0 0 * * 1"}, Type: "cmd"}}, tg.Btn{Name: "Tue", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "432000", "0 0 * * 2"}, Type: "cmd"}}, tg.Btn{Name: "Wed", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "518400", "0 0 * * 3"}, Type: "cmd"}}, tg.Btn{Name: "Thu", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "604800", "0 0 * * 4"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "Fri", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "691200", "0 0 * * 5"}, Type: "cmd"}}, tg.Btn{Name: "Sat", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "172800", "0 0 * * 6"}, Type: "cmd"}}, tg.Btn{Name: "Sun", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "259200", "0 0 * * 0"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "1", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "2678400", "0 0 1 * *"}, Type: "cmd"}}, tg.Btn{Name: "2", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "2764800", "0 0 2 * *"}, Type: "cmd"}}, tg.Btn{Name: "3", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "172800", "0 0 3 * *"}, Type: "cmd"}}, tg.Btn{Name: "4", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "259200", "0 0 4 * *"}, Type: "cmd"}}, tg.Btn{Name: "5", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "345600", "0 0 5 * *"}, Type: "cmd"}}, tg.Btn{Name: "6", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "432000", "0 0 6 * *"}, Type: "cmd"}}, tg.Btn{Name: "7", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "518400", "0 0 7 * *"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "8", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "604800", "0 0 8 * *"}, Type: "cmd"}}, tg.Btn{Name: "9", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "691200", "0 0 9 * *"}, Type: "cmd"}}, tg.Btn{Name: "10", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "777600", "0 0 10 * *"}, Type: "cmd"}}, tg.Btn{Name: "11", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "864000", "0 0 11 * *"}, Type: "cmd"}}, tg.Btn{Name: "12", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "950400", "0 0 12 * *"}, Type: "cmd"}}, tg.Btn{Name: "13", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1036800", "0 0 13 * *"}, Type: "cmd"}}, tg.Btn{Name: "14", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1123200", "0 0 14 * *"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "15", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1209600", "0 0 15 * *"}, Type: "cmd"}}, tg.Btn{Name: "16", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1296000", "0 0 16 * *"}, Type: "cmd"}}, tg.Btn{Name: "17", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1382400", "0 0 17 * *"}, Type: "cmd"}}, tg.Btn{Name: "18", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1468800", "0 0 18 * *"}, Type: "cmd"}}, tg.Btn{Name: "19", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1555200", "0 0 19 * *"}, Type: "cmd"}}, tg.Btn{Name: "20", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1641600", "0 0 20 * *"}, Type: "cmd"}}, tg.Btn{Name: "21", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1728000", "0 0 21 * *"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "22", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1814400", "0 0 22 * *"}, Type: "cmd"}}, tg.Btn{Name: "23", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1900800", "0 0 23 * *"}, Type: "cmd"}}, tg.Btn{Name: "24", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1987200", "0 0 24 * *"}, Type: "cmd"}}, tg.Btn{Name: "25", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "2073600", "0 0 25 * *"}, Type: "cmd"}}, tg.Btn{Name: "26", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "2160000", "0 0 26 * *"}, Type: "cmd"}}, tg.Btn{Name: "27", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "2246400", "0 0 27 * *"}, Type: "cmd"}}, tg.Btn{Name: "28", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "2332800", "0 0 28 * *"}, Type: "cmd"}}}, tg.Btn{Name: "➡️ Move to Today", Cmd: tg.Cmd{Name: "today", Params: []string(nil), Type: "cmd"}}}), tgram.SentKeyboard)
+	r.Equal(tg.NewKeyboard([]tg.Row{[]tg.Btn{tg.Btn{Name: "Weekdays", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "345600", "0 0 * * 1-5"}, Type: "cmd"}}, tg.Btn{Name: "Every day", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "172800", "0 0 * * *"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "Mon", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "345600", "0 0 * * 1"}, Type: "cmd"}}, tg.Btn{Name: "Tue", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "432000", "0 0 * * 2"}, Type: "cmd"}}, tg.Btn{Name: "Wed", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "518400", "0 0 * * 3"}, Type: "cmd"}}, tg.Btn{Name: "Thu", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "604800", "0 0 * * 4"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "Fri", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "691200", "0 0 * * 5"}, Type: "cmd"}}, tg.Btn{Name: "Sat", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "172800", "0 0 * * 6"}, Type: "cmd"}}, tg.Btn{Name: "Sun", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "259200", "0 0 * * 0"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "1", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "2678400", "0 0 1 * *"}, Type: "cmd"}}, tg.Btn{Name: "2", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "2764800", "0 0 2 * *"}, Type: "cmd"}}, tg.Btn{Name: "3", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "172800", "0 0 3 * *"}, Type: "cmd"}}, tg.Btn{Name: "4", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "259200", "0 0 4 * *"}, Type: "cmd"}}, tg.Btn{Name: "5", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "345600", "0 0 5 * *"}, Type: "cmd"}}, tg.Btn{Name: "6", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "432000", "0 0 6 * *"}, Type: "cmd"}}, tg.Btn{Name: "7", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "518400", "0 0 7 * *"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "8", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "604800", "0 0 8 * *"}, Type: "cmd"}}, tg.Btn{Name: "9", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "691200", "0 0 9 * *"}, Type: "cmd"}}, tg.Btn{Name: "10", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "777600", "0 0 10 * *"}, Type: "cmd"}}, tg.Btn{Name: "11", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "864000", "0 0 11 * *"}, Type: "cmd"}}, tg.Btn{Name: "12", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "950400", "0 0 12 * *"}, Type: "cmd"}}, tg.Btn{Name: "13", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1036800", "0 0 13 * *"}, Type: "cmd"}}, tg.Btn{Name: "14", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1123200", "0 0 14 * *"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "15", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1209600", "0 0 15 * *"}, Type: "cmd"}}, tg.Btn{Name: "16", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1296000", "0 0 16 * *"}, Type: "cmd"}}, tg.Btn{Name: "17", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1382400", "0 0 17 * *"}, Type: "cmd"}}, tg.Btn{Name: "18", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1468800", "0 0 18 * *"}, Type: "cmd"}}, tg.Btn{Name: "19", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1555200", "0 0 19 * *"}, Type: "cmd"}}, tg.Btn{Name: "20", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1641600", "0 0 20 * *"}, Type: "cmd"}}, tg.Btn{Name: "21", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1728000", "0 0 21 * *"}, Type: "cmd"}}}, []tg.Btn{tg.Btn{Name: "22", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1814400", "0 0 22 * *"}, Type: "cmd"}}, tg.Btn{Name: "23", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1900800", "0 0 23 * *"}, Type: "cmd"}}, tg.Btn{Name: "24", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "1987200", "0 0 24 * *"}, Type: "cmd"}}, tg.Btn{Name: "25", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "2073600", "0 0 25 * *"}, Type: "cmd"}}, tg.Btn{Name: "26", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "2160000", "0 0 26 * *"}, Type: "cmd"}}, tg.Btn{Name: "27", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "2246400", "0 0 27 * *"}, Type: "cmd"}}, tg.Btn{Name: "28", Cmd: tg.Cmd{Name: "sc", Params: []string{"1c8f", "2332800", "0 0 28 * *"}, Type: "cmd"}}}, tg.Btn{Name: "➡️ Move to Today", Cmd: tg.Cmd{Name: "today", Params: []string(nil), Type: "cmd"}}}), tgram.LastSentKeyboard)
 }
 
 func TestSchedule(t *testing.T) {
@@ -1976,4 +1977,380 @@ func TestShowFileEscapesHTML(t *testing.T) {
 	err = bot.showFile([]string{"", "File.md"})
 	r.NoError(err)
 	r.Equal("File\n&lt;b&gt;bold<i>italic</i>", tgram.LastSentText)
+}
+
+func TestSaveToNewTaskIntegration(t *testing.T) {
+	r := require.New(t)
+
+	savedNow := now
+	defer func() {
+		now = savedNow
+	}()
+	now = func() time.Time {
+		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
+	}
+
+	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
+	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist()
+	r.NoError(err)
+
+	cfg := userconfig.NewConfig(userFS, -1, "config.json")
+	err = cfg.CreateDefaultIfNotExists()
+	r.NoError(err)
+
+	cfg.AddMoveToCmd(consts.CmdScheduleForTmrw)
+	cfg.AddMoveToCmd(consts.CmdMoveToLater)
+	cfg.AddMoveToCmd(consts.CmdShowScheduleForDay)
+	cfg.AddMoveToCmd(consts.CmdShowMoveToDirOrFile)
+	cfg.AddMoveToCmd(consts.CmdMoveToJournal)
+	cfg.AddMoveToCmd(consts.CmdMoveToRead)
+	cfg.AddMoveToCmd(consts.CmdMoveToWatch)
+	cfg.AddMoveToCmd(consts.CmdMoveToShop)
+
+	tgram := tg.NewFakeTG()
+	database := db.NewFakeDB()
+	bot := NewBot(-1, tgram, userFS, database, fakeConfig())
+	err = bot.Answer(tg.NewFakeUpd(-1, "New task"))
+	r.NoError(err)
+
+	kb := tg.NewKeyboard([]tg.Row{
+		tg.NewRow(
+			tg.NewBtn("🌚 To tmrw", tg.NewCmd("sc_tmrw", []string{"d0776a3e2b9"})),
+			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{"d0776a3e2b9"})),
+			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{"d0776a3e2b9"})),
+		),
+		tg.NewRow(
+			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{"d0776a3e2b9"})),
+			tg.NewBtn("➡️ Today", tg.NewCmd("today", nil)),
+		)})
+	r.Equal(kb, tgram.LastSentKeyboard)
+
+	err = bot.Answer(tg.NewFakeUpdCmd(-1, tg.NewCmd("today", nil)))
+	r.NoError(err)
+
+	content, err := userFS.Read("today", "New task.md")
+	r.NoError(err)
+	r.Equal("", content)
+
+	r.Nil(database.InputExpectation(-1))
+	msgID, ok := database.LastKeyboardMsgID(-1)
+	r.True(ok)
+	r.Equal(1, msgID)
+	r.Equal(msgID, tgram.LastSentMessageID)
+}
+
+func TestSaveToExistingFileIntegration(t *testing.T) {
+	r := require.New(t)
+
+	savedNow := now
+	defer func() {
+		now = savedNow
+	}()
+	now = func() time.Time {
+		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
+	}
+
+	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
+	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist()
+	r.NoError(err)
+	err = userFS.Write("", "File.md", "File content")
+	r.NoError(err)
+
+	cfg := userconfig.NewConfig(userFS, -1, "config.json")
+	err = cfg.CreateDefaultIfNotExists()
+	r.NoError(err)
+
+	cfg.AddMoveToCmd(consts.CmdScheduleForTmrw)
+	cfg.AddMoveToCmd(consts.CmdMoveToLater)
+	cfg.AddMoveToCmd(consts.CmdShowScheduleForDay)
+	cfg.AddMoveToCmd(consts.CmdShowMoveToDirOrFile)
+	cfg.AddMoveToCmd(consts.CmdMoveToJournal)
+	cfg.AddMoveToCmd(consts.CmdMoveToRead)
+	cfg.AddMoveToCmd(consts.CmdMoveToWatch)
+	cfg.AddMoveToCmd(consts.CmdMoveToShop)
+
+	tgram := tg.NewFakeTG()
+	database := db.NewFakeDB()
+	bot := NewBot(-1, tgram, userFS, database, fakeConfig())
+	err = bot.Answer(tg.NewFakeUpd(-1, "Text"))
+	r.NoError(err)
+
+	kb := tg.NewKeyboard([]tg.Row{
+		tg.NewRow(
+			tg.NewBtn("🌚 To tmrw", tg.NewCmd("sc_tmrw", []string{"232004794e5"})),
+			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{"232004794e5"})),
+			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{"232004794e5"})),
+		),
+		tg.NewRow(
+			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{"232004794e5"})),
+			tg.NewBtn("➡️ Today", tg.NewCmd("today", nil)),
+		)})
+	r.Equal(kb, tgram.LastSentKeyboard)
+
+	err = bot.Answer(tg.NewFakeUpdCmd(-1, tg.NewCmd("to_file", []string{"232004794e5"})))
+	r.NoError(err)
+
+	selectFileKB := tg.NewKeyboard([]tg.Row{
+		tg.NewRow(
+			tg.NewBtn("📄 Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
+			tg.NewBtn("📄 File", tg.NewCmd("mf", []string{"7595e", "", "23200"})),
+		),
+		tg.NewBtn("Or choose a dir:", tg.NewCustomCmd("search", nil, "iq")),
+		tg.NewRow(
+			tg.NewBtn("🗂️ habits", tg.NewCmd("mv", []string{"51fc0", "", "232004794e5"})),
+			tg.NewBtn("🗂️ inbox", tg.NewCmd("mv", []string{"af1cd", "", "232004794e5"})),
+		),
+	})
+	r.Equal(selectFileKB, tgram.LastEditedKeyboard)
+
+	err = bot.Answer(tg.NewFakeUpdCmd(-1, tg.NewCmd("mf", []string{"7595e", "", "23200"})))
+	r.NoError(err)
+
+	r.Empty(tgram.LastEditedKeyboard.Btns)
+
+	content, err := userFS.Read("", "File.md")
+	r.NoError(err)
+	r.Equal("#### 1 January, Thursday\nText\nFile content", content)
+
+	r.Nil(database.InputExpectation(-1))
+	msgID, ok := database.LastKeyboardMsgID(-1)
+	r.True(ok)
+	r.Equal(1, msgID)
+	r.Equal(msgID, tgram.LastSentMessageID)
+}
+
+func TestSaveToNewFileIntegration(t *testing.T) {
+	r := require.New(t)
+
+	savedNow := now
+	defer func() {
+		now = savedNow
+	}()
+	now = func() time.Time {
+		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
+	}
+
+	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
+	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist()
+	r.NoError(err)
+
+	cfg := userconfig.NewConfig(userFS, -1, "config.json")
+	err = cfg.CreateDefaultIfNotExists()
+	r.NoError(err)
+
+	cfg.AddMoveToCmd(consts.CmdScheduleForTmrw)
+	cfg.AddMoveToCmd(consts.CmdMoveToLater)
+	cfg.AddMoveToCmd(consts.CmdShowScheduleForDay)
+	cfg.AddMoveToCmd(consts.CmdShowMoveToDirOrFile)
+	cfg.AddMoveToCmd(consts.CmdMoveToJournal)
+	cfg.AddMoveToCmd(consts.CmdMoveToRead)
+	cfg.AddMoveToCmd(consts.CmdMoveToWatch)
+	cfg.AddMoveToCmd(consts.CmdMoveToShop)
+
+	tgram := tg.NewFakeTG()
+	database := db.NewFakeDB()
+	bot := NewBot(-1, tgram, userFS, database, fakeConfig())
+	err = bot.Answer(tg.NewFakeUpd(-1, "Text"))
+	r.NoError(err)
+
+	kb := tg.NewKeyboard([]tg.Row{
+		tg.NewRow(
+			tg.NewBtn("🌚 To tmrw", tg.NewCmd("sc_tmrw", []string{"232004794e5"})),
+			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{"232004794e5"})),
+			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{"232004794e5"})),
+		),
+		tg.NewRow(
+			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{"232004794e5"})),
+			tg.NewBtn("➡️ Today", tg.NewCmd("today", nil)),
+		)})
+	r.Equal(kb, tgram.LastSentKeyboard)
+
+	err = bot.Answer(tg.NewFakeUpdCmd(-1, tg.NewCmd("to_file", []string{"232004794e5"})))
+	r.NoError(err)
+
+	selectFileKB := tg.NewKeyboard([]tg.Row{
+		tg.NewRow(
+			tg.NewBtn("📄 Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
+		),
+		tg.NewBtn("Or choose a dir:", tg.NewCustomCmd("search", nil, "iq")),
+		tg.NewRow(
+			tg.NewBtn("🗂️ habits", tg.NewCmd("mv", []string{"51fc0", "", "232004794e5"})),
+			tg.NewBtn("🗂️ inbox", tg.NewCmd("mv", []string{"af1cd", "", "232004794e5"})),
+		),
+	})
+	r.Equal(selectFileKB, tgram.LastEditedKeyboard)
+
+	err = bot.Answer(tg.NewFakeUpdCmd(-1, tg.NewCmd("mf", []string{"23200", "", "23200"})))
+	r.NoError(err)
+
+	r.Empty(tgram.LastEditedKeyboard.Btns)
+
+	content, err := userFS.Read("", "Text.md")
+	r.NoError(err)
+	r.Equal("", content)
+
+	r.Nil(database.InputExpectation(-1))
+	msgID, ok := database.LastKeyboardMsgID(-1)
+	r.True(ok)
+	r.Equal(1, msgID)
+	r.Equal(msgID, tgram.LastSentMessageID)
+}
+
+func TestSaveToNewMultilineFileIntegration(t *testing.T) {
+	r := require.New(t)
+
+	savedNow := now
+	defer func() {
+		now = savedNow
+	}()
+	now = func() time.Time {
+		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
+	}
+
+	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
+	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist()
+	r.NoError(err)
+
+	cfg := userconfig.NewConfig(userFS, -1, "config.json")
+	err = cfg.CreateDefaultIfNotExists()
+	r.NoError(err)
+
+	cfg.AddMoveToCmd(consts.CmdScheduleForTmrw)
+	cfg.AddMoveToCmd(consts.CmdMoveToLater)
+	cfg.AddMoveToCmd(consts.CmdShowScheduleForDay)
+	cfg.AddMoveToCmd(consts.CmdShowMoveToDirOrFile)
+	cfg.AddMoveToCmd(consts.CmdMoveToJournal)
+	cfg.AddMoveToCmd(consts.CmdMoveToRead)
+	cfg.AddMoveToCmd(consts.CmdMoveToWatch)
+	cfg.AddMoveToCmd(consts.CmdMoveToShop)
+
+	tgram := tg.NewFakeTG()
+	database := db.NewFakeDB()
+	bot := NewBot(-1, tgram, userFS, database, fakeConfig())
+	err = bot.Answer(tg.NewFakeUpd(-1, "Text\nMultiline"))
+	r.NoError(err)
+
+	kb := tg.NewKeyboard([]tg.Row{
+		tg.NewRow(
+			tg.NewBtn("🌚 To tmrw", tg.NewCmd("sc_tmrw", []string{"232004794e5"})),
+			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{"232004794e5"})),
+			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{"232004794e5"})),
+		),
+		tg.NewRow(
+			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{"232004794e5"})),
+			tg.NewBtn("➡️ Today", tg.NewCmd("today", nil)),
+		)})
+	r.Equal(kb, tgram.LastSentKeyboard)
+
+	err = bot.Answer(tg.NewFakeUpdCmd(-1, tg.NewCmd("to_file", []string{"232004794e5"})))
+	r.NoError(err)
+
+	selectFileKB := tg.NewKeyboard([]tg.Row{
+		tg.NewRow(
+			tg.NewBtn("📄 Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
+		),
+		tg.NewBtn("Or choose a dir:", tg.NewCustomCmd("search", nil, "iq")),
+		tg.NewRow(
+			tg.NewBtn("🗂️ habits", tg.NewCmd("mv", []string{"51fc0", "", "232004794e5"})),
+			tg.NewBtn("🗂️ inbox", tg.NewCmd("mv", []string{"af1cd", "", "232004794e5"})),
+		),
+	})
+	r.Equal(selectFileKB, tgram.LastEditedKeyboard)
+
+	err = bot.Answer(tg.NewFakeUpdCmd(-1, tg.NewCmd("mf", []string{"23200", "", "23200"})))
+	r.NoError(err)
+
+	r.Empty(tgram.LastEditedKeyboard.Btns)
+
+	content, err := userFS.Read("", "Text.md")
+	r.NoError(err)
+	r.Equal("Text\nMultiline", content)
+
+	r.Nil(database.InputExpectation(-1))
+	msgID, ok := database.LastKeyboardMsgID(-1)
+	r.True(ok)
+	r.Equal(1, msgID)
+	r.Equal(msgID, tgram.LastSentMessageID)
+}
+
+func TestSaveToNewCustomFileIntegration(t *testing.T) {
+	r := require.New(t)
+
+	savedNow := now
+	defer func() {
+		now = savedNow
+	}()
+	now = func() time.Time {
+		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
+	}
+
+	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
+	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist()
+	r.NoError(err)
+
+	cfg := userconfig.NewConfig(userFS, -1, "config.json")
+	err = cfg.CreateDefaultIfNotExists()
+	r.NoError(err)
+
+	cfg.AddMoveToCmd(consts.CmdScheduleForTmrw)
+	cfg.AddMoveToCmd(consts.CmdMoveToLater)
+	cfg.AddMoveToCmd(consts.CmdShowScheduleForDay)
+	cfg.AddMoveToCmd(consts.CmdShowMoveToDirOrFile)
+	cfg.AddMoveToCmd(consts.CmdMoveToJournal)
+	cfg.AddMoveToCmd(consts.CmdMoveToRead)
+	cfg.AddMoveToCmd(consts.CmdMoveToWatch)
+	cfg.AddMoveToCmd(consts.CmdMoveToShop)
+
+	tgram := tg.NewFakeTG()
+	database := db.NewFakeDB()
+	bot := NewBot(-1, tgram, userFS, database, fakeConfig())
+	err = bot.Answer(tg.NewFakeUpd(-1, "Text"))
+	r.NoError(err)
+
+	kb := tg.NewKeyboard([]tg.Row{
+		tg.NewRow(
+			tg.NewBtn("🌚 To tmrw", tg.NewCmd("sc_tmrw", []string{"232004794e5"})),
+			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{"232004794e5"})),
+			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{"232004794e5"})),
+		),
+		tg.NewRow(
+			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{"232004794e5"})),
+			tg.NewBtn("➡️ Today", tg.NewCmd("today", nil)),
+		)})
+	r.Equal(kb, tgram.LastSentKeyboard)
+
+	err = bot.Answer(tg.NewFakeUpdCmd(-1, tg.NewCmd("to_file", []string{"232004794e5"})))
+	r.NoError(err)
+
+	selectFileKB := tg.NewKeyboard([]tg.Row{
+		tg.NewRow(
+			tg.NewBtn("📄 Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
+		),
+		tg.NewBtn("Or choose a dir:", tg.NewCustomCmd("search", nil, "iq")),
+		tg.NewRow(
+			tg.NewBtn("🗂️ habits", tg.NewCmd("mv", []string{"51fc0", "", "232004794e5"})),
+			tg.NewBtn("🗂️ inbox", tg.NewCmd("mv", []string{"af1cd", "", "232004794e5"})),
+		),
+	})
+	r.Equal(selectFileKB, tgram.LastEditedKeyboard)
+
+	err = bot.Answer(tg.NewFakeUpd(-1, "new file"))
+	r.NoError(err)
+
+	r.Empty(tgram.LastEditedKeyboard.Btns)
+
+	content, err := userFS.Read("", "New file.md")
+	r.NoError(err)
+	r.Equal("Text", content)
+
+	r.Nil(database.InputExpectation(-1))
+	msgID, ok := database.LastKeyboardMsgID(-1)
+	r.True(ok)
+	r.Equal(1, msgID)
+	r.Equal(msgID, tgram.LastSentMessageID)
 }

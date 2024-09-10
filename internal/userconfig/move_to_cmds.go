@@ -10,7 +10,7 @@ import (
 
 var AvailableMoveToBtns = []tg.Btn{
 	tg.NewBtn(i18n.StrToTomorrow, tg.NewCmd(consts.CmdScheduleForTmrw, nil)),
-	tg.NewBtn(i18n.StrMoveToLater, tg.NewCmd(consts.CmdMoveToLater, nil)),
+	tg.NewBtn(i18n.StrToLater, tg.NewCmd(consts.CmdMoveToLater, nil)),
 	tg.NewBtn(i18n.StrToADay, tg.NewCmd(consts.CmdShowScheduleForDay, nil)),
 	tg.NewBtn(i18n.StrToFile, tg.NewCmd(consts.CmdShowMoveToDirOrFile, nil)),
 	tg.NewBtn(i18n.StrToJournal, tg.NewCmd(consts.CmdMoveToJournal, nil)),

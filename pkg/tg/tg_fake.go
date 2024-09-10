@@ -7,10 +7,11 @@ import (
 type FakeTG struct {
 	SentTexts          []string
 	LastSentText       string
-	EditedText         string
-	SentKeyboard       *Keyboard
-	EditedKeyboard     *Keyboard
+	LastEditedText     string
+	LastSentKeyboard   *Keyboard
+	LastEditedKeyboard *Keyboard
 	InlineQueryResults []any
+	LastSentMessageID  int
 }
 
 func NewFakeTG() *FakeTG {
@@ -20,14 +21,20 @@ func NewFakeTG() *FakeTG {
 func (f *FakeTG) Send(userID int64, text string, kb *Keyboard, markup string) (int, error) {
 	f.LastSentText = text
 	f.SentTexts = append(f.SentTexts, text)
-	f.SentKeyboard = kb
+	f.LastSentKeyboard = kb
+	f.LastEditedKeyboard = nil
+	f.LastEditedText = ""
 
-	return -2, nil
+	f.LastSentMessageID++
+
+	return f.LastSentMessageID, nil
 }
 
 func (f *FakeTG) Edit(userID int64, msgID int, text string, kb *Keyboard, markup string) error {
-	f.EditedText = text
-	f.EditedKeyboard = kb
+	f.LastEditedText = text
+	f.LastEditedKeyboard = kb
+	f.LastSentText = ""
+	f.LastSentKeyboard = nil
 
 	return nil
 }
