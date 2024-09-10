@@ -74,21 +74,19 @@ func main() {
 		go habitsServer(config.BotCfg.HabitsHost, config.BotCfg.HabitsCertsPath)
 	}
 
+	infolog := slog.New(slog.NewTextHandler(os.Stdout, nil))
+
 	// Main bot loop.
 	// Listen for updates from user and process them in separate goroutines.
 	tgConfig := tgbotapi.NewUpdate(0)
 	tgConfig.Timeout = 60 // TODO release, check if it's enough
 	updates := api.GetUpdatesChan(tgConfig)
-
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
-	errLogger := slog.New(slog.NewTextHandler(os.Stderr, nil))
-
 	for upd := range updates {
 		go func(upd tgbotapi.Update) {
 			defer func() {
 				err := recover()
 				if err != nil {
-					errLogger.Error("Bot panic", "err", err)
+					slog.Error("Bot panic", "err", err)
 				}
 			}()
 
@@ -97,17 +95,17 @@ func main() {
 
 			var updJSON []byte
 			updJSON, _ = json.Marshal(upd)
-			logger.Info("Bot update: ", "upd", string(updJSON))
+			infolog.Info("Bot update: ", "upd", string(updJSON))
 
 			userPath := path.Join(config.BotCfg.StoragePath, txt.I64(userID))
 			userFS, err := fs.NewFS(userPath, afero.NewOsFs())
 			if err != nil {
-				errLogger.Error("Bot error: can't create fs", "err", err)
+				slog.Error("Bot error: can't create fs", "err", err)
 				return
 			}
 			err = userFS.CreateDirsIfNotExist()
 			if err != nil {
-				errLogger.Error("Bot error: can't create user dirs", "err", err)
+				slog.Error("Bot error: can't create user dirs", "err", err)
 				return
 			}
 
@@ -115,13 +113,13 @@ func main() {
 			userconf := userconfig.NewConfig(userFS, userID, confFilename)
 			err = userconf.CreateDefaultIfNotExists()
 			if err != nil {
-				errLogger.Error("Bot error: can't create default user config", "err", err)
+				slog.Error("Bot error: can't create default user config", "err", err)
 				return
 			}
 
 			bot := internal.NewBot(userID, telegram, userFS, db.NewDB(), userconf)
 			if err := bot.Answer(u); err != nil {
-				errLogger.Error("Bot error", "err", err)
+				slog.Error("Bot error", "err", err)
 			}
 		}(upd)
 	}
