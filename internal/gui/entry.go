@@ -10,13 +10,15 @@ import (
 // entry with multiline support
 type entry struct {
 	widget.Entry
-	shiftHeld   bool
-	rowsVisible int
+	shiftHeld        bool
+	rowsVisible      int
+	charsToMultiline int
 }
 
 func newEntry() *entry {
 	e := &entry{}
 	e.rowsVisible = 3
+	e.charsToMultiline = 56
 	e.Scroll = container.ScrollVerticalOnly
 	e.PlaceHolder = "Type here..."
 	e.ExtendBaseWidget(e)
@@ -44,6 +46,12 @@ func (e *entry) TypedKey(key *fyne.KeyEvent) {
 		if !e.shiftHeld {
 			sendMsg()
 		}
+	}
+
+	if len(e.Text) > e.charsToMultiline && !e.MultiLine {
+		e.MultiLine = true
+		e.SetMinRowsVisible(e.rowsVisible)
+		e.Wrapping = fyne.TextWrapBreak
 	}
 
 	e.Entry.TypedKey(key)
