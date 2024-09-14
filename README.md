@@ -14,7 +14,7 @@ An application for your personal stuff:
 
 It works like a regular chat, so it's easier to use because there's less resistance. We're used to sending messages to friends, now we're going to send stuff to the bot.  
 
-When we are focused and distracting information comes in, we want to get rid of it as quickly as possible. To do that, just send the bot whatever's is on your mind. Then choose how you want to save it - as a task, a note, or a journal entry. Will be saved as today's task by default.
+When we are focused and distracting information comes in, we want to get rid of that information as quickly as possible. To do that, just send the bot whatever's is on your mind. Then choose how you want to save it - as a task, a note, or a journal entry. Will be saved as today's task by default.
 
 [Tasks management via bot](https://club.mnogosdelal.ru/post/180/)  
 [Notes taking via bot](https://vas3k.club/post/18815/)
@@ -42,6 +42,19 @@ Bot's artifacts can be seen in `storage/<USER_ID>` folder
 $ make gui
 ```
 
+## File structure
+We differentiate the following types of files (with `/` denoting your root folder):
+- Tasks: `/today/Pay the bills.md` (`/today/*.md`, `/later/*.md`)
+- Notes: `/brain/Brain is the most complex object.md` (`/*/*.md` also `/inbox/*.md`)
+- Files: `/My project.md` (`/*.md`)
+- Checklists: `/-read-/How to Take Smart Notes.md` (`/-[read|watch|shop]-/*.md`)
+- Journal: `/Journal/2024.08 August.md` (`/journal/<YEAR>.<MONTH> <MONTH NAME>.md`)
+- Habits: `/habits/2 minute morning workout.md` (`/habits/*.md`)
+- Insights: `/insights/2024 Habits.md` (`/insights/<YEAR> Habits.md`)
+- Images: `/img/*`
+- Pomodoro: `/today/Finished a break.md`
+- Archive: `/archive/*`
+
 ## How we contribute
 - No long-lived branches except `main`
 - Feature branches are [short-lived](https://trunkbaseddevelopment.com/short-lived-feature-branches/)
@@ -65,18 +78,6 @@ $ git checkout -b feature/feature_name
 - `ctime` for dir - adding or removing files or subdirectories (similar to `mtime`)
 
 Any file can be uniquely identified by filename and dir. We only support one level of nesting.
-
-We differentiate the following types of files (with `/` denoting your root folder):
-- Tasks: `/today/Pay the bills.md` (`/today/*.md`, `/later/*.md`)
-- Notes: `/brain/Brain is the most complex object.md` (`/*/*.md` also `/inbox/*.md`)
-- Files: `/My project.md` (`/*.md`)
-- Checklists: `/-read-/How to Take Smart Notes.md` (`/-[read|watch|shop]-/*.md`)
-- Journal: `/Journal/2024.08 August.md` (`/journal/<YEAR>.<MONTH> <MONTH NAME>.md`)
-- Habits: `/habits/2 minute morning workout.md` (`/habits/*.md`)
-- Insights: `/insights/2024 Habits.md` (`/insights/<YEAR> Habits.md`)
-- Images: `/img/*`
-- Pomodoro: `/today/Finished a break.md`
-- Archive: `/archive/*`
 
 ## Performance
 The app is  blazing fast :) If you're afraid of using files or mutexes unnecessarily for performance reasons, take a look at this:  
