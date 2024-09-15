@@ -4,6 +4,7 @@ import (
 	"image/color"
 	"io"
 	"strings"
+	"sync"
 	"time"
 
 	"fyne.io/fyne/v2"
@@ -27,6 +28,7 @@ type ChatGUI struct {
 	updater   func(updInterface internal.Update) error
 	container *fyne.Container
 	removable []*fyne.Container
+	toastLock sync.Mutex
 }
 
 var Chat *ChatGUI
@@ -93,6 +95,12 @@ func (c *ChatGUI) Send(_ int64, text string, kb *tg.Keyboard, markup string) (in
 	}
 	c.attachKeyboard(kb, btnsContainer)
 
+	title := text
+	if len(title) > 50 {
+		title = txt.Substr(text, 0, 50) + "..."
+	}
+	c.window.SetTitle(title)
+
 	c.messages.Add(msgContainer)
 	c.removable = append(c.removable, msgContainer)
 	c.scroll.Refresh()
@@ -121,14 +129,17 @@ func (c *ChatGUI) AnswerCallbackQuery(_ string, msg string) error {
 		return nil
 	}
 
-	toast := canvas.NewText(msg, color.RGBA{R: 0, G: 0, B: 0, A: 30})
+	if !c.toastLock.TryLock() {
+		return nil
+	}
+
+	toast := widget.NewLabel(msg)
 	toast.Alignment = fyne.TextAlignCenter
 	Chat.container.Add(toast)
-
-	Chat.window.Canvas().Content()
 	go func() {
 		time.Sleep(1 * time.Second)
 		toast.Hide()
+		c.toastLock.Unlock()
 	}()
 
 	return nil
