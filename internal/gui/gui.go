@@ -24,7 +24,7 @@ type ChatGUI struct {
 	scroll    *container.Scroll
 	window    fyne.Window
 	entry     *entry
-	updater   func(updInterface internal.UpdInterface) error
+	updater   func(updInterface internal.Update) error
 	container *fyne.Container
 }
 
@@ -36,7 +36,7 @@ const (
 	maxCharsPerLine = 50
 )
 
-func NewGui(userID int64, updater func(u internal.UpdInterface) error) *ChatGUI {
+func NewGui(userID int64, updater func(u internal.Update) error) *ChatGUI {
 	return &ChatGUI{userID: userID, messages: container.NewVBox(), entry: newEntry(), updater: updater}
 }
 

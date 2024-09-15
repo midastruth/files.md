@@ -12,7 +12,7 @@ import (
 	"golang.org/x/exp/slog"
 )
 
-type TGInterface interface {
+type Chat interface {
 	Send(userID int64, text string, kb *tg.Keyboard, markup string) (int, error)
 }
 
@@ -39,10 +39,10 @@ var (
 
 type WorldClockPlugin struct {
 	userID int64
-	tg     TGInterface
+	tg     Chat
 }
 
-func NewWorldClockPlugin(userID int64, tg TGInterface) *WorldClockPlugin {
+func NewWorldClockPlugin(userID int64, tg Chat) *WorldClockPlugin {
 	return &WorldClockPlugin{userID, tg}
 }
 

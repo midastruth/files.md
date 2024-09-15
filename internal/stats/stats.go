@@ -12,12 +12,10 @@ import (
 	"zakirullin/stuffbot/internal/sched"
 )
 
-type DBInterface interface {
-}
-
 var now = time.Now
 
-func TodayReport(userFS *fs.FS, db DBInterface, userID int64) (string, error) {
+// TODO db is necessary?
+func TodayReport(userFS *fs.FS, db any, userID int64) (string, error) {
 	files, err := DoneToday(userFS, db, userID)
 	if err != nil {
 		return "", fmt.Errorf("stats.TodayReport: %w", err)
@@ -58,7 +56,7 @@ func emoji(filename string) string {
 	return "✅"
 }
 
-func DoneToday(userFS *fs.FS, db DBInterface, userID int64) ([]string, error) {
+func DoneToday(userFS *fs.FS, db any, userID int64) ([]string, error) {
 	return doneToday(userFS, db, userID, false)
 }
 
@@ -66,7 +64,7 @@ func DoneTodayScheduled(userFS *fs.FS, db *db.DB, userID int64) ([]string, error
 	return doneToday(userFS, db, userID, true)
 }
 
-func doneToday(userFS *fs.FS, db DBInterface, userID int64, withScheduled bool) ([]string, error) {
+func doneToday(userFS *fs.FS, db any, userID int64, withScheduled bool) ([]string, error) {
 	files, err := userFS.FilesAndDirs(fs.DirArchive)
 	if err != nil {
 		return nil, fmt.Errorf("stats.DoneTasks: %w", err)

@@ -29,7 +29,7 @@ import (
 )
 
 var (
-	botPlugins                  []BotPluginInterface
+	botPlugins                  []BotPlugin
 	errUnknownCommand           = errors.New("unknown command")
 	errInvalidRequestFromInline = errors.New("invalid request from inline query")
 	errInvalidInlineQuery       = errors.New("invalid inline query")
@@ -52,8 +52,8 @@ const (
 	wideSpacer = "<code>            ⁠</code>"
 )
 
-// UpdInterface represents incoming user updates
-type UpdInterface interface {
+// Update represents incoming user updates
+type Update interface {
 	MsgText() string
 	UserID() int64
 	Cmd() *tg.Cmd
@@ -70,8 +70,8 @@ type UpdInterface interface {
 	Caption() string
 }
 
-// ChatInterface provides a simple interface to telegram API
-type ChatInterface interface {
+// Chat provides a simple interface to chat API like Telegram
+type Chat interface {
 	Send(userID int64, text string, kb *tg.Keyboard, markup string) (int, error)
 	Edit(userID int64, msgID int, text string, kb *tg.Keyboard, markup string) error
 	Del(userID int64, msgID int) error
@@ -80,7 +80,7 @@ type ChatInterface interface {
 	DownloadFile(fileID string, outFile io.Writer) (string, error)
 }
 
-type DBInterface interface {
+type Database interface {
 	LastKeyboardMsgID(userID int64) (int, bool)
 	SetLastKeyboardMsgID(userID int64, ID int)
 	DelLastKeyboardMsgID(userID int64)
@@ -102,19 +102,19 @@ type DBInterface interface {
 // to bot (texts, photos) - in that case we'd save everything.
 type Bot struct {
 	userID int64
-	tg     ChatInterface
+	tg     Chat
 	fs     *fs.FS
-	db     DBInterface
+	db     Database
 	cfg    *userconfig.Config
 }
 
-type BotPluginInterface interface {
+type BotPlugin interface {
 	TryToRun(string) bool
 }
 
 var now = time.Now
 
-func NewBot(userID int64, tg ChatInterface, fs *fs.FS, db DBInterface, cfg *userconfig.Config) *Bot {
+func NewBot(userID int64, tg Chat, fs *fs.FS, db Database, cfg *userconfig.Config) *Bot {
 	botPlugins = append(botPlugins,
 		plugins.NewWorldClockPlugin(userID, tg),
 	)
@@ -123,7 +123,7 @@ func NewBot(userID int64, tg ChatInterface, fs *fs.FS, db DBInterface, cfg *user
 }
 
 // Answer to incoming text message, command or inline query
-func (b *Bot) Answer(u UpdInterface) error {
+func (b *Bot) Answer(u Update) error {
 	// Handle inline queries
 	if _, ok := u.InlineQueryID(); ok {
 		return b.answerSearch(u)
@@ -259,7 +259,7 @@ func (b *Bot) handlers() map[string]func([]string) error {
 	return handlers
 }
 
-func (b *Bot) extractCmd(u UpdInterface) (*tg.Cmd, error) {
+func (b *Bot) extractCmd(u Update) (*tg.Cmd, error) {
 	cmd := u.Cmd()
 	if cmd != nil {
 		// Check if the command is known
@@ -311,7 +311,7 @@ func (b *Bot) extractCmd(u UpdInterface) (*tg.Cmd, error) {
 	return nil, nil
 }
 
-func (b *Bot) saveFromRegularMsg(u UpdInterface) error {
+func (b *Bot) saveFromRegularMsg(u Update) error {
 	content := extractMarkdown(u)
 	title, err := b.extractTitle(content)
 	if err != nil {
@@ -338,7 +338,7 @@ func (b *Bot) saveFromRegularMsg(u UpdInterface) error {
 	return b.showMoveTo([]string{fs.Hash(filename)})
 }
 
-func (b *Bot) saveFromPhoto(u UpdInterface) error {
+func (b *Bot) saveFromPhoto(u Update) error {
 	photoID, _ := u.PhotoOrImageID()
 
 	var buf bytes.Buffer
@@ -386,7 +386,7 @@ func (b *Bot) saveFromPhoto(u UpdInterface) error {
 }
 
 // TODO Add tests
-func (b *Bot) saveFromForward(u UpdInterface) error {
+func (b *Bot) saveFromForward(u Update) error {
 	content := extractMarkdown(u)
 	sanitizedTitle, err := b.extractTitle(content)
 	if err != nil {
@@ -453,7 +453,7 @@ func (b *Bot) addToRepliedFile(replyToMsgID int, newContent string) error {
 	return b.ShowToday(nil)
 }
 
-func (b *Bot) answerSearch(u UpdInterface) error {
+func (b *Bot) answerSearch(u Update) error {
 	query, ok := u.InlineQuery()
 	if !ok {
 		return nil
@@ -635,7 +635,7 @@ func (b *Bot) showHTML(validHTML string, kb *tg.Keyboard) error {
 // Replace last message + keyboard with the new ones
 // Or show the new one (in case of photo).
 // Read "Markdown to HTML conversion" section in readme's ADRs
-// Telegram allows 1-4096 characters AFTER entities parsing,
+// Chat allows 1-4096 characters AFTER entities parsing,
 // meaning we can have 4096 plain chars + any amount of tags.
 func (b *Bot) showMD(probablyInvalidMD string, kb *tg.Keyboard) error {
 	mid, hasLastKeyboard := b.db.LastKeyboardMsgID(b.userID)
@@ -2113,7 +2113,7 @@ func (b *Bot) showHelp(_ []string) error {
 	return err
 }
 
-func extractMarkdown(u UpdInterface) string {
+func extractMarkdown(u Update) string {
 	content := txt.TelegramEntitiesToMarkdown(u.MsgText(), u.MsgEntities())
 	content = strings.TrimSpace(txt.NormNewLines(content))
 

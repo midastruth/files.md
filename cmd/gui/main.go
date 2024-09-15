@@ -42,7 +42,7 @@ func main() {
 		panic(fmt.Sprintf("Error loading i18n: %s\n", err))
 	}
 
-	updater := func(u internal.UpdInterface) error {
+	updater := func(u internal.Update) error {
 		defer func() {
 			err := recover()
 			if err != nil {

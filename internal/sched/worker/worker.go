@@ -30,7 +30,7 @@ func MoveDueTasks(
 	storagePath,
 	configFilename string,
 	fsBackend afero.Fs,
-	telegram internal.ChatInterface,
+	telegram internal.Chat,
 ) error {
 	rootFS, err := fs.NewFS(storagePath, fsBackend)
 	if err != nil {
