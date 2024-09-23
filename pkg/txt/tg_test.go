@@ -99,7 +99,7 @@ func TestSpacedItalic(t *testing.T) {
 	r.Equal(expectedMarkdown, markdown)
 }
 
-func TestEmoji(t *testing.T) {
+func TestEmojiInMessageEntities(t *testing.T) {
 	r := require.New(t)
 
 	text := "👍b"

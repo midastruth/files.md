@@ -54,33 +54,34 @@ func Emoji(emoji, str string) string {
 }
 
 func NormNewLines(text string) string {
-	text = strings.Replace(text, "\\r\\n", "\n", -1)
-	return strings.Replace(text, "\\n\\r", "\n", -1)
+	text = strings.Replace(text, "\r\n", "\n", -1)
+	return strings.Replace(text, "\n\r", "\n", -1)
 }
 
 // SplitTextIntoChunks splits the text into chunks less than or equal to maxLen.
-// The chunks are split at the last new line or space before maxLen.
+// The chunks are split at the last new line or space before maxLen (inclusive).
 // Spaces-like characters are trimmed out from the beginning and the end of each chunk.
 func SplitTextIntoChunks(text string, maxLen int) []string {
+	text = strings.TrimSpace(text)
+
 	if maxLen <= 0 {
 		return []string{text}
 	}
 
 	var chunks []string
-	runes := []rune(strings.TrimSpace(text)) // Convert the string to runes
+	runes := []rune(text) // Convert the string to runes
 
 	for len(runes) > maxLen {
-		subStr := runes[:maxLen]
-
-		// Find the last newline in the substring
+		// Find the split index
 		splitIndex := -1
+		subStr := runes[:maxLen]
+		// Find the last newline in the substring
 		for i := len(subStr) - 1; i >= 0; i-- {
 			if subStr[i] == '\n' {
 				splitIndex = i
 				break
 			}
 		}
-
 		if splitIndex == -1 {
 			// No newline found, find the last space
 			for i := len(subStr) - 1; i >= 0; i-- {
@@ -89,20 +90,17 @@ func SplitTextIntoChunks(text string, maxLen int) []string {
 					break
 				}
 			}
-			if splitIndex == -1 {
-				// No space found either, split at maxLen
-				splitIndex = maxLen
-			}
+		}
+		if splitIndex == -1 {
+			// No space found either, split at maxLen
+			splitIndex = maxLen
 		}
 
-		// Add the chunk to the list
 		trimmedSubStr := strings.TrimSpace(string(runes[:splitIndex]))
 		if len(trimmedSubStr) > 0 {
 			chunks = append(chunks, trimmedSubStr)
 		}
-		// Move the pointer forward
 		runes = runes[splitIndex:]
-		// Prevent leading spaces
 		runes = []rune(strings.TrimSpace(string(runes)))
 	}
 
@@ -123,14 +121,12 @@ func InsertTextAfterHeader(existingContent, header, newContent string) string {
 	return strings.TrimSpace(content)
 }
 
-// TODO add tests
 func FirstWord(str string) string {
 	str = strings.TrimSpace(str)
 	re := regexp.MustCompile(`^[^\s\p{P}]+`)
 	return re.FindString(str)
 }
 
-// TODO add tests
 func EscapeHTML(str string) string {
 	// HTML escaping
 	var htmlEscaper = strings.NewReplacer(
@@ -147,7 +143,6 @@ func StripHTMLTags(str string) string {
 	return re.ReplaceAllString(str, "")
 }
 
-// TODO add tests
 func ReplaceWithPlaceholders(str, regex, placeholder string) (string, map[string]string) {
 	re := regexp.MustCompile(regex)
 	placeholders := make(map[string]string)
@@ -171,7 +166,6 @@ func RestoreFromPlaceholders(str string, placeholders map[string]string) string 
 	return str
 }
 
-// TODO add tests
 func SplitLongLines(input string, maxRunesPerLine int) string {
 	var res strings.Builder
 	lines := strings.Split(input, "\n")

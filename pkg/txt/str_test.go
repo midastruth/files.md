@@ -164,3 +164,270 @@ func TestSplitTextIntoChunks(t *testing.T) {
 		})
 	}
 }
+
+func TestNormNewLines(t *testing.T) {
+	// Initialize the test cases
+	testCases := []struct {
+		input          string
+		expectedOutput string
+	}{
+		// Test Case 1: Windows-style line endings
+		{input: "Hello\r\nWorld", expectedOutput: "Hello\nWorld"},
+
+		// Test Case 2: Mixed line endings
+		{input: "Line1\n\rLine2\r\nLine3", expectedOutput: "Line1\nLine2\nLine3"},
+
+		// Test Case 3: Unix-style line endings (no change expected)
+		{input: "This\nis\na\ntest", expectedOutput: "This\nis\na\ntest"},
+
+		// Test Case 4: No line endings
+		{input: "NoLineEndingsHere", expectedOutput: "NoLineEndingsHere"},
+	}
+
+	for _, tc := range testCases {
+		output := NormNewLines(tc.input)
+		require.Equal(t, tc.expectedOutput, output, "Input: %s", tc.input)
+	}
+}
+
+func TestEmoji(t *testing.T) {
+	// Test with a valid emoji
+	res := Emoji("😊", "Hello")
+	require.Equal(t, "😊 Hello", res)
+
+	// Test with an empty emoji (should just return the string)
+	res = Emoji("", "Hello")
+	require.Equal(t, "Hello", res)
+
+	// Test with a different emoji
+	res = Emoji("🎉", "Congratulations")
+	require.Equal(t, "🎉 Congratulations", res)
+
+	// Test with an empty string for str
+	res = Emoji("🎉", "")
+	require.Equal(t, "🎉 ", res)
+
+	// Test with both emoji and str empty
+	res = Emoji("", "")
+	require.Equal(t, "", res)
+}
+
+func TestSubstr(t *testing.T) {
+	// Basic test case
+	require.Equal(t, "ello", Substr("hello", 1, 4), "Should return 'ello'")
+
+	// Test start index beyond string length
+	require.Equal(t, "", Substr("hello", 10, 2), "Should return empty string for out-of-bound start index")
+
+	// Test length exceeding string length
+	require.Equal(t, "hello", Substr("hello", 0, 10), "Should return entire string when length exceeds")
+
+	// Test empty string
+	require.Equal(t, "", Substr("", 0, 1), "Should return empty string when input is empty")
+
+	// Test Unicode characters (basic)
+	require.Equal(t, "界", Substr("世界", 1, 1), "Should return '界' for unicode characters")
+
+	// Test handling of emoji (simple)
+	require.Equal(t, "👋", Substr("👋🌍", 0, 1), "Should return first emoji '👋'")
+
+	// Test handling of emoji with skin tone (skin tone modifier counts as 2 codepoints)
+	require.Equal(t, "👋🏻", Substr("👋🏻🌍", 0, 2), "Should return first emoji with skin tone modifier '👋🏻'")
+
+	// Test for slicing emoji across boundaries (shouldn't break)
+	require.Equal(t, "👋🏻", Substr("👋🏻🌍", 0, 2), "Should return the entire emoji with modifier '👋🏻'")
+
+	// Test when slicing exceeds bounds with emoji and unicode characters
+	require.Equal(t, "👋🏻🌍", Substr("👋🏻🌍", 0, 5), "Should return the whole string with emoji and modifier")
+
+	// Test invalid range where length is 0
+	require.Equal(t, "", Substr("hello", 0, 0), "Should return an empty string when length is 0")
+}
+
+func TestFirstWord(t *testing.T) {
+	// Basic test case
+	require.Equal(t, "Hello", FirstWord("Hello world!"), "Should return 'Hello' as the first word")
+
+	// Test with leading spaces
+	require.Equal(t, "Hello", FirstWord("   Hello world!"), "Should trim leading spaces and return 'Hello'")
+
+	// Test with trailing spaces
+	require.Equal(t, "Hello", FirstWord("Hello world!   "), "Should trim trailing spaces and return 'Hello'")
+
+	// Test with punctuation
+	require.Equal(t, "Hello", FirstWord("Hello, world!"), "Should return 'Hello' ignoring punctuation")
+
+	// Test empty string
+	require.Equal(t, "", FirstWord(""), "Should return an empty string for an empty input")
+
+	// Test with only spaces
+	require.Equal(t, "", FirstWord("     "), "Should return an empty string for spaces only")
+
+	// Test with only punctuation
+	require.Equal(t, "", FirstWord(",.!?"), "Should return an empty string for only punctuation")
+
+	// Test with multiple words and punctuation
+	require.Equal(t, "This", FirstWord("This is a sentence!"), "Should return 'This'")
+
+	// Test with non-ASCII characters
+	require.Equal(t, "первое", FirstWord("первое слово"), "Should return the first non-ASCII word 'первое'")
+
+	// Test with hyphenated word
+	require.Equal(t, "Hello", FirstWord("Hello-world!"), "Should return 'Hello' before the hyphen")
+}
+
+func TestEscapeHTML(t *testing.T) {
+	// Basic test case
+	require.Equal(t, "&lt;div&gt;", EscapeHTML("<div>"), "Should escape '<' and '>' into '&lt;' and '&gt;'")
+
+	// Test escaping ampersand
+	require.Equal(t, "&amp;hello&amp;", EscapeHTML("&hello&"), "Should escape '&' into '&amp;'")
+
+	// Test escaping mixed characters
+	require.Equal(t, "&lt;div&gt; &amp; text", EscapeHTML("<div> & text"), "Should escape both '<', '>' and '&'")
+
+	// Test string without special characters
+	require.Equal(t, "Hello World", EscapeHTML("Hello World"), "Should return the same string if no HTML special characters")
+
+	// Test string with all special characters
+	require.Equal(t, "&amp;&lt;&gt;", EscapeHTML("&<>"), "Should escape '&', '<', and '>'")
+
+	// Test empty string
+	require.Equal(t, "", EscapeHTML(""), "Should return an empty string when input is empty")
+
+	// Test string with multiple occurrences of the same special characters
+	require.Equal(t, "&lt;&lt;&lt;tag&gt;&gt;&gt;", EscapeHTML("<<<tag>>>"), "Should escape all occurrences of '<' and '>'")
+}
+
+func TestStripHTMLTags(t *testing.T) {
+	// Basic test case
+	require.Equal(t, "Hello World", StripHTMLTags("<div>Hello World</div>"), "Should strip basic HTML tags")
+
+	// Test with multiple tags
+	require.Equal(t, "Hello World", StripHTMLTags("<div><p>Hello</p> <b>World</b></div>"), "Should strip multiple HTML tags")
+
+	// Test with self-closing tags
+	require.Equal(t, "Hello", StripHTMLTags("<img src='test.jpg' />Hello"), "Should strip self-closing tags")
+
+	// Test with no HTML tags
+	require.Equal(t, "Plain text", StripHTMLTags("Plain text"), "Should return the same string if no HTML tags are present")
+
+	// Test with empty string
+	require.Equal(t, "", StripHTMLTags(""), "Should return an empty string when input is empty")
+
+	// Test with tag attributes
+	require.Equal(t, "Hello", StripHTMLTags("<a href='https://example.com'>Hello</a>"), "Should strip tags and their attributes")
+
+	// Test with nested tags
+	require.Equal(t, "Nested tags", StripHTMLTags("<div><span>Nested</span> tags</div>"), "Should strip nested HTML tags")
+
+	// Test with special characters
+	require.Equal(t, "1 > 0", StripHTMLTags("1 > 0"), "Should retain special characters like '>' when not in a tag")
+
+	// Test with incomplete tags
+	require.Equal(t, "Text with <tag", StripHTMLTags("Text with <tag"), "Should retain incomplete tags as plain text")
+}
+
+func TestReplaceWithPlaceholders(t *testing.T) {
+	// Basic test case
+	str, placeholders := ReplaceWithPlaceholders("Hello World, Hello Universe", "Hello", "placeholder")
+	require.Equal(t, "#placeholder0# World, #placeholder1# Universe", str, "Should replace 'Hello' with placeholders")
+	require.Equal(t, map[string]string{
+		"#placeholder0#": "Hello",
+		"#placeholder1#": "Hello",
+	}, placeholders, "Should map placeholders to their original matches")
+
+	// Test with numbers
+	str, placeholders = ReplaceWithPlaceholders("123-456-7890 and 987-654-3210", `\d{3}-\d{3}-\d{4}`, "phone")
+	require.Equal(t, "#phone0# and #phone1#", str, "Should replace phone numbers with placeholders")
+	require.Equal(t, map[string]string{
+		"#phone0#": "123-456-7890",
+		"#phone1#": "987-654-3210",
+	}, placeholders, "Should map placeholders to phone numbers")
+
+	// Test with special characters
+	str, placeholders = ReplaceWithPlaceholders("email@example.com and test@example.org", `\S+@\S+\.\S+`, "email")
+	require.Equal(t, "#email0# and #email1#", str, "Should replace emails with placeholders")
+	require.Equal(t, map[string]string{
+		"#email0#": "email@example.com",
+		"#email1#": "test@example.org",
+	}, placeholders, "Should map placeholders to emails")
+
+	// Test with no matches
+	str, placeholders = ReplaceWithPlaceholders("No matches here", `\d+`, "num")
+	require.Equal(t, "No matches here", str, "Should return the original string if no matches")
+	require.Empty(t, placeholders, "Should return an empty map if no matches are found")
+
+	// Test with empty string
+	str, placeholders = ReplaceWithPlaceholders("", `\d+`, "num")
+	require.Equal(t, "", str, "Should return an empty string if input is empty")
+	require.Empty(t, placeholders, "Should return an empty map if input is empty")
+}
+
+func TestRestoreFromPlaceholders(t *testing.T) {
+	// Basic test case
+	str := "Hello #placeholder0#, Welcome to #placeholder1#!"
+	placeholders := map[string]string{
+		"#placeholder0#": "World",
+		"#placeholder1#": "Earth",
+	}
+	require.Equal(t, "Hello World, Welcome to Earth!", RestoreFromPlaceholders(str, placeholders), "Should restore placeholders to original values")
+
+	// Test with multiple occurrences of the same placeholder
+	str = "#placeholder0# and #placeholder0# are the same"
+	placeholders = map[string]string{
+		"#placeholder0#": "X",
+	}
+	require.Equal(t, "X and X are the same", RestoreFromPlaceholders(str, placeholders), "Should replace all occurrences of the same placeholder")
+
+	// Test with no placeholders
+	str = "No placeholders here"
+	placeholders = map[string]string{}
+	require.Equal(t, "No placeholders here", RestoreFromPlaceholders(str, placeholders), "Should return original string when no placeholders")
+
+	// Test with empty string
+	str = ""
+	placeholders = map[string]string{
+		"#placeholder0#": "X",
+	}
+	require.Equal(t, "", RestoreFromPlaceholders(str, placeholders), "Should return empty string when input is empty")
+
+	// Test with placeholders not in the string
+	str = "No matching placeholders"
+	placeholders = map[string]string{
+		"#placeholder1#": "Y",
+	}
+	require.Equal(t, "No matching placeholders", RestoreFromPlaceholders(str, placeholders), "Should return the original string if placeholder is not found")
+}
+
+func TestSplitLongLines(t *testing.T) {
+	// Basic test case with a short line
+	input := "Short line"
+	expected := "Short line\n"
+	require.Equal(t, expected, SplitLongLines(input, 10), "Should return the same line since it's shorter than the limit")
+
+	// Test case with one long line
+	input = "This is a very long line that should be split into smaller lines."
+	expected = "This is a \nvery long \nline that \nshould be \nsplit into\n smaller l\nines.\n"
+	require.Equal(t, expected, SplitLongLines(input, 10), "Should split the line into chunks of 10 runes")
+
+	// Test case with multiple lines
+	input = "First line\nThis is a very long line that needs splitting\nShort"
+	expected = "First line\nThis is a \nvery long \nline that \nneeds spli\ntting\nShort\n"
+	require.Equal(t, expected, SplitLongLines(input, 10), "Should split only the long line and keep short lines intact")
+
+	// Test with Unicode characters
+	input = "这是一个很长的中文句子。它应该被分割。"
+	expected = "这是一个很长\n的中文句子。\n它应该被分割\n。\n"
+	require.Equal(t, expected, SplitLongLines(input, 6), "Should correctly split a line with Unicode characters")
+
+	// Test with maxRunesPerLine greater than the longest line
+	input = "A short line\nAnother short line"
+	expected = "A short line\nAnother short line\n"
+	require.Equal(t, expected, SplitLongLines(input, 50), "Should return the same lines as input if the max limit is larger than the longest line")
+
+	// Test with empty input
+	input = ""
+	expected = "\n"
+	require.Equal(t, expected, SplitLongLines(input, 10), "Should handle empty input by returning a single newline")
+}
