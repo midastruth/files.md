@@ -56,7 +56,7 @@ func TestWorldClock_parseTimestamp_When_InvalidTimestamp(t *testing.T) {
 	worldClockPlugin := NewWorldClockPlugin(1, tg)
 
 	_, err := worldClockPlugin.parseTimestamp("ff6480214")
-	r.EqualError(err, "Invalid timestamp")
+	r.EqualError(err, "invalid timestamp")
 }
 
 func TestWorldClock_parseTime(t *testing.T) {
@@ -76,7 +76,7 @@ func TestWorldClock_parseTime_When_InvalidTime(t *testing.T) {
 	worldClockPlugin := NewWorldClockPlugin(1, tg)
 
 	_, err := worldClockPlugin.parseTime("15_06_2023 15:30:00")
-	r.EqualError(err, "Invalid time")
+	r.EqualError(err, "invalid time")
 }
 
 func TestWorldClock_parseDate(t *testing.T) {
@@ -96,7 +96,7 @@ func TestWorldClock_parseDate_When_InvalidDate(t *testing.T) {
 	worldClockPlugin := NewWorldClockPlugin(1, tg)
 
 	_, err := worldClockPlugin.parseDate("41.06.2023")
-	r.EqualError(err, "Invalid date")
+	r.EqualError(err, "invalid date")
 }
 
 func TestWorldClock_buildMessage(t *testing.T) {
