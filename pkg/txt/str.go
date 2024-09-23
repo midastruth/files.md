@@ -29,8 +29,9 @@ func Lcfirst(str string) string {
 	return ""
 }
 
-// Substr isn't multi-Unicode-codepoint aware, like specifying skintone or
-// gender of an emoji: https://unicode.org/emoji/charts/full-emoji-modifiers.html
+// Substr respects unicode codepoints, but not multi-unicode-codepoint aware.
+// Specifying skintone or gender of an emoji will count as 2 codepoints:
+// https://unicode.org/emoji/charts/full-emoji-modifiers.html
 func Substr(input string, start int, length int) string {
 	asRunes := []rune(input)
 	if start >= len(asRunes) {
@@ -57,34 +58,58 @@ func NormNewLines(text string) string {
 	return strings.Replace(text, "\\n\\r", "\n", -1)
 }
 
-// Spaces-like characters are trimmed out
-// TODO add tests
+// SplitTextIntoChunks splits the text into chunks less than or equal to maxLen.
+// The chunks are split at the last new line or space before maxLen.
+// Spaces-like characters are trimmed out from the beginning and the end of each chunk.
 func SplitTextIntoChunks(text string, maxLen int) []string {
-	var chunks []string
+	if maxLen <= 0 {
+		return []string{text}
+	}
 
-	for utf8.RuneCountInString(text) > maxLen {
-		// Get the substring of the first maxLen runes
-		runes := []rune(text)
-		subStr := string(runes[:maxLen])
+	var chunks []string
+	runes := []rune(text) // Convert the string to runes
+
+	for len(runes) > maxLen {
+		subStr := runes[:maxLen]
 
 		// Find the last newline in the substring
-		splitIndex := strings.LastIndex(subStr, "\n")
+		splitIndex := -1
+		for i := len(subStr) - 1; i >= 0; i-- {
+			if subStr[i] == '\n' {
+				splitIndex = i
+				break
+			}
+		}
+
 		if splitIndex == -1 {
 			// No newline found, find the last space
-			splitIndex = strings.LastIndex(subStr, " ")
+			for i := len(subStr) - 1; i >= 0; i-- {
+				if subStr[i] == ' ' {
+					splitIndex = i
+					break
+				}
+			}
 			if splitIndex == -1 {
 				// No space found either, split at maxLen
 				splitIndex = maxLen
 			}
-		} else {
-			// Adjust the split index to the rune count
-			splitIndex = utf8.RuneCountInString(subStr[:splitIndex])
 		}
 
+		// Ensure we don't split at index 0, so we always make progress
+		if splitIndex == 0 {
+			splitIndex = maxLen
+		}
+
+		// Add the chunk to the list
 		chunks = append(chunks, strings.TrimSpace(string(runes[:splitIndex])))
-		text = string(runes[splitIndex:])
+		// Move the pointer forward
+		runes = runes[splitIndex:]
+		// Prevent leading spaces in the remaining part of the string
+		runes = []rune(strings.TrimLeft(string(runes), " "))
 	}
-	chunks = append(chunks, strings.TrimSpace(text))
+
+	// Add the remaining runes as the final chunk
+	chunks = append(chunks, strings.TrimSpace(string(runes)))
 
 	return chunks
 }

@@ -93,3 +93,62 @@ func TestInsertTextAfterHeaderInTheMiddleOnlyHeader(t *testing.T) {
 
 	r.Equal("### header 0\n### header 1\nnew item\n### header 2", content)
 }
+
+func TestSplitTextIntoChunks(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		maxLen   int
+		expected []string
+	}{
+		{
+			name:     "basic split with spaces",
+			input:    "This is a test to check the splitting of text",
+			maxLen:   10,
+			expected: []string{"This is a", "test to", "check the", "splitting", "of text"},
+		},
+		{
+			name:     "split with newlines",
+			input:    "Line one\nLine two\nLine three",
+			maxLen:   15,
+			expected: []string{"Line one", "Line two", "Line three"},
+		},
+		{
+			name:     "long string without spaces",
+			input:    "supercalifragilisticexpialidocious",
+			maxLen:   10,
+			expected: []string{"supercalif", "ragilistic", "expialidoc", "ious"},
+		},
+		{
+			name:     "exact match",
+			input:    "ExactMatch",
+			maxLen:   10,
+			expected: []string{"ExactMatch"},
+		},
+		{
+			name:     "trailing and leading spaces",
+			input:    "   Leading and trailing spaces   ",
+			maxLen:   15,
+			expected: []string{"Leading and", "trailing", "spaces"},
+		},
+		{
+			name:     "no split needed",
+			input:    "Short text",
+			maxLen:   50,
+			expected: []string{"Short text"},
+		},
+		{
+			name:     "empty string",
+			input:    "",
+			maxLen:   10,
+			expected: []string{""},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			res := SplitTextIntoChunks(tt.input, tt.maxLen)
+			require.Equal(t, tt.expected, res)
+		})
+	}
+}
