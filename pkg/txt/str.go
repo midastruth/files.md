@@ -179,10 +179,10 @@ func SplitLongLines(input string, maxRunesPerLine int) string {
 				if end > len(runes) {
 					end = len(runes)
 				}
-				res.WriteString(string(runes[i:end]) + "\n")
+				res.WriteString(strings.TrimSpace(string(runes[i:end])) + "\n")
 			}
 		} else {
-			res.WriteString(line + "\n")
+			res.WriteString(strings.TrimSpace(line) + "\n")
 		}
 	}
 

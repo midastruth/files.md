@@ -408,12 +408,12 @@ func TestSplitLongLines(t *testing.T) {
 
 	// Test case with one long line
 	input = "This is a very long line that should be split into smaller lines."
-	expected = "This is a \nvery long \nline that \nshould be \nsplit into\n smaller l\nines.\n"
+	expected = "This is a\nvery long\nline that\nshould be\nsplit into\nsmaller l\nines.\n"
 	require.Equal(t, expected, SplitLongLines(input, 10), "Should split the line into chunks of 10 runes")
 
 	// Test case with multiple lines
 	input = "First line\nThis is a very long line that needs splitting\nShort"
-	expected = "First line\nThis is a \nvery long \nline that \nneeds spli\ntting\nShort\n"
+	expected = "First line\nThis is a\nvery long\nline that\nneeds spli\ntting\nShort\n"
 	require.Equal(t, expected, SplitLongLines(input, 10), "Should split only the long line and keep short lines intact")
 
 	// Test with Unicode characters
