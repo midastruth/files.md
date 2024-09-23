@@ -95,11 +95,6 @@ func SplitTextIntoChunks(text string, maxLen int) []string {
 			}
 		}
 
-		// Ensure we don't split at index 0, so we always make progress
-		if splitIndex == 0 {
-			splitIndex = maxLen
-		}
-
 		// Add the chunk to the list
 		trimmedSubStr := strings.TrimSpace(string(runes[:splitIndex]))
 		if len(trimmedSubStr) > 0 {
