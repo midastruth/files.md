@@ -202,6 +202,7 @@ func (b *Bot) handlers() map[string]func([]string) error {
 		consts.CmdShowStart:          b.showStart,
 		consts.CmdShowLater:          b.showLaterTasks,
 		consts.CmdShowFiles:          b.showFiles,
+		consts.CmdShowDirs:           b.showDirs,
 		consts.CmdShowChecklists:     b.showChecklists,
 		consts.CmdShowPostpone:       b.showPostpone,
 		consts.CmdShowMoveFromToday:  b.showMoveFromToday,
@@ -698,7 +699,7 @@ func (b *Bot) showMD(probablyInvalidMD string) error {
 
 func (b *Bot) showMoveTo(params []string) error {
 	filenameHash := params[0]
-	if b.cfg.FilesOnlyMode() {
+	if b.cfg.NotesOnlyMode() {
 		b.delAllKeyboards()
 
 		return b.showMoveToFileOrDir([]string{filenameHash})
@@ -775,8 +776,8 @@ func (b *Bot) recentCmdBtn(filenameHash string) *tg.Btn {
 }
 
 func (b *Bot) ShowToday(_ []string) error {
-	if b.cfg.FilesOnlyMode() {
-		return b.showFiles(nil)
+	if b.cfg.NotesOnlyMode() {
+		return b.showDirs(nil)
 	}
 
 	files, err := b.fs.FilesAndDirs(fs.DirToday)
@@ -889,7 +890,7 @@ func (b *Bot) todayLabel() string {
 func (b *Bot) showFiles(_ []string) error {
 	files, err := b.fs.FilesAndDirs(fs.DirRoot)
 	if err != nil {
-		return fmt.Errorf("show files: can't get dirs: %w", err)
+		return fmt.Errorf("show files: can't get files: %w", err)
 	}
 
 	var kb tg.Keyboard
@@ -907,7 +908,7 @@ func (b *Bot) showFiles(_ []string) error {
 	inlineCmd := tg.NewCustomCmd(consts.CmdInlineQuerySearchEveryWhere, nil, tg.CmdTypeInlineQueryCurrentChat)
 
 	footer := tg.NewRow(tg.NewBtn(i18n.Tr("🔎 Search"), inlineCmd))
-	if !b.cfg.FilesOnlyMode() {
+	if !b.cfg.NotesOnlyMode() {
 		footer = append(footer, tg.NewBtn(i18n.StrToday, tg.NewCmd(consts.CmdShowToday, nil)))
 	}
 	kb.AddRow(footer)
@@ -915,6 +916,57 @@ func (b *Bot) showFiles(_ []string) error {
 	err = b.showHTML(b.tr("📄 Your files:")+wideSpacer, &kb)
 	if err != nil {
 		return fmt.Errorf("show files: %w", err)
+	}
+
+	return nil
+}
+
+func (b *Bot) showDirs(_ []string) error {
+	files, err := b.fs.FilesAndDirs(fs.DirRoot)
+	if err != nil {
+		return fmt.Errorf("show dirs: can't get dirs: %w", err)
+	}
+
+	dirs := fs.OnlyNoteDirs(fs.OnlyDirs(files))
+	var dirBtns []tg.Btn
+	for _, dir := range dirs {
+		cmd := tg.NewCustomCmd("", []string{dir.Name}, tg.CmdTypeInlineQueryCurrentChat)
+		btn := tg.NewBtn(fmt.Sprintf("%s %s", i18n.Emoji("dir"), dir.Title), cmd)
+		dirBtns = append(dirBtns, btn)
+	}
+
+	var kb tg.Keyboard
+	dirBtnsByRows := slice.Chunk(dirBtns, btnsPerRow)
+	for _, row := range dirBtnsByRows {
+		kb.AddRow(row)
+	}
+	shouldAddSeparator := len(dirs) > 0 && len(files) > 0
+	if shouldAddSeparator {
+		kb.AddRow(tg.NewBtn("-", tg.NewCmd(consts.CmdDoNothing, nil)))
+	}
+
+	files = fs.ExcludeConfig(fs.OnlyMDFiles(files))
+	var fileBtns []tg.Btn
+	for _, file := range files {
+		cmd := tg.NewCmd(consts.CmdShowFile, []string{fs.DirRoot, fs.Hash(file.Name)})
+		btn := tg.NewBtn(fmt.Sprintf("📄 %s", fs.UnsanitizeFilename(file.Title)), cmd)
+		fileBtns = append(fileBtns, btn)
+	}
+	fileBtnsByRows := slice.Chunk(fileBtns, btnsPerRow)
+	for _, row := range fileBtnsByRows {
+		kb.AddRow(row)
+	}
+
+	inlineCmd := tg.NewCustomCmd(consts.CmdInlineQuerySearchEveryWhere, nil, tg.CmdTypeInlineQueryCurrentChat)
+	footer := tg.NewRow(tg.NewBtn(i18n.Tr("🔎 Search"), inlineCmd))
+	if !b.cfg.NotesOnlyMode() {
+		footer = append(footer, tg.NewBtn(i18n.StrToday, tg.NewCmd(consts.CmdShowToday, nil)))
+	}
+	kb.AddRow(footer)
+
+	err = b.showHTML(b.tr("🗂 Your dirs:")+wideSpacer, &kb)
+	if err != nil {
+		return fmt.Errorf("show dirs: %w", err)
 	}
 
 	return nil

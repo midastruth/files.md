@@ -22,7 +22,7 @@ var defaultConfig = config{
 	Schedules:                 []Schedule{},
 	QuickCmds:                 []string{},
 	AllowTwoEmojisInButton:    false,
-	FilesOnlyMode:             false,
+	NotesOnlyMode:             false,
 }
 
 var (
@@ -51,7 +51,7 @@ type config struct {
 	Schedules                 []Schedule `json:"schedules"`
 	QuickCmds                 []string   `json:"quickCommands"`
 	AllowTwoEmojisInButton    bool       `json:"allowTwoEmojisInButton"`
-	FilesOnlyMode             bool       `json:"filesOnlyMode"`
+	NotesOnlyMode             bool       `json:"filesOnlyMode"`
 }
 
 func NewConfig(userFS *fs.FS, userID int64, filename string) *Config {
@@ -91,10 +91,10 @@ func (c *Config) Timezone() *time.Location {
 }
 
 // TODO release test everything in this mode
-func (c *Config) FilesOnlyMode() bool {
+func (c *Config) NotesOnlyMode() bool {
 	cfg, _ := c.read(c.filename)
 
-	return cfg.FilesOnlyMode
+	return cfg.NotesOnlyMode
 }
 
 func (c *Config) PomodoroDuration() time.Duration {

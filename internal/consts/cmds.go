@@ -8,6 +8,7 @@ const (
 	CmdShowLater                   = "later"
 	CmdShowToday                   = "today"
 	CmdShowFiles                   = "files"
+	CmdShowDirs                    = "dirs"
 	CmdShowPostpone                = "postpone"
 	CmdShowMoveFromToday           = "move"
 	CmdShowMoveTo                  = "s_move"
