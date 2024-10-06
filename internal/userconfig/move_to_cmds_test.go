@@ -19,7 +19,7 @@ const defaultTestCfgWithNewMoveCmd = `{
     "schedules": [],
     "quickCommands": [],
     "allowTwoEmojisInButton": false,
-    "filesOnlyMode": false
+    "notesOnlyMode": false
 }`
 
 func TestAddAndDelMoveCmd(t *testing.T) {

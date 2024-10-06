@@ -19,7 +19,7 @@ const defaultTestCfgWithNewQuickCmd = `{
         "new_quick_cmd"
     ],
     "allowTwoEmojisInButton": false,
-    "filesOnlyMode": false
+    "notesOnlyMode": false
 }`
 
 func TestAddAndDelQuickCmd(t *testing.T) {
