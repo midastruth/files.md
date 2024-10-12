@@ -390,17 +390,18 @@ stuff // 🧠+
                 slider.value = 2;
                 document.querySelectorAll('l2').forEach(el => el.style.display = 'inline');
                 document.querySelectorAll('l3').forEach(el => el.style.display = 'none');
+                highlightNewBlocks('l2');
             } else if (currentHash === '#all') {
                 slider.value = 3;
                 document.querySelectorAll('l2').forEach(el => el.style.display = 'inline');
                 document.querySelectorAll('l3').forEach(el => el.style.display = 'inline');
+                highlightNewBlocks('l3');
             }
 
-            highlightNewBlocks();
         }
 
-        function highlightNewBlocks() {
-            const newBlocks = document.querySelectorAll('l2, l3');
+        function highlightNewBlocks(selector) {
+            const newBlocks = document.querySelectorAll(selector);
             newBlocks.forEach(block => {
                 console.log('hi')
                 block.classList.add('highlight');
