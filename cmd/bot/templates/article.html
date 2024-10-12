@@ -422,11 +422,11 @@ stuff // 🧠+
         document.getElementById('slider').addEventListener('input', function() {
             const sliderValue = parseInt(this.value);
             if (sliderValue === 1) {
-                location.hash = 'quick';
+                location.replace('#quick');
             } else if (sliderValue === 2) {
-                location.hash = 'detailed';
+                location.replace('#detailed');
             } else if (sliderValue === 3) {
-                location.hash = 'full';
+                location.replace('#full');
             }
             window.scrollTo({
                 top: 0,
