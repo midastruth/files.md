@@ -104,7 +104,7 @@ body {
     width: 40px;
     height: 40px;
     border: none;
-    background-color: #007bff;
+    background-color: black;
     color: white;
     border-radius: 50%;
     cursor: pointer;
@@ -117,7 +117,7 @@ body {
 }
 
 #send-button:hover:not(:disabled) {
-    background-color: #0056b3;
+    background-color: #494949;
 }
 
 .button-container {
@@ -134,11 +134,11 @@ body {
 
 .button-row button,
 .button-container > button {
-    flex: 1; /* Make buttons take equal space within the row */
+    flex: 1;
     padding: 10px;
     border: none;
-    background-color: #e5e5ea; /* Light gray background similar to Telegram */
-    color: #333; /* Text color */
+    background-color: #e5e5ea;
+    color: #333;
     cursor: pointer;
     border-radius: 5px;
     text-align: center;
