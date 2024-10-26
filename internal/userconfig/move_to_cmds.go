@@ -29,6 +29,13 @@ func (c *Config) AddMoveToCmd(cmd string) error {
 	if err != nil {
 		return fmt.Errorf("can't add move to cmd: can't read config: %w", err)
 	}
+
+	for _, existingCmd := range cfg.MoveToCmds {
+		if existingCmd == cmd {
+			return nil
+		}
+	}
+
 	cfg.MoveToCmds = append(cfg.MoveToCmds, cmd)
 	err = c.write(cfg)
 	if err != nil {

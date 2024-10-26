@@ -29,6 +29,13 @@ func (c *Config) AddQuickCmd(cmd string) error {
 	if err != nil {
 		return fmt.Errorf("can't add quick cmd: can't read config: %w", err)
 	}
+
+	for _, existingCmd := range cfg.QuickCmds {
+		if existingCmd == cmd {
+			return nil
+		}
+	}
+
 	cfg.QuickCmds = append(cfg.QuickCmds, cmd)
 	err = c.write(cfg)
 	if err != nil {
