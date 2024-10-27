@@ -34,7 +34,7 @@ var favicon string
 //go:embed templates/styles.css
 var styles string
 
-//go:embed templates/tomassanchez.jpg
+//go:embed templates/tomassanchez.webp
 var img string
 
 // TODO release graceful shutdown etc
@@ -118,7 +118,7 @@ func setupRouter(router *http.ServeMux, logger *log.Logger) {
 	})
 
 	router.HandleFunc("/tomassanchez.jpg", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "image/jpeg")
+		w.Header().Set("Content-Type", "image/webp")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(img))
 	})
