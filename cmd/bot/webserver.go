@@ -117,7 +117,7 @@ func setupRouter(router *http.ServeMux, logger *log.Logger) {
 		_, _ = w.Write([]byte(favicon))
 	})
 
-	router.HandleFunc("/tomassanchez.jpg", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/tomassanchez.webp", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/webp")
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte(img))
