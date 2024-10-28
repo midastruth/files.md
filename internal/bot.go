@@ -1588,11 +1588,12 @@ func (b *Bot) moveToNewFile(params []string) error {
 func (b *Bot) moveToNewChecklist(params []string) error {
 	filenameHash := params[0]
 	checklist := params[1]
+	checklist = fs.SanitizeFilename(checklist)
 
-	err := b.fs.Write(fs.DirRoot, txt.Ucfirst(checklist), "")
-	if err != nil {
-		return fmt.Errorf("move to new checklist: can't create empty doc: %w", err)
-	}
+	//err := b.fs.Write(fs.DirRoot, txt.Ucfirst(checklist), "")
+	//if err != nil {
+	//	return fmt.Errorf("move to new checklist: can't create empty doc: %w", err)
+	//}
 
 	return b.moveToExistingFile([]string{fs.Hash(checklist), fs.DirRoot, filenameHash})
 }
@@ -1992,7 +1993,7 @@ func (b *Bot) showToChecklist(params []string) error {
 
 	b.db.SetInputExpectation(b.userID, tg.NewCmd(consts.CmdMoveToNewChecklist, []string{filenameHash, "%s"}))
 
-	err = b.showHTML("choose your checklist", kb)
+	err = b.showHTML(i18n.Tr("Choose a checklist or name a new one"), kb)
 	if err != nil {
 		return fmt.Errorf("show to checklist: %w", err)
 	}
