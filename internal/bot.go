@@ -518,13 +518,9 @@ func (b *Bot) answerFileRequest(msg string) error {
 			return b.ShowToday(nil)
 		}
 
-		content, err := b.fs.Read(fs.DirRoot, newFilename)
+		content, err := b.readContent(fs.DirRoot, newFilename)
 		if err != nil {
 			return fmt.Errorf("inline query: can't read file %s: %w", newFilename, err)
-		}
-		content = strings.TrimSpace(content)
-		if len(content) == 0 {
-			content = fs.Title(newFilename)
 		}
 
 		if dir == fs.DirRoot {
@@ -1408,17 +1404,9 @@ func (b *Bot) moveToExistingFile(params []string) error {
 		return fmt.Errorf("move to file: can't unhash new filename '%s': %w", fromFilenameHash, err)
 	}
 
-	content, err := b.fs.Read(fromDir, fromFilename)
+	content, err := b.readContent(fromDir, fromFilename)
 	if err != nil {
 		return fmt.Errorf("move to file: can't read content of '%s': %w", fromFilename, err)
-	}
-	content = strings.TrimSpace(content)
-
-	filenameHasContent := !strings.HasPrefix(strings.ToLower(content), strings.ToLower(fs.Title(fromFilename)))
-	if len(content) == 0 {
-		content = fs.Title(fromFilename)
-	} else if filenameHasContent {
-		content = fmt.Sprintf("%s\n%s", fs.Title(fromFilename), content)
 	}
 
 	// We can tolerate this
@@ -1462,16 +1450,9 @@ func (b *Bot) moveToExistingNote(params []string) error {
 		return fmt.Errorf("move to existing note:: %w", err)
 	}
 
-	content, err := b.fs.Read(fs.DirToday, fromFilename)
+	content, err := b.readContent(fs.DirToday, fromFilename)
 	if err != nil {
 		return fmt.Errorf("move to existing note: can't read file %s: %w", fromFilename, err)
-	}
-
-	filenameHasContent := !strings.HasPrefix(strings.ToLower(content), strings.ToLower(fs.Title(fromFilename)))
-	if len(content) == 0 {
-		content = fs.Title(fromFilename)
-	} else if filenameHasContent {
-		content = fmt.Sprintf("%s\n%s", fs.Title(fromFilename), content)
 	}
 
 	err = b.addToFile(toDir, toFilename, content)
@@ -1621,16 +1602,10 @@ func (b *Bot) moveToJournal(params []string) error {
 	if err != nil {
 		return fmt.Errorf("move to journal: can't unhash filename: %w", err)
 	}
-	content, err := b.fs.Read(fs.DirToday, fromFilename)
+
+	content, err := b.readContent(fs.DirToday, fromFilename)
 	if err != nil {
 		return fmt.Errorf("move to journal: can't read content of '%s': %w", fromFilename, err)
-	}
-
-	filenameHasContent := !strings.HasPrefix(strings.ToLower(content), strings.ToLower(fs.Title(fromFilename)))
-	if len(content) == 0 {
-		content = fs.Title(fromFilename)
-	} else if filenameHasContent {
-		content = fmt.Sprintf("%s\n%s", fs.Title(fromFilename), content)
 	}
 
 	err = journal.AddRecord(b.fs, content, b.cfg.Timezone())
@@ -2267,6 +2242,25 @@ func (b *Bot) fullMode(_ []string) error {
 	}
 
 	return b.ShowToday(nil)
+}
+
+// If file is empty, use its title as content.
+// If file has content, add title to the beginning of the content.
+// If file has title as part of the content, don't add it again (happens when title was truncated).
+// TODO add tests
+func (b *Bot) readContent(dir, filename string) (string, error) {
+	content, err := b.fs.Read(dir, filename)
+	if err != nil {
+		return "", fmt.Errorf("can't read content of '%s': %w", filename, err)
+	}
+	filenameHasContent := !strings.HasPrefix(strings.ToLower(content), strings.ToLower(fs.Title(filename)))
+	if len(content) == 0 {
+		content = fs.Title(filename)
+	} else if filenameHasContent {
+		content = fmt.Sprintf("%s\n%s", fs.Title(filename), content)
+	}
+
+	return content, nil
 }
 
 func extractMarkdown(u Update) string {
