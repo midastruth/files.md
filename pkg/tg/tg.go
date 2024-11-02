@@ -2,6 +2,7 @@ package tg
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -13,6 +14,10 @@ import (
 const (
 	MarkupMarkdown = "MarkdownV2"
 	MarkupHTML     = "Html"
+)
+
+var (
+	errNoMediaMessagesSent = errors.New("no media messages sent")
 )
 
 // FakeTG is a simple wrapper over Telegram API.
@@ -51,13 +56,17 @@ func (tg *TG) SendImages(userID int64, images []string) (int, error) {
 
 	msg := tgbotapi.NewMediaGroup(userID, files)
 
-	resp, err := tg.api.Send(msg)
+	responses, err := tg.api.SendMediaGroup(msg)
 	if err != nil {
 		js, _ := json.Marshal(msg)
 		return 0, fmt.Errorf("tg send images: can't send json %s: %w", js, err)
 	}
 
-	return resp.MessageID, nil
+	if len(responses) == 0 {
+		return 0, fmt.Errorf("tg send images: %w", errNoMediaMessagesSent)
+	}
+
+	return responses[0].MessageID, nil
 }
 
 func (tg *TG) Edit(userID int64, msgID int, text string, kb *Keyboard, markup string) error {
