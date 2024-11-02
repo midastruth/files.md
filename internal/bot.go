@@ -43,7 +43,7 @@ const (
 	maxBtns                = 50
 	maxBtnsInChecklist     = 5 // For _read_ and _watch_ checklists, so we're less likely to be overwhelmed :)
 	maxBtnsInMoveTo        = 6
-	maxInlineResults       = 10
+	maxInlineResults       = 20
 	maxMsgLength           = 4096 // In UTF-8 characters (runes), skin-tone emojis count as 2
 	maxMsgsToSendAtOnce    = 5    // For lengthy messages
 	imgWidth               = 400  // We insert images into *.md files with the specified width
@@ -654,6 +654,8 @@ func (b *Bot) showHTML(validHTML string, kb *tg.Keyboard) error {
 // Chat allows 1-4096 characters AFTER entities parsing,
 // meaning we can have 4096 plain chars + any amount of tags.
 func (b *Bot) showMD(probablyInvalidMD string, kb *tg.Keyboard) error {
+	b.delAllImages()
+
 	probablyInvalidMD, images, links := txt.ExtractTextImgsLinks(probablyInvalidMD)
 
 	for label, link := range links {
@@ -1869,6 +1871,22 @@ func (b *Bot) delAllKeyboards() {
 		msgIDs = append(msgIDs, mid)
 	}
 
+	mid, hasImageSent := b.db.ImageMsgID(b.userID)
+	if hasImageSent {
+		b.db.DelImageMsgID(b.userID)
+		msgIDs = append(msgIDs, mid)
+	}
+
+	// No worries if we fail - it will be cleaned up by the worker
+	for _, msgID := range msgIDs {
+		// If we fail to del - user would get a bunch
+		// of keyboards in one chat, which is messy but not critical
+		_ = b.tg.Del(b.userID, msgID)
+	}
+}
+
+func (b *Bot) delAllImages() {
+	var msgIDs []int
 	mid, hasImageSent := b.db.ImageMsgID(b.userID)
 	if hasImageSent {
 		b.db.DelImageMsgID(b.userID)
