@@ -32,7 +32,8 @@
 </head>
 <body>
 <div id="editor">
-<div id="editor-sidebar"></div>
+<div id="editor-sidebar">
+</div>
 <div id="editor-content"><textarea id="editor-textarea"></textarea></div>
 <ninja-keys placeholder="Quick panel" class="dark" openHotkey="cmd+m" noAutoLoadMdIcons="true" hideBreadcrumbs="true">
     <slot name="footer"></slot>
@@ -215,12 +216,9 @@
     }
 
     document.addEventListener("keydown", function (event) {
-        if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-            event.preventDefault();
-            const folder = editor.currentFolder;
-            const filename = editor.currentFile;
-            if (folder && filename) saveFile(folder, filename);
-        }
+        const folder = editor.currentFolder;
+        const filename = editor.currentFile;
+        if (folder && filename) saveFile(folder, filename);
     });
 
     function initDB() {
@@ -259,7 +257,5 @@
 
     openDirectory();
 </script>
-<button onclick="openDirectory()">Open Zettel Directory</button>
-<button onclick="saveFile(editor.currentFolder, editor.currentFile)">Save Current File</button>
 </body>
 </html>
