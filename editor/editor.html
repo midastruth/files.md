@@ -152,11 +152,22 @@
     ninja.data = hotkeys;
 
 
-    // Open directory function
+    let savedDirectoryHandle = null;
+
     async function openDirectory() {
-        const directoryHandle = await window.showDirectoryPicker();
+        // Retrieve saved handle from IndexedDB if available
+        if (!savedDirectoryHandle) {
+            savedDirectoryHandle= await getSavedDirectoryHandle();
+        }
+
+        // If no saved handle, prompt the user to pick a directory
+        if (!savedDirectoryHandle) {
+            savedDirectoryHandle = await window.showDirectoryPicker();
+            await saveDirectoryHandle(savedDirectoryHandle);  // Save handle to IndexedDB
+        }
+
         zettel = {};  // Reset the zettel structure
-        await loadDirectory(directoryHandle);
+        await loadDirectory(savedDirectoryHandle);
         buildSidebar();
     }
 
@@ -214,6 +225,42 @@
             if (folder && filename) saveFile(folder, filename);
         }
     });
+
+    function initDB() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open('zettelApp', 1);
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve(request.result);
+            request.onupgradeneeded = () => {
+                const db = request.result;
+                if (!db.objectStoreNames.contains('handles')) {
+                    db.createObjectStore('handles');
+                }
+            };
+        });
+    }
+
+    // Save the directory handle to IndexedDB
+    async function saveDirectoryHandle(directoryHandle) {
+        const db = await initDB();
+        const transaction = db.transaction('handles', 'readwrite');
+        const store = transaction.objectStore('handles');
+        await store.put(directoryHandle, 'savedDirectoryHandle');
+    }
+
+    // Retrieve the saved directory handle from IndexedDB
+    async function getSavedDirectoryHandle() {
+        const db = await initDB();
+        return new Promise((resolve, reject) => {
+            const transaction = db.transaction('handles', 'readonly');
+            const store = transaction.objectStore('handles');
+            const request = store.get('savedDirectoryHandle');
+            request.onsuccess = () => resolve(request.result); // Resolve with the result from IndexedDB
+            request.onerror = () => reject(request.error);
+        });
+    }
+
+    openDirectory();
 </script>
 <button onclick="openDirectory()">Open Zettel Directory</button>
 <button onclick="saveFile(editor.currentFolder, editor.currentFile)">Save Current File</button>
