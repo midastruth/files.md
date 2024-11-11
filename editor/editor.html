@@ -37,6 +37,12 @@
                 hideBreadcrumbs="true">
         <slot name="footer"></slot>
     </ninja-keys>
+    <div id="goToFile" style="display: none;">
+        <form autocomplete="off">
+            <input type="text" id="goToFileInput" placeholder="Go to file..." oninput="filterFiles()">
+        </form>
+        <ul id="goToFileResults"></ul>
+    </div>
 </div>
 
 <script>
@@ -297,6 +303,122 @@
             await openRandomFile();
         }
     }
+
+    let searchList = [];
+
+    function openSearchModal() {
+        document.getElementById('goToFile').style.display = 'block';
+        document.getElementById('goToFileInput').focus();
+
+        searchList = Object.keys(zettel).flatMap(folder =>
+            Object.keys(zettel[folder]).map(filename => ({ folder, filename }))
+        );
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.metaKey && event.key === 'p') {
+            event.preventDefault();
+            openSearchModal();
+        }
+    });
+
+    function closeSearchModal() {
+        document.getElementById('goToFile').style.display = 'none';
+    }
+
+    function similarity(s1, s2) {
+        let longer = s1.toLowerCase();
+        let shorter = s2.toLowerCase();
+        if (s1.length < s2.length) {
+            longer = s2;
+            shorter = s1;
+        }
+        let longerLength = longer.length;
+        if (longerLength === 0) {
+            return 1;
+        }
+
+        if (longer.includes(shorter)) {
+            return 1;
+        }
+
+        return (longerLength - editDistance(longer, shorter)) / parseFloat(longerLength);
+    }
+
+    function editDistance(s1, s2) {
+        s1 = s1.toLowerCase();
+        s2 = s2.toLowerCase();
+
+        let costs = [];
+        for (let i = 0; i <= s1.length; i++) {
+            let lastValue = i;
+            for (let j = 0; j <= s2.length; j++) {
+                if (i === 0)
+                    costs[j] = j;
+                else {
+                    if (j > 0) {
+                        var newValue = costs[j - 1];
+                        if (s1.charAt(i - 1) != s2.charAt(j - 1))
+                            newValue = Math.min(Math.min(newValue, lastValue),
+                                costs[j]) + 1;
+                        costs[j - 1] = lastValue;
+                        lastValue = newValue;
+                    }
+                }
+            }
+            if (i > 0)
+                costs[s2.length] = lastValue;
+        }
+        return costs[s2.length];
+    }
+
+    function filterFiles() {
+        const input = document.getElementById('goToFileInput').value.toLowerCase();
+        const list = document.getElementById('goToFileResults');
+        list.innerHTML = '';
+
+        const lowPriorityFolders = ["archive", "_read_", "_watch_", "_shop_", "journal", "habits", "triggers", "today", "later"];
+
+        const similarityThreshold = 60;
+        const highPriorityResults = [];
+        const lowPriorityResults = [];
+
+        searchList.forEach(({ filename, folder }) => {
+            const similarityScore = similarity(input, filename.replace(/\.md$/, "")) * 100;
+
+            if (similarityScore >= similarityThreshold) {
+                if (lowPriorityFolders.includes(folder)) {
+                    lowPriorityResults.push({ folder, filename });
+                } else {
+                    highPriorityResults.push({ folder, filename });
+                }
+            }
+        });
+
+        // Concatenate high-priority results first, then low-priority results
+        const sortedResults = [...highPriorityResults, ...lowPriorityResults];
+
+        // Display sorted results
+        sortedResults.forEach(({ folder, filename }) => {
+            const listItem = document.createElement('li');
+            listItem.textContent = `${folder}/${filename}`;
+            listItem.onclick = () => {
+                showFile(folder, filename);
+                closeSearchModal();
+            };
+            list.appendChild(listItem);
+        });
+    }
+
+    function closeGoToFile() {
+        document.getElementById('goToFile').style.display = 'none';
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeGoToFile();
+        }
+    });
 
     init();
 </script>
