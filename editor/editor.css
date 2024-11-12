@@ -98,7 +98,7 @@ td {
 }
 
 a {
-    color: var(--color-tx);
+    color: var(--color-tx) !important;
     text-decoration: underline;
 }
 
@@ -231,3 +231,18 @@ a:hover {
     background-color: var(--color-bg-alt) !important;
     color: var(--color-tx-muted) !important;
 }
+
+.cm-s-hypermd-light pre.HyperMD-codeblock {
+    color: var(--color-tx-muted) !important;
+    font-family: var(--font-mono) !important;
+    font-size: var(--font-smaller) !important;
+}
+
+.cm-s-hypermd-light span.cm-link {
+    color: var(--color-tx-hover) !important;
+}
+
+.cm-s-hypermd-light span.cm-link:hover {
+    color: #4D978A !important;
+}
+
