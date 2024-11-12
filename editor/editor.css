@@ -55,6 +55,11 @@ body {
     border-left: 1px solid var(--color-border);
 }
 
+.CodeMirror-code {
+    text-rendering: optimizeLegibility !important;
+    font-family: var(--font) !important;
+}
+
 #editor {
     display: flex;
     height: 100vh; /* Full viewport height */
@@ -171,7 +176,6 @@ a:hover {
 .CodeMirror-foldmarker {
     color: blue;
     text-shadow: #b9f 1px 1px 2px, #b9f -1px -1px 2px, #b9f 1px -1px 2px, #b9f -1px 1px 2px;
-    font-family: arial;
     line-height: .3;
     cursor: pointer;
 }
