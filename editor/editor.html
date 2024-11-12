@@ -411,6 +411,19 @@
     }
 
     let searchList = [];
+    let focusedItemIndex = -1;
+
+    function updateFocusedItem(resultsList) {
+        document.querySelectorAll('#goToFileResults li').forEach(li => li.classList.remove('focused'));
+        resultsList.forEach((item, index) => {
+            if (index === focusedItemIndex) {
+                item.classList.add('focused');
+                item.scrollIntoView({ block: "nearest" });
+            } else {
+                item.classList.remove('focused');
+            }
+        });
+    }
 
     function openSearchModal() {
         document.getElementById('goToFile').style.display = 'block';
@@ -422,18 +435,9 @@
             .flatMap(folder =>
                 Object.keys(zettel[folder]).map(filename => ({ folder, filename }))
             );
-
-        inputField.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault();
-                const firstResult = document.getElementById('goToFileResults').querySelector('li');
-                if (firstResult) {
-                    const [folder, filename] = firstResult.getAttribute('data-path').split('/');
-                    showFile(folder, filename);
-                    closeSearchModal();
-                }
-            }
-        });
+        focusedItemIndex = -1;
+        const goToFileResults = document.getElementById('goToFileResults');
+        goToFileResults.innerHTML = ''; // Clear all existing <li> element
     }
 
     document.addEventListener('keydown', (event) => {
@@ -530,7 +534,7 @@
         const sortedResults = [...highPriorityResults, ...lowPriorityResults];
 
         // Display sorted results
-        sortedResults.forEach(({ folder, filename }) => {
+        sortedResults.forEach(({ folder, filename }, index) => {
             const listItem = document.createElement('li');
             let title = filename.replace(/\.md$/, "")
             if (folder !== '') {
@@ -539,12 +543,21 @@
                 listItem.textContent = title;
             }
             listItem.setAttribute('data-path', `${folder}/${filename}`);
+            listItem.setAttribute('data-index', index);
             listItem.onclick = () => {
                 showFile(folder, filename);
                 closeSearchModal();
             };
+            listItem.onmouseenter = () => {
+                document.querySelectorAll('#goToFileResults li').forEach(li => li.classList.remove('focused'));
+                listItem.classList.add('focused');
+                focusedItemIndex = index;
+            };
             list.appendChild(listItem);
         });
+
+        focusedItemIndex = 0;
+        updateFocusedItem(list.querySelectorAll('li'));
     }
 
     function closeGoToFile() {
@@ -558,12 +571,13 @@
     });
 
     // Scroll to bottom (like VIM)
+    // Shift G is not an optinon
     document.addEventListener('keydown', function(event) {
-        if (event.shiftKey && event.key === 'G') {
-            event.preventDefault();
-            const lastLine = editor.lastLine();
-            editor.scrollIntoView({ line: lastLine, ch: 0 }, 300);
-        }
+        // if (event.shiftKey && event.key === 'G') {
+        //     event.preventDefault();
+        //     const lastLine = editor.lastLine();
+        //     editor.scrollIntoView({ line: lastLine, ch: 0 }, 300);
+        // }
     });
 
     // Toggle focus mode
@@ -586,6 +600,31 @@
         if (state) {
             console.log("POP", state)
             showFile(state['folder'], state['file'], false);
+        }
+    });
+
+    document.getElementById('goToFile').addEventListener('keydown', (event) => {
+        const resultsList = document.getElementById('goToFileResults').querySelectorAll('li');
+
+        // Handle Enter key to open focused item
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            if (resultsList[focusedItemIndex]) {
+                const [folder, filename] = resultsList[focusedItemIndex].getAttribute('data-path').split('/');
+                showFile(folder, filename);
+                closeSearchModal();
+            }
+        }
+
+        // Navigate up/down with arrow keys
+        if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            focusedItemIndex = (focusedItemIndex + 1) % resultsList.length;
+            updateFocusedItem(resultsList);
+        } else if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            focusedItemIndex = (focusedItemIndex - 1 + resultsList.length) % resultsList.length;
+            updateFocusedItem(resultsList);
         }
     });
 

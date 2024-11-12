@@ -149,8 +149,8 @@ a:hover {
     cursor: pointer;
 }
 
-#goToFileResults li:hover {
-    background-color: #f0f0f0;
+#goToFileResults .focused {
+    background-color: var(--color-tx-sel);
 }
 
 .CodeMirror-scroll {
