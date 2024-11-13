@@ -390,10 +390,10 @@ func TestSaveFromPhotoWithoutCaption(t *testing.T) {
 	r.NoError(err)
 
 	r.Len(files, 1)
-	r.Equal("Img 11.08.24 09꞉54.md", files[0].Name)
+	r.Equal("Img 11.08.24 09:54.md", files[0].Name)
 	r.True(files[0].IsMultiline)
 
-	content, err := bot.fs.Read("today", "Img 11.08.24 09꞉54.md")
+	content, err := bot.fs.Read("today", "Img 11.08.24 09:54.md")
 	r.NoError(err)
 	r.Equal("![center|400](img/tg_PHOTO_ID)", content)
 }

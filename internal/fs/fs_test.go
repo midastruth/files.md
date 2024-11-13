@@ -594,10 +594,10 @@ func TestSanitizeAndUnsanitizeFilename(t *testing.T) {
 	r := require.New(t)
 
 	sanitized := SanitizeFilename("test/file:name\\with/special\\chars")
-	r.Equal("test{|}file꞉name{||}with{|}special{||}chars", sanitized)
+	r.Equal("test{|}file:name{||}with{|}special{||}chars", sanitized)
 
 	unsanitized := UnsanitizeFilename(sanitized)
-	r.Equal("test/file꞉name\\with/special\\chars", unsanitized)
+	r.Equal("test/file:name\\with/special\\chars", unsanitized)
 }
 
 func TestFilesAndDirs(t *testing.T) {
