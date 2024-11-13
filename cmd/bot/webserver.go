@@ -11,6 +11,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/spf13/afero"
@@ -41,7 +42,7 @@ var img string
 func habitsServer(habitsHost, certDir, logFilename string) {
 	autocertManager := autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist(habitsHost, "app.files.md"),
+		HostPolicy: autocert.HostWhitelist(habitsHost, "www.files.md", "app.files.md"),
 		Cache:      autocert.DirCache(certDir),
 	}
 
@@ -125,6 +126,18 @@ func setupRouter(router *http.ServeMux, logger *log.Logger) {
 	// TODO add hashing or secrets
 	// TODO before release habits_v2 => habits
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		// Serving editor app
+		host := r.Host
+		if strings.HasPrefix(host, "app.") {
+			if r.URL.Path == "/app" || r.URL.Path == "/app/" {
+				http.ServeFile(w, r, "./editor/editor.html")
+				return
+			}
+
+			http.FileServer(http.Dir("./editor")).ServeHTTP(w, r)
+		}
+
+		// Serving the site
 		w.WriteHeader(http.StatusOK)
 		_, err := w.Write([]byte(html))
 		if err != nil {
