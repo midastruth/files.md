@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>files.md</title>
+    <link rel="canonical" href="https://app.files.md/">
+    <link rel="icon" href="favicon.ico" sizes="32x32">
+    <link rel="manifest" href="manifest.json">
+    <link href="app.css" rel="stylesheet">
+    <link href="lib/normalize.css" rel="stylesheet">
+    <link href="lib/tree.css" rel="stylesheet" >
+    <link href="lib/codemirror.css" rel="stylesheet" >
+    <link href="lib/hypermd.css" rel="stylesheet" >
+    <script src="lib/tree.js"></script>
+    <script src="zettel.js"></script>
+    <script src="lib/codemirror.js"></script>
+    <script src="lib/core.js"></script>
+    <script src="lib/markdown.js"></script>
+    <script src="lib/hypermd.js"></script>
+    <script src="lib/click.js"></script>
+    <script src="lib/hide-token.js"></script>
+    <script src="lib/fold.js"></script>
+    <script src="lib/fold-image.js"></script>
+    <script src="lib/fold-emoji.js"></script>
+    <script src="lib/complete-emoji.js"></script>
+    <script src="lib/show-hint.js"></script>
+    <script src="lib/codemirror-go.js"></script>
+    <script src="lib/codemirror-php.js"></script>
+</head>
+<body>
+<div id="editor">
+    <div id="editor-sidebar">
+    </div>
+    <div id="editor-content">
+        <div id="welcome" style="display: none; justify-content: center;align-items: center; height: 100vh; flex-direction: column">
+            <div><p>100% local, we don't process your files</p></div>
+            <div>
+                <button onclick="openDirectory()" id="openDirectory">Open directory with *.md files</button>
+            </div>
+        </div>
+        <textarea id="editor-textarea"></textarea>
+    </div>
+    <div id="goToFile" style="display: none;">
+        <form autocomplete="off">
+            <input type="text" id="goToFileInput" placeholder="Go to file..." oninput="filterFiles()">
+        </form>
+        <ul id="goToFileResults"></ul>
+    </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+    init(document.getElementById("editor-textarea"));
+</script>
+</body>
+</html>
