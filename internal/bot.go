@@ -1401,10 +1401,10 @@ func (b *Bot) moveToDir(params []string) error {
 	}
 
 	if toDir != fs.DirLater {
-		b.db.SetRecentCommand(b.userID, consts.CmdMoveToExistingDir)
+		b.db.SetRecentCommand(b.userID, consts.CmdMoveToExistingNote)
 		// Move from dir is today, because quick command
 		// appears when file is in today dir
-		b.db.SetRecentCommandParams(b.userID, []string{toDirHash, fs.Hash(fs.DirToday)})
+		b.db.SetRecentCommandParams(b.userID, []string{fs.Hash(filename), toDirHash})
 	}
 
 	b.delAllKeyboards()
