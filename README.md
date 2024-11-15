@@ -18,11 +18,6 @@ It works like a regular chat, so it's easier to use because there's less resista
 [Tasks management via bot](https://club.mnogosdelal.ru/post/180/)  
 [Notes taking via bot](https://vas3k.club/post/18815/)
 
-## App 📝
-[app.files.md](https://app.files.md), a standalone application for viewing/editing files, alpha version. Works offline.  
-
-`/app` - app's source code. All other directories and files are part of the Golang bot.
-
 ## Telegram Bot 🤖
 1) Install [Go](https://go.dev/doc/install)
 2) Register new telegram bot via [@BotFather](https://t.me/BotFather)
@@ -40,6 +35,11 @@ Bot's artifacts can be seen in `./storage/<USER_ID>` folder
 ```bash
 $ make gui
 ```
+
+## App 📝
+[app.files.md](https://app.files.md), a standalone application for viewing/editing files, alpha version. Works offline.
+
+`/app` - app's source code. All other directories and files are part of the Golang bot.
 
 ## File structure
 We differentiate the following types of files (with `/` denoting your root folder):
