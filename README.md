@@ -18,6 +18,13 @@ It works like a regular chat, so it's easier to use because there's less resista
 [Tasks management via bot](https://club.mnogosdelal.ru/post/180/)  
 [Notes taking via bot](https://vas3k.club/post/18815/)
 
+## Repository structure
+`/cmd/tgbot` - entrypoint for telegram bot
+`/cmd/bot` - entrypoint for local bot 
+`/internal` - bot's code (reused for both telegram/local bots)  
+`/pkg` - various packages   
+`/app` - standalone PWA app for viewing/editing files (alpha version)   
+
 ## Telegram Bot 🤖
 1) Install [Go](https://go.dev/doc/install)
 2) Register new telegram bot via [@BotFather](https://t.me/BotFather)
@@ -38,8 +45,7 @@ $ make gui
 
 ## App 📝
 [app.files.md](https://app.files.md), a standalone application for viewing/editing files, alpha version. Works offline.
-
-`/app` - app's source code. All other directories and files are part of the Golang bot.
+1) Open `/app/app.html`
 
 ## File structure
 We differentiate the following types of files (with `/` denoting your root folder):

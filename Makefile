@@ -1,8 +1,8 @@
-bot:
-	go run ./cmd/bot
+tgbot:
+	go run ./cmd/tgbot
 
-gui:
-	cd ./cmd/gui && wails dev
+bot:
+	cd ./cmd/bot && wails dev
 
 test:
 	go test ./...
@@ -30,7 +30,7 @@ deploy:
 	RESET='\e[0m'; \
 	printf "$${YELLOW}Building...$${RESET}\n" && \
 	make check && \
-	GOOS=linux GOARCH=amd64 go build -o /tmp/bot ./cmd/bot && \
+	GOOS=linux GOARCH=amd64 go build -o /tmp/bot ./cmd/tgbot && \
 	printf "$${GREEN}Build Completed$${RESET}\n" && \
 	ssh $(host) "killall bot || true" && \
 	scp /tmp/bot $(host):/app/bot && printf "$${GREEN}The binary is copied on the server$${RESET}\n" && \
