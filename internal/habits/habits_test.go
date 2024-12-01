@@ -5,6 +5,7 @@ package habits
 
 import (
 	_ "embed"
+	"os"
 	"testing"
 	"time"
 
@@ -22,6 +23,12 @@ var lastMonthMD string
 
 //go:embed testdata/two_months_habits.md
 var twoMonthsMD string
+
+func init() {
+	fs.Ctime = func(fi os.FileInfo) int64 {
+		return 0
+	}
+}
 
 func TestHabits(t *testing.T) {
 	r := require.New(t)
@@ -100,6 +107,8 @@ func TestLastWeekHabitsWhenWeekFallsIntoTwoMonths(t *testing.T) {
 	err = userFS.CreateDirsIfNotExist()
 	r.NoError(err)
 	_ = userFS.Write(fs.DirInsights, "1970 Habits.md", twoMonthsMD)
+	_ = userFS.Write(fs.DirHabits, "Habit", "")
+	_ = userFS.Write(fs.DirHabits, "Mood", "")
 
 	savedNow := now
 	defer func() {
