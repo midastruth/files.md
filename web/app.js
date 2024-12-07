@@ -140,7 +140,7 @@ function initHyperMD(el) {
 // We use it as links autocomplete
 function createAutocompleteDict() {
     const emojiDict = {};
-    const ignoredFolders = ["img", "archive", "_read_", "_watch_", "_shop_", "today", "later", "journal", "habits", "triggers", "places", ""];
+    const ignoredFolders = ["img", "archive", "_read_", "_watch_", "_shop_", "today", "later", "journal", "journal/past", "habits", "triggers", "places", ""];
 
     Object.keys(zettel).forEach(folder => {
         if (ignoredFolders.includes(folder)) return;
