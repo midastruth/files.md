@@ -1,5 +1,5 @@
 let editor = null;
-let searchList = [];
+let files = [];
 let focusedItemIndex = -1;
 
 function initHyperMD(el) {
@@ -25,7 +25,7 @@ function initHyperMD(el) {
     editor.setSize(null, "100%");
 
     editor.addKeyMap({
-        'Cmd-Y': function(cm) {
+        'Cmd-Y': function (cm) {
             cm.replaceSelection('✅');
             cm.focus();
         }
@@ -112,10 +112,10 @@ function initHyperMD(el) {
             let end = cm.getCursor("end");
             if (isBold) {
                 cm.replaceSelection(selectedText.slice(2, -2));
-                cm.setSelection({ line: start.line, ch: start.ch }, { line: end.line, ch: end.ch - 4 });
+                cm.setSelection({line: start.line, ch: start.ch}, {line: end.line, ch: end.ch - 4});
             } else {
                 cm.replaceSelection(`**${selectedText}**`);
-                cm.setSelection({ line: start.line, ch: start.ch }, { line: end.line, ch: end.ch + 4 });
+                cm.setSelection({line: start.line, ch: start.ch}, {line: end.line, ch: end.ch + 4});
             }
             cm.focus();
         },
@@ -127,10 +127,10 @@ function initHyperMD(el) {
             let end = cm.getCursor("end");
             if (isItalic) {
                 cm.replaceSelection(selectedText.slice(1, -1));
-                cm.setSelection({ line: start.line, ch: start.ch }, { line: end.line, ch: end.ch - 2 });
+                cm.setSelection({line: start.line, ch: start.ch}, {line: end.line, ch: end.ch - 2});
             } else {
                 cm.replaceSelection(`*${selectedText}*`);
-                cm.setSelection({ line: start.line, ch: start.ch }, { line: end.line, ch: end.ch + 2 });
+                cm.setSelection({line: start.line, ch: start.ch}, {line: end.line, ch: end.ch + 2});
             }
             cm.focus();
         },
@@ -249,10 +249,15 @@ async function loadDirectory(dirHandle, path = "", depth = 1) {
         ) {
             const folder = path.split('/').filter(Boolean).join('/');
             if (!zettel[folder]) zettel[folder] = {};
+            let file = await entry.getFile();
             if (folder === 'img') {
-                zettel[folder][filename] = {handle: entry, url: await getImageUrl(entry)};
+                zettel[folder][filename] = {
+                    handle: entry,
+                    url: await getImageUrl(entry),
+                    lastModified: await file.lastModified
+                };
             } else {
-                zettel[folder][filename] = {handle: entry};
+                zettel[folder][filename] = {handle: entry, lastModified: file.lastModified};
             }
         }
     }
@@ -417,14 +422,16 @@ function openSearchModal() {
     const inputField = document.getElementById('goToFileInput');
     inputField.focus();
 
-    searchList = Object.keys(zettel)
+    files = Object.keys(zettel)
         .filter(folder => folder !== 'img')
         .flatMap(folder =>
-            Object.keys(zettel[folder]).map(filename => ({folder, filename}))
+            Object.keys(zettel[folder]).map(filename => ({folder, filename, lastModified: zettel[folder][filename].lastModified,}))
         );
+    console.log(files);
     focusedItemIndex = -1;
     const goToFileResults = document.getElementById('goToFileResults');
     goToFileResults.innerHTML = '';
+    loadRecentFiles();
 }
 
 document.addEventListener('keydown', (event) => {
@@ -485,8 +492,7 @@ function levenshtein(s1, s2) {
             a = p[y];
             if (a < c || b < c) {
                 c = (a > b ? b + 1 : a + 1);
-            }
-            else {
+            } else {
                 if (e1 !== k) {
                     c++;
                 }
@@ -494,8 +500,7 @@ function levenshtein(s1, s2) {
 
             if (c < b || d < b) {
                 b = (c > d ? d + 1 : c + 1);
-            }
-            else {
+            } else {
                 if (e2 !== k) {
                     b++;
                 }
@@ -503,8 +508,7 @@ function levenshtein(s1, s2) {
 
             if (b < d || g < d) {
                 d = (b > g ? g + 1 : b + 1);
-            }
-            else {
+            } else {
                 if (e3 !== k) {
                     d++;
                 }
@@ -512,8 +516,7 @@ function levenshtein(s1, s2) {
 
             if (d < g || h < g) {
                 g = (d > h ? h + 1 : d + 1);
-            }
-            else {
+            } else {
                 if (e4 !== k) {
                     g++;
                 }
@@ -534,12 +537,10 @@ function levenshtein(s1, s2) {
             a = p[y];
             if (a < c || d < c) {
                 d = (a > d ? d + 1 : a + 1);
-            }
-            else {
+            } else {
                 if (e !== s1.charCodeAt(y)) {
                     d = c + 1;
-                }
-                else {
+                } else {
                     d = c;
                 }
             }
@@ -552,8 +553,24 @@ function levenshtein(s1, s2) {
     return h;
 }
 
+function loadRecentFiles() {
+    const ignoredDirs = ["archive", "_read_", "_watch_", "_shop_", "habits", "triggers", "today", "later", "insights"];
+
+    let results = [...files]
+        .filter(file => !ignoredDirs.includes(file.folder)) // Exclude files from ignored directories
+        .sort((a, b) => b.lastModified - a.lastModified) // Sort the remaining files
+        .slice(0, 8); // Take the top 8 recent files
+
+    showResults(results);
+}
+
 function filterFiles() {
     const search = document.getElementById('goToFileInput').value.toLowerCase();
+    if (search.trim() === '') {
+        loadRecentFiles();
+        return;
+    }
+
     const list = document.getElementById('goToFileResults');
     list.innerHTML = '';
 
@@ -562,7 +579,7 @@ function filterFiles() {
     let results = [];
 
     // Levenshtein distance
-    searchList.forEach(({filename, folder}) => {
+    files.forEach(({filename, folder}) => {
         const potentialMatch = filename.replace(/\.md$/, "");
         let similarityScore = similarity(search, potentialMatch);
         if (similarityScore >= 70) {
@@ -574,7 +591,7 @@ function filterFiles() {
     });
 
     // Substring
-    searchList.forEach(({filename, folder}) => {
+    files.forEach(({filename, folder}) => {
         const potentialMatch = filename.replace(/\.md$/, "");
         const isSubstringMatch = potentialMatch.toLowerCase().includes(search.toLowerCase());
         if (!isSubstringMatch) {
@@ -599,7 +616,11 @@ function filterFiles() {
         }
     }
     results = Array.from(uniqueResultsMap.values()).sort((a, b) => b.score - a.score);
+    showResults(results);
+}
 
+function showResults(results) {
+    const list = document.getElementById('goToFileResults');
     results.forEach(({folder, filename}, index) => {
         const listItem = document.createElement('li');
         let title = filename.replace(/\.md$/, "")
@@ -621,7 +642,6 @@ function filterFiles() {
         };
         list.appendChild(listItem);
     });
-
 
     focusedItemIndex = 0;
     updateFocusedItem(list.querySelectorAll('li'));
