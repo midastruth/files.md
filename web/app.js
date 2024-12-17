@@ -25,8 +25,8 @@ let editor = null;
 let focusedItemIndex = -1;
 
 let saveQueue = [];
-
-let pollingInterval;
+let queueWorkerInterval;
+let changesPollingInterval;
 
 async function init(el) {
     initEditor(el);
@@ -38,7 +38,7 @@ async function init(el) {
             document.getElementById('welcome').style.display = 'flex';
         }
         files = await loadFiles(savedDirectoryHandle);
-        pollingInterval = setInterval(async function() {
+        changesPollingInterval = setInterval(async function() {
             // console.time("loadFiles Execution Time");
             let newFiles = await loadFiles(savedDirectoryHandle);
             // console.timeEnd("loadFiles Execution Time");
@@ -511,7 +511,8 @@ window.addEventListener('popstate', (event) => {
 });
 
 window.addEventListener('beforeunload', function () {
-    clearInterval(pollingInterval);
+    clearInterval(changesPollingInterval);
+    clearInterval(queueWorkerInterval);
 });
 
 document.getElementById('goToFile').addEventListener('keydown', (event) => {
@@ -657,7 +658,7 @@ async function getImageUrl(fileHandle) {
 
 // Worker to process the saving queue
 let isProcessing = false;
-setInterval(async function processSaveQueue() {
+queueWorkerInterval = setInterval(async function processSaveQueue() {
     if (isProcessing) return;
     if (saveQueue.length === 0) return;
 
