@@ -674,3 +674,11 @@ queueWorkerInterval = setInterval(async function processSaveQueue() {
 
     isProcessing = false;
 }, 50);
+
+document.addEventListener('mousedown', (event) => {
+    const goToFile = document.getElementById('goToFile');
+    if (goToFile.style.display === 'block' &&
+        !goToFile.contains(event.target)) {
+        closeSearchModal();
+    }
+});

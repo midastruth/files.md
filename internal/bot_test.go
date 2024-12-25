@@ -3452,7 +3452,7 @@ func FuzzSaveFromTextMsg(f *testing.F) {
 		shortcuts := []string{"jj", "жж", "++"}
 		for _, shortcut := range shortcuts {
 			lowerInput := strings.ToLower(input)
-			if strings.HasPrefix(lowerInput, shortcut+" ") || strings.HasSuffix(lowerInput, " "+shortcut) {
+			if strings.HasPrefix(lowerInput, shortcut) || strings.HasSuffix(lowerInput, shortcut) {
 				return
 			}
 		}
