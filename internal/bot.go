@@ -261,6 +261,7 @@ func (b *Bot) handlers() map[string]func([]string) error {
 		consts.CmdNotesOnlyMode:               b.notesOnlyMode,
 		consts.CmdJournalOnlyMode:             b.journalOnlyMode,
 		consts.CmdFullMode:                    b.fullMode,
+		consts.CmdCompleteHabit:               b.completeHabit,
 		// Used for button-like separators
 		consts.CmdDoNothing: func(s []string) error { return nil },
 	}
@@ -879,6 +880,12 @@ func (b *Bot) ShowToday(_ []string) error {
 
 		kb.AddRow(btn)
 	}
+
+	kb.AddRow(tg.NewBtn("🤸‍♂️", tg.NewCmd(consts.CmdDoNothing, nil)))
+	kb.AddRow(tg.NewBtn("🍽", tg.NewCmd(consts.CmdDoNothing, nil)))
+	kb.AddRow(tg.NewBtn("🚶‍♂️", tg.NewCmd(consts.CmdDoNothing, nil)))
+	kb.AddRow(tg.NewBtn("📵", tg.NewCmd(consts.CmdDoNothing, nil)))
+	kb.AddRow(tg.NewBtn("💪", tg.NewCmd(consts.CmdDoNothing, nil)))
 
 	quickBtns := b.quickBtns()
 	if len(quickBtns) > 0 {
@@ -2393,6 +2400,10 @@ func (b *Bot) fullMode(_ []string) error {
 	}
 
 	return b.ShowToday(nil)
+}
+
+func (b *Bot) completeHabit(params []string) error {
+	return nil
 }
 
 func extractMarkdown(u Update) string {

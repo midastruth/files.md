@@ -67,6 +67,7 @@ const (
 	CmdWebAppHabits                = "habits"
 	CmdAddToJournalShortcut        = "j"
 	CmdAddToRecentFileShortcut     = "+"
+	CmdCompleteHabit               = "ch"
 )
 
 var Shortcuts = map[string][]string{
