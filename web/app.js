@@ -149,6 +149,11 @@ function initEditor(el) {
 
     editor.setOption("viewportMargin", Infinity);
 
+    editor.on("cursorActivity", function() {
+        let cursor = editor.getCursor();
+        editor.scrollIntoView({ line: cursor.line, ch: cursor.ch }, 40);
+    });
+
     // TODO Image uploading
     editor.on("paste", async (_, event) => {
         const items = (event.clipboardData || event.originalEvent.clipboardData).items;
