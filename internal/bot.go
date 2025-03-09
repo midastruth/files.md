@@ -2079,6 +2079,9 @@ func (b *Bot) showMoveToFileOrDir(params []string) error {
 		if err != nil {
 			return fmt.Errorf("to file dialog: %w", err)
 		}
+
+		b.db.SetRecentCommand(consts.CmdMoveToExistingFile)
+		b.db.SetRecentCommandParams([]string{fs.ShortHash(filename), fs.ShortHash(fs.DirRoot)})
 	}
 
 	kb := tg.NewKeyboard(nil)
