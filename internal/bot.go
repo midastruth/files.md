@@ -1346,7 +1346,8 @@ func (b *Bot) showFile(params []string) error {
 		row = append(row, tg.NewBtn(i18n.Tr("🖨 Share"), tg.NewCmd(consts.CmdShare, []string{dirHash, filenameHash})))
 	}
 	row = append(row, tg.NewBtn(i18n.StrToday, tg.NewCmd(consts.CmdShowToday, nil)))
-	kb := tg.NewKeyboard([]tg.Row{row})
+	kb := tg.NewKeyboard(nil)
+	kb.AddRow(row)
 
 	md := fmt.Sprintf("**%s**\n\n%s", fs.Title(filename), content)
 	err = b.showMD(md, kb)
