@@ -1,6 +1,6 @@
 // Package webserver provides a server for habits tracking functionality through Telegram miniapps.
 // SSLs certificates are handled automatically via LetsEncrypt.
-package web
+package server
 
 import (
 	"crypto/tls"
@@ -193,4 +193,7 @@ func setupRouter(router *http.ServeMux, logger *log.Logger) {
 			_, _ = w.Write([]byte("can't write habit to journal"))
 		}
 	})
+
+	router.HandleFunc("/timestamps", AuthMiddleware(Timestamps))
+	router.HandleFunc("/sync", AuthMiddleware(Sync))
 }
