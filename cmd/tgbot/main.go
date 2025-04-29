@@ -78,6 +78,7 @@ func main() {
 			config.BotCfg.AppHost,
 			config.BotCfg.ServerCertDir,
 			config.BotCfg.ServerLogFile,
+			config.BotCfg.AuthToken,
 		)
 	}
 

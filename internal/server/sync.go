@@ -15,7 +15,10 @@ import (
 // Configuration
 const (
 	StorageDir = "/app/mystorage"
-	AuthToken  = "strongtokenwhichonlyyouknow"
+)
+
+var (
+	AuthToken string
 )
 
 type File struct {

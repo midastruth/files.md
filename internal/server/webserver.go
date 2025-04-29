@@ -26,7 +26,7 @@ import (
 )
 
 // TODO release graceful shutdown etc
-func Serve(habitsHost, appHost, certDir, logFilename string) {
+func Serve(habitsHost, appHost, certDir, logFilename, token string) {
 	autocertManager := autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
 		HostPolicy: autocert.HostWhitelist(habitsHost, appHost),
