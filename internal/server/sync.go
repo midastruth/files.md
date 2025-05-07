@@ -93,8 +93,9 @@ func Sync(w http.ResponseWriter, r *http.Request) {
 					log.Printf("Error reading file '%s': %v", fullPath, err)
 					continue
 				}
-				logSync(fmt.Sprintf("Mergin and writing: '%s'", clientFile.Path))
+				logSync(fmt.Sprintf("Merging and writing: '%s'", clientFile.Path))
 				clientContent = Merge(string(serverContent), clientFile.Content)
+				logSync(fmt.Sprintf("Diff: %s", Diff(string(serverContent), clientFile.Content)))
 			} else {
 				// Server file hasn't changed since client's last sync
 				logSync(fmt.Sprintf("Writing only: '%s'", clientFile.Path))
