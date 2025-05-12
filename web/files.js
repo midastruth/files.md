@@ -153,21 +153,16 @@ async function syncWithServer() {
         } else {
             console.log("Hashes match, no need to write file.");
         }
-        if (!filesMetadata['files'][dir]) filesMetadata['files'][dir] = {};
-        filesMetadata['files'][dir][filename] = {
-            hash: hash(content),
-            lastModified: lastModified,
-            path: path
-        };
+        setMetadata(path, content, lastModified);
     }
     filesMetadata['timestamps'] = server.timestamps;
-    localStorage.setItem(SYNC_STORAGE_KEY, JSON.stringify(filesMetadata));
+    saveMetadata();
     console.log("Sync completed in " + (performance.now() - startTime) + "ms");
 }
 
 async function syncFileWithServer(dir, filename) {
     let file = getFileHandle(`${dir}/${filename}`);
-    let lastModified = filesMetadata?.files?.[dir]?.[filename]?.lastModified ?? 0;
+    let lastModified = getMetadata(`${dir}/${filename}`)?.lastModified;
     console.log(lastModified, file);
 
     return;
@@ -292,7 +287,7 @@ function getMetadata(path) {
     }
 }
 
-function addMetadata(path, content, lastModified) {
+function setMetadata(path, content, lastModified) {
     filesMetadata['files'] = filesMetadata['files'] ?? {};
     filesMetadata['files'][dir] = filesMetadata['files'][dir] ?? {};
 
