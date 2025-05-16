@@ -185,7 +185,7 @@ async function syncFileWithServer(dir, filename) {
         return;
     }
     console.log(serverFile);
-    await write(path, serverFile.Content);
+    await write(path, serverFile.content);
     await showFile(dir, filename);
     console.log("File synced with server");
 }
