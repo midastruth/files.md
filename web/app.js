@@ -262,6 +262,7 @@ async function showFile(dir, filename, saveToHistory = true) {
         const file = await fileData.handle.getFile();
         content = await file.text();
     } else {
+        // When do we go here?
         content = fileData.content;
     }
 
@@ -545,7 +546,7 @@ async function getImageUrl(fileHandle) {
 }
 
 // Normalize text to use only \n as line endings
-function norm(text) {
+function normNewLines(text) {
     return text.replace(/\r\n|\r/g, "\n");
 }
 

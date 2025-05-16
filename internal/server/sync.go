@@ -209,6 +209,8 @@ func SyncFile(w http.ResponseWriter, r *http.Request) {
 	serverContent, err := ioutil.ReadFile(fullPath)
 	if err != nil {
 		log.Printf("Error reading one file '%s': %v", fullPath, err)
+		http.Error(w, "Error reading server file", http.StatusBadRequest)
+		return
 	}
 
 	// Return already up-todate status
@@ -219,10 +221,7 @@ func SyncFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var content string
-	if err != nil && !os.IsNotExist(err) {
-		log.Printf("Error reading one file '%s': %v", fullPath, err)
-		logSync(fmt.Sprintf("Error reading one file '%s': %v", fullPath, err))
-	} else if os.IsNotExist(err) {
+	if os.IsNotExist(err) {
 		logSync(fmt.Sprintf("Creating one file: '%s'", file.Path))
 		content = file.Content
 	} else {
@@ -242,6 +241,8 @@ func SyncFile(w http.ResponseWriter, r *http.Request) {
 	if err := os.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
 		log.Printf("Error creating directory for file '%s': %v", fullPath, err)
 		logSync(fmt.Sprintf("Error creating directory for file '%s': %v", fullPath, err))
+		http.Error(w, "Error creating directory", http.StatusInternalServerError)
+		return
 	}
 
 	// Write the content to the server at path
@@ -249,6 +250,8 @@ func SyncFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Error writing file '%s': %v", fullPath, err)
 		logSync(fmt.Sprintf("Error writing file '%s': %v", fullPath, err))
+		http.Error(w, "Error writing file", http.StatusInternalServerError)
+		return
 	}
 
 	// Get file timestamp
@@ -256,6 +259,7 @@ func SyncFile(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Error getting one file '%s' timestamp: %v", fullPath, err)
 		logSync(fmt.Sprintf("Error getting one file '%s' timestamp: %v", fullPath, err))
+		http.Error(w, "Error getting file timestamp", http.StatusInternalServerError)
 		return
 	}
 
@@ -268,6 +272,8 @@ func SyncFile(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		log.Printf("Error encoding sync response: %v", err)
+		http.Error(w, "Error encoding response", http.StatusInternalServerError)
+		return
 	}
 }
 

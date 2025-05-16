@@ -1,5 +1,5 @@
 const saverInterval = 50; // ms, how often to save currently open file
-const loaderInterval = 3000; // ms, how often to load files from local system and sync with server
+const loaderInterval = 3000; // ms, how often to load current file from local file system
 
 let hasUnsavedChanges = false;
 let isSaving = false;
@@ -150,8 +150,8 @@ async function syncWithServer() {
             console.log("Malformed name, skipping file...");
             continue;
         }
-        let file = await fileHandle.getFile()
 
+        let file = await fileHandle.getFile()
         let clientHash = hash(await file.text());
         let serverHash = hash(content);
         if (clientHash !== serverHash) {
@@ -201,7 +201,9 @@ async function syncFileWithServer(dir, filename) {
         }
 
         serverFile = await response.json();
-        console.log(serverFile);
+        await write(path, serverFile.Content);
+        await showFile(dir, filename);
+        console.log("File synced with server");
     } catch (error) {
         console.error("Network error occurred:", error.message);
         return;
@@ -294,6 +296,28 @@ async function getFileHandle(path) {
     return fileHandle;
 }
 
+async function write(path, content) {
+    let fileHandle = await getFileHandle(path);
+    if (fileHandle === null) {
+        // TODO fix once Chromium fixes the bug
+        console.log("Malformed name, skipping file...");
+        return;
+    }
+
+    let file = await fileHandle.getFile()
+    let clientHash = hash(await file.text());
+    let serverHash = hash(content);
+    if (clientHash !== serverHash) {
+        console.log("Hashes do not match, writing file...");
+        // TODO rem
+        const writable = await fileHandle.createWritable();
+        await writable.write(content);
+        await writable.close();
+    } else {
+        console.log("Hashes match, no need to write file.");
+    }
+}
+
 function getMetadata(path) {
     const parts = path.split('/');
     const filename = parts.pop();
@@ -324,6 +348,8 @@ function saveMetadata() {
     localStorage.setItem(SYNC_STORAGE_KEY, JSON.stringify(filesMetadata));
 }
 
+// 1) Save current content to local filesystem
+// 2) Sync it with the server
 async function saveCurrentFile() {
     if (!hasUnsavedChanges) return;
 
@@ -376,6 +402,7 @@ async function initFiles() {
     console.log(`Files loaded in ${performance.now() - startTime}ms`);
     await syncWithServer();
 
+    // Refresh current file
     window.loader = setInterval(async function () {
         // Check if current file has been modified
         let dir = editor.currentDir;
@@ -387,7 +414,7 @@ async function initFiles() {
         let currentContent = getCurrentContent();
         if (!hasUnsavedChanges) {
             newContent = newContent.replace(/\[\[(.+?)\|.*?\]\]/g, '[[$1]]');
-            if (norm(currentContent) !== norm(newContent)) {
+            if (normNewLines(currentContent) !== normNewLines(newContent)) {
                 await showFile(dir, file, false);
             }
         }
