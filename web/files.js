@@ -556,17 +556,6 @@ async function initFiles() {
     files = await loadLocalFiles(rootDirHandle);
     console.log(`Files loaded in ${performance.now() - startTime}ms`);
     await syncAllWithServer();
-
-    // Refresh current file
-    // window.loader = setInterval(async function () {
-    //     // Check if current file has been modified
-    //     let path = `${editor.currentDir}/${editor.currentFile}`;
-    //     let contentWithNormalizedLinks = getCurrentContent().replace(/\[\[(.+?)\|.*?\]\]/g, '[[$1]]');
-    //     if (!hasUnsavedChanges && !await isContentEqual(path, contentWithNormalizedLinks)) {
-    //         console.log('showing file');
-    //         await showFile(editor.currentDir, editor.currentFile, false);
-    //     }
-    // }, loaderInterval)
 }
 
 window.addEventListener('beforeunload', function () {

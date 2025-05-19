@@ -2,6 +2,15 @@ package server
 
 import "strings"
 
+// Merge combines two strings (s1 and s2) by identifying longest common sections
+// and unique content. This function is particularly useful for merging text that may have
+// been edited independently, such as journal entries or notes.
+//
+// The algorithm:
+// - Splits both inputs into lines
+// - Uses dynamic programming to find the longest common subsequence (LCS) between the lines
+// - Constructs a merged result that preserves all unique content from both strings
+// - Maintains the original order of content from both strings
 func Merge(s1, s2 string) string {
 	if len(s1) == 0 {
 		return s2
@@ -9,111 +18,52 @@ func Merge(s1, s2 string) string {
 	if len(s2) == 0 {
 		return s1
 	}
+	lines1 := strings.Split(s1, "\n")
+	lines2 := strings.Split(s2, "\n")
 
-	// Split both strings into lines
-	originalLines := strings.Split(s1, "\n")
-	modifiedLines := strings.Split(s2, "\n")
-
-	// Find common prefix lines
-	var commonPrefixLength int
-	for commonPrefixLength < len(originalLines) &&
-		commonPrefixLength < len(modifiedLines) &&
-		originalLines[commonPrefixLength] == modifiedLines[commonPrefixLength] {
-		commonPrefixLength++
+	lcsLengths := make([][]int, len(lines1)+1)
+	for i := range lcsLengths {
+		lcsLengths[i] = make([]int, len(lines2)+1)
 	}
 
-	// Find common suffix lines
-	var commonSuffixLength int
-	for commonSuffixLength < len(originalLines)-commonPrefixLength &&
-		commonSuffixLength < len(modifiedLines)-commonPrefixLength &&
-		originalLines[len(originalLines)-1-commonSuffixLength] == modifiedLines[len(modifiedLines)-1-commonSuffixLength] {
-		commonSuffixLength++
-	}
-
-	// Build result with common prefix
-	var resultLines []string
-	resultLines = append(resultLines, originalLines[:commonPrefixLength]...)
-
-	// Add the unique middle parts from both files
-	originalMiddleStart := commonPrefixLength
-	originalMiddleEnd := len(originalLines) - commonSuffixLength
-	for i := originalMiddleStart; i < originalMiddleEnd; i++ {
-		resultLines = append(resultLines, originalLines[i])
-	}
-
-	modifiedMiddleStart := commonPrefixLength
-	modifiedMiddleEnd := len(modifiedLines) - commonSuffixLength
-	for i := modifiedMiddleStart; i < modifiedMiddleEnd; i++ {
-		resultLines = append(resultLines, modifiedLines[i])
-	}
-
-	// Add common suffix
-	if commonSuffixLength > 0 {
-		suffixStart := len(originalLines) - commonSuffixLength
-		resultLines = append(resultLines, originalLines[suffixStart:]...)
-	}
-
-	return strings.Join(resultLines, "\n")
-}
-
-func Diff(s1, s2 string) string {
-	if len(s1) == 0 {
-		return "+ " + s2
-	}
-	if len(s2) == 0 {
-		return "- " + s1
-	}
-
-	// Split both strings into lines
-	originalLines := strings.Split(s1, "\n")
-	modifiedLines := strings.Split(s2, "\n")
-
-	// Find common prefix lines
-	var commonPrefixLength int
-	for commonPrefixLength < len(originalLines) &&
-		commonPrefixLength < len(modifiedLines) &&
-		originalLines[commonPrefixLength] == modifiedLines[commonPrefixLength] {
-		commonPrefixLength++
-	}
-
-	// Find common suffix lines
-	var commonSuffixLength int
-	for commonSuffixLength < len(originalLines)-commonPrefixLength &&
-		commonSuffixLength < len(modifiedLines)-commonPrefixLength &&
-		originalLines[len(originalLines)-1-commonSuffixLength] == modifiedLines[len(modifiedLines)-1-commonSuffixLength] {
-		commonSuffixLength++
-	}
-
-	// Build result with common prefix (unchanged)
-	var resultLines []string
-	for i := 0; i < commonPrefixLength; i++ {
-		resultLines = append(resultLines, "  "+originalLines[i]) // Unchanged line prefix
-	}
-
-	// Get the unique middle parts from both files
-	originalMiddleStart := commonPrefixLength
-	originalMiddleEnd := len(originalLines) - commonSuffixLength
-
-	modifiedMiddleStart := commonPrefixLength
-	modifiedMiddleEnd := len(modifiedLines) - commonSuffixLength
-
-	// Add removed lines (from original)
-	for i := originalMiddleStart; i < originalMiddleEnd; i++ {
-		resultLines = append(resultLines, "- "+originalLines[i])
-	}
-
-	// Add added lines (from modified)
-	for i := modifiedMiddleStart; i < modifiedMiddleEnd; i++ {
-		resultLines = append(resultLines, "+ "+modifiedLines[i])
-	}
-
-	// Add common suffix (unchanged)
-	if commonSuffixLength > 0 {
-		suffixStart := len(originalLines) - commonSuffixLength
-		for i := suffixStart; i < len(originalLines); i++ {
-			resultLines = append(resultLines, "  "+originalLines[i]) // Unchanged line prefix
+	// Fill the lcsLengths table
+	for i := 1; i <= len(lines1); i++ {
+		for j := 1; j <= len(lines2); j++ {
+			if lines1[i-1] == lines2[j-1] {
+				lcsLengths[i][j] = lcsLengths[i-1][j-1] + 1
+			} else {
+				lcsLengths[i][j] = max(lcsLengths[i-1][j], lcsLengths[i][j-1])
+			}
 		}
 	}
 
-	return strings.Join(resultLines, "\n")
+	// Build the merged result
+	result := buildMergedResult(lines1, lines2, lcsLengths, len(lines1), len(lines2))
+	return strings.Join(result, "\n")
+}
+
+func buildMergedResult(lines1, lines2 []string, dp [][]int, i, j int) []string {
+	if i == 0 && j == 0 {
+		return []string{}
+	}
+
+	if i == 0 {
+		return append(buildMergedResult(lines1, lines2, dp, i, j-1), lines2[j-1])
+	}
+
+	if j == 0 {
+		return append(buildMergedResult(lines1, lines2, dp, i-1, j), lines1[i-1])
+	}
+
+	// If the current lines are the same, include it only once
+	if lines1[i-1] == lines2[j-1] {
+		return append(buildMergedResult(lines1, lines2, dp, i-1, j-1), lines1[i-1])
+	}
+
+	// Choose the direction with the longer common subsequence
+	if dp[i-1][j] > dp[i][j-1] {
+		return append(buildMergedResult(lines1, lines2, dp, i-1, j), lines1[i-1])
+	} else {
+		return append(buildMergedResult(lines1, lines2, dp, i, j-1), lines2[j-1])
+	}
 }

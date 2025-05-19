@@ -79,3 +79,12 @@ func TestMergeDivergentChars(t *testing.T) {
 	merged := Merge(original, modified)
 	r.Equal("abc\nadc", merged)
 }
+
+func TestJournal(t *testing.T) {
+	r := require.New(t)
+
+	server := "1 April\nfelt good\nate good\n2 April\nslept not so good"
+	client := "1 April\nfelt good\n2 April\nslept not so good\nwent for hiking"
+	merged := Merge(server, client)
+	r.Equal("1 April\nfelt good\nate good\n2 April\nslept not so good\nwent for hiking", merged)
+}
