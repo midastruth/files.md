@@ -615,6 +615,6 @@ window.addEventListener("focus", async () => {
     const savedDirectoryHandle = await getRootDirHandle();
     files = await loadLocalFiles(savedDirectoryHandle);
     console.log("Files loaded");
-    // await syncAllWithServer()
+    await syncAllWithServer()
     console.log("Sync completed");
 });

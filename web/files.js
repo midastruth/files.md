@@ -323,6 +323,11 @@ async function collectLocallyModifiedTextFiles() {
         if (dir === 'img') continue; // Skip image directory
 
         for (const filename in files[dir]) {
+            if (dir === editor.currentDir && filename === editor.currentFile) {
+                console.log("Skip sending current file");
+                continue;
+            }
+
             const promise = getFileIfChanged(dir, filename)
                 .then(result => {
                     if (result) filesToSend.push(result);
