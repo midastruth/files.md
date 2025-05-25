@@ -158,7 +158,9 @@ async function syncAllWithServer() {
             }
 
             // todo try-catch?
+            await saveTextFile(path, content)
             setMetadata(path, content, lastModified);
+            saveMetadata();
         }
         filesMetadata['timestamps'] = server.timestamps;
         saveMetadata();
