@@ -90,8 +90,11 @@ async function loadLocalFiles(rootDirHandle) {
         }
 
         await Promise.all(dirPromises.map(({handle, dir, depth}) =>
-            loadDir(handle, dir, depth)
-        ));
+        {
+            if (dir === "journal/" || dir === "img/") {
+                loadDir(handle, dir, depth)
+            }
+        }));
     }
 
     await loadDir(rootDirHandle);
@@ -603,4 +606,4 @@ window.addEventListener('beforeunload', function () {
 
 
 // Worker to process the saving queue
-window.saver = setInterval(syncCurrentFile, saverInterval);
+// window.saver = setInterval(syncCurrentFile, saverInterval);
