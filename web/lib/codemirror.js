@@ -3243,6 +3243,27 @@
         return coords[prop];
       }
 
+      // A logical line can be wrapped into a few visual lines.
+      function getVisualLines(cm, logicalLineNo) {
+        var lineObj = getLine(cm.doc, logicalLineNo);
+        var segments = [];
+        var pos = 0;
+
+        while (pos < lineObj.text.length) {
+          var extent = wrappedLineExtentChar(cm, lineObj, null, pos);
+          segments.push({
+            logicalLine: logicalLineNo,
+            startChar: extent.begin,
+            endChar: extent.end,
+            visualIndex: segments.length
+          });
+          pos = extent.end;
+          if (pos === extent.begin) break; // Safety check
+        }
+
+        return segments;
+      }
+
       var order = getOrder(lineObj, doc.direction);
       iterateBidiSections(order, fromArg || 0, toArg == null ? lineLen : toArg, function (from, to, dir, i) {
         var ltr = dir == "ltr";
@@ -3272,27 +3293,6 @@
             botRight = !docLTR ? rightSide : wrapX(to, dir, "after");
           }
 
-          // A logical line can be wrapped into a few visual lines.
-          function getVisualLines(cm, logicalLineNo) {
-            var lineObj = getLine(cm.doc, logicalLineNo);
-            var segments = [];
-            var pos = 0;
-
-            while (pos < lineObj.text.length) {
-              var extent = wrappedLineExtentChar(cm, lineObj, null, pos);
-              segments.push({
-                logicalLine: logicalLineNo,
-                startChar: extent.begin,
-                endChar: extent.end,
-                visualIndex: segments.length
-              });
-              pos = extent.end;
-              if (pos === extent.begin) break; // Safety check
-            }
-
-            return segments;
-          }
-
           drawRect(topLeft, fromPos.top, topRight - topLeft, fromPos.bottom);
           // if (fromPos.bottom < toPos.top) {
           //   drawRect(leftSide, fromPos.bottom, null, toPos.top);
@@ -3306,27 +3306,20 @@
             for (let lineNo = startLine; lineNo <= endLine; lineNo++) {
               let lineObj = getLine(cm.doc, lineNo);
               let visualLines = getVisualLines(cm, lineNo);
-
               visualLines.forEach(visualLine => {
                 // Get coordinates for this visual line segment
                 let segmentStartCoords = charCoords(cm, Pos(lineNo, visualLine.startChar), "div");
 
-                // Use the new wrapX function with lineObj
-                let segmentRight = wrapXObj(cm, lineObj, visualLine.startChar, dir, "before");
-                let segmentLeft = wrapXObj(cm, lineObj, visualLine.endChar, dir, "after");
+                let left = wrapXObj(cm, lineObj, visualLine.startChar, dir, "before");
+                let right = wrapXObj(cm, lineObj, visualLine.endChar, dir, "after");
 
-                console.log(visualLine, "left:", segmentLeft, "right", segmentRight);
+                // console.log(visualLine, "left:", segmentLeft, "right", segmentRight);
 
-                // console.log()
+                console.log(fromPos, toPos);
                 // Only draw segments that are within our vertical selection range
                 if (segmentStartCoords.bottom > fromPos.bottom && segmentStartCoords.top < toPos.top) {
-                  // Use wrapX coordinates for proper width
-                  let segmentWidth = segmentRight - segmentLeft;
-
-                  // Draw rectangle for this visual line segment
-                  console.log(segmentLeft, segmentStartCoords.top, segmentWidth, segmentStartCoords.bottom - segmentStartCoords.top);
-                  drawRect(segmentLeft, segmentStartCoords.top,
-                      segmentWidth, segmentStartCoords.top + + cm.defaultTextHeight());
+                  let width = left - right;
+                  drawRect(right, segmentStartCoords.top, width, segmentStartCoords.top + cm.defaultTextHeight());
                 }
               });
             }
