@@ -3312,8 +3312,8 @@
           let areThereInBetweenLines = fromPos.bottom < toPos.top
           if (areThereInBetweenLines) {
             // Get the logical line range for the middle section
-            let startLine = cm.lineAtHeight(fromPos.bottom, "page");
-            let endLine = cm.lineAtHeight(toPos.top, "page");
+            let startLine = cm.lineAtHeight(fromPos.bottom, "div");
+            let endLine = cm.lineAtHeight(toPos.top, "div");
 
             // Loop through ALL lines in the range, not just endLine
             for (let lineNo = startLine; lineNo <= endLine; lineNo++) {
@@ -3326,9 +3326,6 @@
                 let left = wrapXObj(cm, lineObj, visualLine.startChar, dir, "before");
                 let right = wrapXObj(cm, lineObj, visualLine.endChar, dir, "after");
 
-                // console.log(visualLine, "left:", segmentLeft, "right", segmentRight);
-
-                console.log(fromPos, toPos);
                 // Only draw segments that are within our vertical selection range
                 if (segmentStartCoords.bottom > fromPos.bottom && segmentStartCoords.top < toPos.top) {
                   let width = left - right;
@@ -3338,13 +3335,13 @@
             }
           }
 
-          // Draw last line of selection
-          let lastLine = cm.lineAtHeight(fromPos.top, "page")
-          let lastVisualLine = getVisualLines(cm, lastLine)[0];
-          let lastLineRight = wrapXObj(cm, lineObj, lastVisualLine.startChar, dir, "before");
-          let lastLineLeft = wrapXObj(cm, lineObj, lastVisualLine.endChar, dir, "after");
-          drawRect(botLeft, toPos.top, lastLineRight - lastLineLeft, toPos.bottom);
-
+          // // Draw last line of selection
+          // let lastLine = cm.lineAtHeight(toPos.top, "page")
+          // let lastVisualLine = getVisualLines(cm, lastLine).pop();
+          // console.log(lastVisualLine);
+          // let lastLineRight = wrapXObj(cm, lineObj, lastVisualLine.startChar, dir, "before");
+          // let lastLineLeft = wrapXObj(cm, lineObj, lastVisualLine.endChar, dir, "after");
+          // drawRect(botLeft, toPos.top, lastLineRight - lastLineLeft, toPos.bottom);
         }
 
         if (!start || cmpCoords(fromPos, start) < 0) { start = fromPos; }
