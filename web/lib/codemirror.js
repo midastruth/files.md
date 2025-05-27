@@ -3215,7 +3215,7 @@
       if (top < 0) { top = 0; }
       top = Math.round(top);
       bottom = Math.round(bottom);
-      fragment.appendChild(elt("div", null, "CodeMirror-selected", ("position: absolute; left: " + left + "px;\n                             top: " + top + "px; width: " + (width == null ? rightSide - left : width) + "px;\n                             height: " + (bottom - top) + "px")));
+      fragment.appendChild(elt("div", null, "CodeMirror-selected", ("position: absolute; left: " + (left - 2)+ "px;\n                             top: " + top + "px; width: " + ((width == null ? rightSide - left : width) + 4) + "px;\n                             height: " + (bottom - top) + "px")));
     }
 
     function drawForLine(line, fromArg, toArg) {
@@ -3293,11 +3293,24 @@
             botRight = !docLTR ? rightSide : wrapX(to, dir, "after");
           }
 
-          drawRect(topLeft, fromPos.top, topRight - topLeft, fromPos.bottom);
+
+          // Old implementation:
+          // drawRect(topLeft, fromPos.top, topRight - topLeft, fromPos.bottom);
           // if (fromPos.bottom < toPos.top) {
           //   drawRect(leftSide, fromPos.bottom, null, toPos.top);
           // }
-          if (fromPos.bottom < toPos.top) {
+          // drawRect(botLeft, toPos.top, botRight - botLeft, toPos.bottom);
+
+          // Draw first line of selection
+          let firstLine = cm.lineAtHeight(fromPos.top, "page")
+          let firstVisualLine = getVisualLines(cm, firstLine)[0];
+          let firstLineRight = wrapXObj(cm, lineObj, firstVisualLine.startChar, dir, "before");
+          let firstLineLeft = wrapXObj(cm, lineObj, firstVisualLine.endChar, dir, "after");
+          drawRect(topLeft, fromPos.top, firstLineRight - firstLineLeft, fromPos.bottom);
+
+
+          let areThereInBetweenLines = fromPos.bottom < toPos.top
+          if (areThereInBetweenLines) {
             // Get the logical line range for the middle section
             let startLine = cm.lineAtHeight(fromPos.bottom, "page");
             let endLine = cm.lineAtHeight(toPos.top, "page");
@@ -3324,7 +3337,14 @@
               });
             }
           }
-          drawRect(botLeft, toPos.top, botRight - botLeft, toPos.bottom);
+
+          // Draw last line of selection
+          let lastLine = cm.lineAtHeight(fromPos.top, "page")
+          let lastVisualLine = getVisualLines(cm, lastLine)[0];
+          let lastLineRight = wrapXObj(cm, lineObj, lastVisualLine.startChar, dir, "before");
+          let lastLineLeft = wrapXObj(cm, lineObj, lastVisualLine.endChar, dir, "after");
+          drawRect(botLeft, toPos.top, lastLineRight - lastLineLeft, toPos.bottom);
+
         }
 
         if (!start || cmpCoords(fromPos, start) < 0) { start = fromPos; }
