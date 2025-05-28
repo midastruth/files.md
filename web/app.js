@@ -275,7 +275,7 @@ async function showFile(dir, filename, saveToHistory = true) {
 
     content = `# ${header}\n${content}`;
     // Replace extended links with just link
-    content = content.replace(/\[\[(.+?)\|.*?\]\]/g, '[[$1]]');
+    // content = content.replace(/\[\[(.+?)\|.*?\]\]/g, '[[$1]]');
 
     editor.currentDir = dir;
     editor.currentFile = filename;
