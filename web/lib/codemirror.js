@@ -3293,7 +3293,6 @@
             botRight = !docLTR ? rightSide : wrapX(to, dir, "after");
           }
 
-
           // Old implementation:
           // drawRect(topLeft, fromPos.top, topRight - topLeft, fromPos.bottom);
           // if (fromPos.bottom < toPos.top) {
@@ -3306,8 +3305,7 @@
           let firstVisualLine = getVisualLines(cm, firstLine)[0];
           let firstLineRight = wrapXObj(cm, lineObj, firstVisualLine.startChar, dir, "before");
           let firstLineLeft = wrapXObj(cm, lineObj, firstVisualLine.endChar, dir, "after");
-          drawRect(topLeft, fromPos.top, (firstLineRight - firstLineLeft) - topLeft, fromPos.bottom);
-          console.log(fromPos.top, firstLine, firstVisualLine);
+          drawRect(fromPos.left, fromPos.top, (firstLineRight - firstLineLeft) - topLeft, fromPos.bottom);
 
           let areThereInBetweenLines = fromPos.bottom < toPos.top
           if (areThereInBetweenLines) {
@@ -3327,7 +3325,10 @@
                 let right = wrapXObj(cm, lineObj, visualLine.endChar, dir, "after");
 
                 // Only draw segments that are within our vertical selection range
+                console.log(fromPos.bottom, toPos.top);
+                console.log('vis:', segmentStartCoords.bottom, segmentStartCoords.top);
                 if (segmentStartCoords.bottom > fromPos.bottom && segmentStartCoords.top < toPos.top) {
+                  console.log('inside');
                   let width = left - right;
                   drawRect(right, segmentStartCoords.top, width, segmentStartCoords.top + cm.defaultTextHeight());
                 }
