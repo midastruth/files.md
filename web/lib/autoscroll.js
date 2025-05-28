@@ -75,7 +75,7 @@ function initAutoscroll(editor) {
         lastMousePos = null;
         stopAutoScroll();
     });
-    
+
     // Additional: Check for auto-scroll during selection changes
     // This catches cases where the selection extends to edges programmatically
     editor.on('beforeSelectionChange', function (cm, obj) {
