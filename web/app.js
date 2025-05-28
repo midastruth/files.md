@@ -71,6 +71,7 @@ function initEditor(el) {
     };
 
     editor.hmdReadLink = async function (path) {
+        path = path.replace(/\|.*]$/, '');
         path = path.replace('[', '').replace(']', '');
         let parts = path.split('/');
         if (parts.length === 1) {
