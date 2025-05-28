@@ -3291,54 +3291,50 @@
           }
 
           // Old implementation:
-          drawRect(topLeft, fromPos.top, topRight - topLeft, fromPos.bottom);
-          if (fromPos.bottom < toPos.top) {
-            drawRect(leftSide, fromPos.bottom, null, toPos.top);
-          }
-          drawRect(botLeft, toPos.top, botRight - botLeft, toPos.bottom);
+          // drawRect(topLeft, fromPos.top, topRight - topLeft, fromPos.bottom);
+          // if (fromPos.bottom < toPos.top) {
+          //   drawRect(leftSide, fromPos.bottom, null, toPos.top);
+          // }
+          // drawRect(botLeft, toPos.top, botRight - botLeft, toPos.bottom);
 
-          // Draw first line of selection
-        //   let firstLine = cm.lineAtHeight(fromPos.top, "div")
-        //   let firstVisualLine = getVisualLines(cm, firstLine)[0];
-        //   let firstLineRight = wrapXObj(cm, lineObj, firstVisualLine.startChar, dir, "before");
-        //   let firstLineLeft = wrapXObj(cm, lineObj, firstVisualLine.endChar, dir, "after");
-        //   drawRect(fromPos.left, fromPos.top, (firstLineRight - firstLineLeft) - topLeft, fromPos.bottom);
-        //
-        //   let areThereInBetweenLines = fromPos.bottom < toPos.top
-        //   if (areThereInBetweenLines) {
-        //     // Get the logical line range for the middle section
-        //     let startLine = cm.lineAtHeight(fromPos.bottom, "div");
-        //     let endLine = cm.lineAtHeight(toPos.top, "div");
-        //
-        //     // Loop through ALL lines in the range, not just endLine
-        //     for (let lineNo = startLine; lineNo <= endLine; lineNo++) {
-        //       let lineObj = getLine(cm.doc, lineNo);
-        //       let visualLines = getVisualLines(cm, lineNo);
-        //       visualLines.forEach(visualLine => {
-        //         // Get coordinates for this visual line segment
-        //         let segmentStartCoords = charCoords(cm, Pos(lineNo, visualLine.startChar), "div");
-        //
-        //         let left = wrapXObj(cm, lineObj, visualLine.startChar, dir, "before");
-        //         let right = wrapXObj(cm, lineObj, visualLine.endChar, dir, "after");
-        //
-        //         // Only draw segments that are within our vertical selection range
-        //         console.log(fromPos.bottom, toPos.top);
-        //         console.log('vis:', segmentStartCoords.bottom, segmentStartCoords.top);
-        //         if (segmentStartCoords.bottom > fromPos.bottom && segmentStartCoords.top < toPos.top) {
-        //           console.log('inside');
-        //           let width = left - right;
-        //           drawRect(right, segmentStartCoords.top, width, segmentStartCoords.top + cm.defaultTextHeight());
-        //         }
-        //       });
-        //     }
-        //   }
-        //
-        //   // Draw last line of selection
-        //   let lastLine = cm.lineAtHeight(toPos.top, "div")
-        //   let lastVisualLine = getVisualLines(cm, lastLine).pop();
-        //   let lastLineRight = wrapXObj(cm, lineObj, lastVisualLine.startChar, dir, "before");
-        //   let lastLineLeft = wrapXObj(cm, lineObj, lastVisualLine.endChar, dir, "after");
-        //   drawRect(botLeft, toPos.top, lastLineRight - lastLineLeft, toPos.bottom);
+          // // Draw first line of selection
+          let firstLine = cm.lineAtHeight(fromPos.top, "div")
+          let firstVisualLine = getVisualLines(cm, firstLine)[0];
+          let firstLineRight = wrapXObj(cm, lineObj, firstVisualLine.startChar, dir, "before");
+          let firstLineLeft = wrapXObj(cm, lineObj, firstVisualLine.endChar, dir, "after");
+          drawRect(fromPos.left, fromPos.top, (firstLineRight - firstLineLeft) - topLeft, fromPos.bottom);
+
+          let areThereInBetweenLines = fromPos.bottom < toPos.top
+          if (areThereInBetweenLines) {
+            // Get the logical line range for the middle section
+            let startLine = cm.lineAtHeight(fromPos.bottom, "div");
+            let endLine = cm.lineAtHeight(toPos.top, "div");
+
+            // Loop through ALL lines in the range, not just endLine
+            for (let lineNo = startLine; lineNo <= endLine; lineNo++) {
+              let lineObj = getLine(cm.doc, lineNo);
+              let visualLines = getVisualLines(cm, lineNo);
+              visualLines.forEach(visualLine => {
+                // Get coordinates for this visual line segment
+                let segmentStartCoords = charCoords(cm, Pos(lineNo, visualLine.startChar), "div");
+
+                let left = wrapXObj(cm, lineObj, visualLine.startChar, dir, "before");
+                let right = wrapXObj(cm, lineObj, visualLine.endChar, dir, "after");
+
+                // Only draw segments that are within our vertical selection range
+                if (segmentStartCoords.bottom > fromPos.bottom && segmentStartCoords.top < toPos.top) {
+                  let width = left - right;
+                  drawRect(right, segmentStartCoords.top, width, segmentStartCoords.top + cm.defaultTextHeight());
+                }
+              });
+            }
+          }
+
+          // Draw last line of selection
+          let lastLine = cm.lineAtHeight(toPos.top, "div")
+          let lastVisualLine = getVisualLines(cm, lastLine).pop();
+          let lastLineLeft = wrapXObj(cm, lineObj, lastVisualLine.endChar, dir, "after");
+          drawRect(lastLineLeft, toPos.top, toPos.right - lastLineLeft, toPos.bottom);
         }
 
         if (!start || cmpCoords(fromPos, start) < 0) { start = fromPos; }
@@ -3351,7 +3347,6 @@
 
     var sFrom = range.from(), sTo = range.to();
     if (sFrom.line === sTo.line) { // Single line selection
-      console.log('draw single');
       drawForLine(sFrom.line, sFrom.ch, sTo.ch);
     } else {
       let fromLine = getLine(doc, sFrom.line);
@@ -3372,23 +3367,26 @@
 
       let hasLinesInBetween = leftEnd.bottom < rightStart.top;
       if (hasLinesInBetween) {
-        drawRect(leftSide, leftEnd.bottom, null, rightStart.top);
-        console.log(sFrom, sTo);
+        // console.log(sFrom, sTo);
         let startLine = sFrom.line;
         let endLine = sTo.line;
-        for (let lineNum = startLine; lineNum <= endLine; lineNum++) {
+        // start and end lines are handled already, so we exclude them
+        for (let lineNum = startLine+1; lineNum <= endLine-1; lineNum++) {
+          let line = getLine(doc, lineNum);
           let visualLines  = getVisualLines(cm, lineNum);
           visualLines.forEach(visualLine => {
-            console.log(lineNum, visualLine);
-            // let left = wrapXObj(cm, lineObj, visualLine.startChar, dir, "before");
-            // let right = wrapXObj(cm, lineObj, visualLine.endChar, dir, "after");
-            // let width = left - right;
+            let firstCharPos = charCoords(cm, Pos(lineNum, visualLine.startChar), "div");
+            // console.log(firstCharPos);
+            // TODO we only support LTR here
+            let left = wrapXObj(cm, line, visualLine.startChar, 'ltr', "before");
+            let right = wrapXObj(cm, line, visualLine.endChar, 'ltr', "after");
+            let width = left - right;
+            drawRect(leftSide, firstCharPos.top, width, firstCharPos.bottom);
           });
         }
-
-
       }
       // if (leftEnd.bottom < rightStart.top) {
+      // // drawRect(leftSide, leftEnd.bottom, null, rightStart.top);
       //   // Highlight each middle line from start to end of its text content
       //   var startLine = cm.lineAtHeight(leftEnd.bottom, "div");
       //   var endLine = cm.lineAtHeight(rightStart.top, "div");
