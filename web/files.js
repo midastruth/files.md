@@ -90,7 +90,7 @@ async function loadLocalFiles(rootDirHandle) {
         }
 
         if (debug) {
-            if (debug.loaded === undefined) {
+            if (!debug.loaded) {
                 debug.loaded = true
                 await loadDir(rootDirHandle, debug.dir, 1);
             }
