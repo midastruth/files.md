@@ -292,15 +292,6 @@ async function showFile(dir, filename, saveToHistory = true) {
     editor.getDoc().setValue(content);
     editor.clearHistory();
 
-    const scrollInfo = editor.getScrollInfo();
-
-    // If scroll height equals client height, content fits in one screen
-    const viewport = editor.getViewport();
-    const totalLines = editor.lineCount();
-    const lastLine = totalLines - 1;
-
-    // Check if the last line is visible in the viewport
-    console.log(viewport.to >= totalLines);
 
     if (cursorPos !== null) {
         setTimeout(() => {
@@ -310,6 +301,13 @@ async function showFile(dir, filename, saveToHistory = true) {
             editor.focus();
         }, 300);
     } else {
+        const viewport = editor.getViewport();
+        const totalLines = editor.lineCount();
+        let docFitInOneScreen = viewport.to >= totalLines
+        if (!docFitInOneScreen) {
+            return;
+        }
+
         // Set cursor at the end of the page.
         // We need to execute this code after some rendering loop. If we don't do that,
         // Images and other heavy stuff won't be loaded
