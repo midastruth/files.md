@@ -297,7 +297,6 @@ async function showFile(dir, filename, saveToHistory = true) {
         // Focus last line if we have short content
         const cmScroller = document.querySelector('.CodeMirror-scroll')
         const hasVerticalScroll = cmScroller.scrollHeight > cmScroller.clientHeight
-        console.log("VERTICAL", hasVerticalScroll);
         if (hasVerticalScroll) {
             return;
         }

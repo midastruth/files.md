@@ -120,6 +120,7 @@ async function loadLocalFiles(rootDirHandle) {
 }
 
 async function syncAllWithServer() {
+    return;
     if (debug) {
         return;
     }
@@ -465,10 +466,6 @@ async function isContentEqual(path, content) {
                 diff.push(`Line ${i + 1}: "${clientLine}" vs "${serverLine}"`);
             }
         }
-        // Log from async without console.log
-        setTimeout(() => {
-            console.log("Content differs:", diff.join('\n'));
-        }, 0);
 
         return false;
     } else {
