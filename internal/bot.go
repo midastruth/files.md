@@ -2284,6 +2284,7 @@ func (b *Bot) togglePomodoro(_ []string) error {
 		return fmt.Errorf("toggle pomodoro: failed to check if pomodoro is already running %w", err)
 	}
 
+	// TODO replace with move so we can track/sync
 	if hasPomodoroInToday {
 		err = b.fs.Del(fs.DirToday, fs.FilePomodoro)
 		if err != nil {

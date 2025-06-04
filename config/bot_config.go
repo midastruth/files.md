@@ -2,11 +2,13 @@ package config
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/kelseyhightower/envconfig"
 )
 
 type BotConfig struct {
+	WorkingDir     string
 	StorageDir     string `default:"./storage"  envconfig:"STORAGE_DIR"`
 	BotAPIToken    string `required:"true" envconfig:"BOT_API_TOKEN"`
 	ConfigFilename string `default:"config.json"`
@@ -23,6 +25,12 @@ func LoadBotConfig() error {
 	if err := envconfig.Process("", &BotCfg); err != nil {
 		return fmt.Errorf("can't load config: %w", err)
 	}
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("config can't get working directory: %w", err)
+	}
+	BotCfg.WorkingDir = wd
 
 	return nil
 }
