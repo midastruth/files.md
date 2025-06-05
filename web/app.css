@@ -201,10 +201,6 @@ a:hover {
     font-size: var(--font-smaller) !important;
 }
 
-.hmd-hidden-token {
-    display: none !important;
-}
-
 ::selection {
     background: var(--color-tx-sel);
 }
@@ -299,4 +295,18 @@ a:hover {
 .cm-formatting-list-ul {
     font-size: 0; /* Hide the "-" character */
     color: transparent; /* Backup to hide the character */
+}
+
+
+/*Hide bulletpoints when tasks*/
+.cm-formatting-list-ul:has(+ .cm-formatting-task) {
+    width: 0;
+}
+
+.cm-formatting-list-ul:has(+ .cm-formatting-task)::before {
+    display: none;
+    width: 0;
+}
+.cm-formatting-list-ul:has(+ .cm-formatting-task) + .cm-formatting-task {
+    margin-left: -24px; /* Negative margin equal to the width of the ::before element */
 }
