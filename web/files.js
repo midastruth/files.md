@@ -510,7 +510,8 @@ async function rename(oldPath, newPath) {
         return;
     }
 
-    await fileHandle.move(newPath);
+    let file = fileHandle.getFile()
+    await file.move(newPath);
     console.log(`File renamed from ${oldPath} to ${newPath}`);
 }
 
