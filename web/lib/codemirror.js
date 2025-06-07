@@ -3206,6 +3206,15 @@
     var segments = [];
     var pos = 0;
 
+    if (lineObj.text.length === 0) {
+      return [{
+        logicalLine: logicalLineNo,
+        startChar: 0,
+        endChar: 0,
+        visualIndex: 0
+      }];
+    }
+
     while (pos < lineObj.text.length) {
       var extent = wrappedLineExtentChar(cm, lineObj, null, pos);
       segments.push({
@@ -3242,9 +3251,15 @@
     var docLTR = doc.direction == "ltr";
 
     function drawSelectionRect(left, top, width, bottom) {
+      console.log("drawSelectionRect", left, top, width, bottom);
       // CHANGED, sometimes when we select "`code` text" hide/show tokens causes left to be negative.
       // That all causes blinking, so we just ignore negative lefts.
       if (left < 0) { return; }
+
+      // CHANGED, added minimum width
+      if (width <= 0) {
+        width = cm.defaultCharWidth();
+      }
 
       if (top < 0) { top = 0; }
       top = Math.round(top);
@@ -3302,7 +3317,6 @@
           let firstLine = cm.lineAtHeight(fromPos.top, "div")
           let firstVisualLine = getVisualLines(cm, firstLine)[0];
           let firstLineRight = wrapXObj(cm, lineObj, firstVisualLine.startChar, dir, "before");
-          let firstLineLeft = wrapXObj(cm, lineObj, firstVisualLine.endChar, dir, "after");
           drawSelectionRect(fromPos.left, fromPos.top, (firstLineRight - fromPos.left), fromPos.bottom);
 
           // CHANGED
