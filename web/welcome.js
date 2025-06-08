@@ -76,7 +76,8 @@ let defaultFiles = {
                 "[My amazing project](/My amazing project.md)"
         },
         "Hotkeys.md": {
-            "content": "## File Navigation\n" +
+            "content": "# Hotkeys\n" +
+                "## File Navigation\n" +
                 "\n" +
                 "| Hotkey | Action |\n" +
                 "| -------- |-------- |\n" +
@@ -98,7 +99,10 @@ let defaultFiles = {
                 "\n" +
                 "| Hotkey | Action |\n" +
                 "| -------- | -------- |\n" +
-                "| `[` | Trigger file link autocomplete |",
+                "| `[` | Trigger file link autocomplete |\n" +
+                "\n" +
+                "[Welcome](/Welcome.md)\n" +
+                "[Markdown Guide](/Markdown Guide.md)",
         },
         "My amazing project.md": {
             "content": "You can dump project related thoughts here"
