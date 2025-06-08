@@ -623,6 +623,7 @@ async function syncCurrentFile() {
         return
     }
 
+    /// TODO detect welcome mode separately
     const savedDirHandle = await getRootDirHandle();
     const hasSavedDir = savedDirHandle instanceof FileSystemDirectoryHandle;
     if (!hasSavedDir) {
