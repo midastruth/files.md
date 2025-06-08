@@ -20,7 +20,9 @@ let defaultFiles = {
     },
     "": {
         "Welcome.md": {
-            "content": "Only essential features. No distractions.\n\n![Why taking notes](https://files.md/lib/notes.jpg)\nYou don't need a feature-rich tool or a fancy methodology to be successful at taking notes.\n\n[Markdown Guide](Markdown Guide.md)\n[Hotkeys](Hotkeys.md)"
+            "content": "- First item\n" +
+                "- Second item\n" +
+                "  - Nested item\nOnly essential features. No distractions.\n\nYou don't need a feature-rich tool or a fancy methodology to be successful at taking notes.\n\n[Markdown Guide](Markdown Guide.md)\n[Hotkeys](Hotkeys.md)"
         },
         "Markdown Guide.md": {
             "content": "#### Headers\n" +
@@ -74,7 +76,7 @@ let defaultFiles = {
                 "\n" +
                 "#### Images\n" +
                 "\n" +
-                "![Why taking notes](https://files.md/lib/notes.jpg)\n" +
+                "![Why taking notes](https://app.files.md/lib/notes.jpg)\n" +
                 "\n" +
                 "*Caption: This is a sample image with alt text*\n" +
                 "#### Links\n" +
