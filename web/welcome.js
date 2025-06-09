@@ -20,7 +20,7 @@ let defaultFiles = {
     },
     "": {
         "Welcome.md": {
-            "content": "Only essential features. No distractions.\n\nYou don't need a feature-rich tool or a fancy template to be successful at taking notes.\n\nYou can insert your own links by typing `[`.\n\n[Markdown Guide](Markdown Guide.md)\n[Hotkeys](Hotkeys.md)\n[Why using links](Links.md)"
+            "content": "Only essential features. No distractions.\n\nTo be successful at taking notes, you don't need a feature-rich tool or a fancy template.\n\n[Markdown Guide](Markdown Guide.md)\n[Hotkeys](Hotkeys.md)\n[Why using links](Links.md)"
         },
         "Links.md": {
             "content": "Links are important\n" +

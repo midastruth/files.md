@@ -320,8 +320,20 @@ async function openFile(dir, filename, saveToHistory = true) {
 
 // Focus last line before the links.
 function focusLastLine() {
-    const lastLine = editor.lastLine();
+    let lastLine = editor.lastLine();
     let targetLine = lastLine;
+
+    // Eat all empty lines before first links.
+    while (lastLine >= 0) {
+        const lineContent = editor.getLine(lastLine).trim();
+        if (lineContent === "" || lineContent.startsWith("[") || lineContent.endsWith("]") || lineContent.endsWith(")")) {
+            lastLine--;
+            continue;
+        }
+
+        lastLine = Math.min(lastLine + 1, editor.lastLine());
+        break;
+    }
     for (let i = lastLine; i >= 0; i--) {
         const lineContent = editor.getLine(i).trim();
         if (!lineContent.startsWith("[") && (!lineContent.endsWith("]") || !lineContent.endsWith(")"))) {
@@ -329,6 +341,7 @@ function focusLastLine() {
             break;
         }
     }
+    console.log(targetLine);
     const targetChar = editor.getLine(targetLine).length;
     editor.setCursor({line: targetLine, ch: targetChar});
     // Cursor at the end, but scroll the doc to top
