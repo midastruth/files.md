@@ -565,9 +565,10 @@
 .cm-s-hypermd-light .cm-formatting-link + .cm-formatting-link-string + .cm-url + .cm-formatting-link-string,
 .cm-s-hypermd-light .cm-formatting-link + .cm-formatting-link-string + .cm-url + .cm-link,
 .cm-s-hypermd-light .cm-formatting-link + .cm-formatting-link-string + .cm-url + .cm-link + .cm-formatting-link-string {
-    display: inline-block;
-    font-size: 0.85em;
-    vertical-align: text-top;
+    /*PATCHED, display same as regular text */
+    /*display: inline-block;*/
+    /*font-size: 0.85em;*/
+    /*vertical-align: text-top;*/
 }
 .cm-s-hypermd-light.HyperMD-with-alt span.cm-url,
 .cm-s-hypermd-light.HyperMD-with-alt span.cm-link,
