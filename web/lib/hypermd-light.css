@@ -71,3 +71,8 @@
 .cm-s-hypermd-light .cm-strong {
     font-weight: 600;
 }
+
+/*Otherwise cursor height is not correct*/
+.cm-s-hypermd-light pre.HyperMD-list-line {
+    padding-top: 0 !important;
+}

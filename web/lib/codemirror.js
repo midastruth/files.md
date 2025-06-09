@@ -3174,13 +3174,31 @@
   }
 
   // Draws a cursor for the given range
+  // PATCHED, cursor height without padding
   function drawSelectionCursor(cm, head, output) {
     var pos = cursorCoords(cm, head, "div", null, null, !cm.options.singleCursorHeightPerLine);
 
     var cursor = output.appendChild(elt("div", "\u00a0", "CodeMirror-cursor"));
     cursor.style.left = pos.left + "px";
-    cursor.style.top = pos.top + "px";
-    cursor.style.height = Math.max(0, pos.bottom - pos.top) * cm.options.cursorHeight + "px";
+
+    // Get the line element to measure actual text properties
+    var lineView = findViewForLine(cm, head.line);
+    var lineElement = lineView && lineView.text;
+
+    if (lineElement) {
+      var style = window.getComputedStyle(lineElement);
+      var paddingTop = parseFloat(style.paddingTop) || 0;
+      var fontSize = parseFloat(style.fontSize) || textHeight(cm.display);
+      var lineHeight = parseFloat(style.lineHeight) || fontSize;
+
+      // Adjust top to account for padding and center the cursor with the text baseline
+      var textOffset = paddingTop + (lineHeight - fontSize) / 2;
+      cursor.style.top = (pos.top + textOffset - 2) + "px";
+      cursor.style.height = (fontSize * cm.options.cursorHeight) + 4 + "px";
+    } else {
+      cursor.style.top = pos.top + "px";
+      cursor.style.height = (textHeight(cm.display) * cm.options.cursorHeight) + "px";
+    }
 
     if (/\bcm-fat-cursor\b/.test(cm.getWrapperElement().className)) {
       var charPos = charCoords(cm, head, "div", null, null);
@@ -3189,12 +3207,23 @@
     }
 
     if (pos.other) {
-      // Secondary cursor, shown when on a 'jump' in bi-directional text
       var otherCursor = output.appendChild(elt("div", "\u00a0", "CodeMirror-cursor CodeMirror-secondarycursor"));
       otherCursor.style.display = "";
       otherCursor.style.left = pos.other.left + "px";
-      otherCursor.style.top = pos.other.top + "px";
-      otherCursor.style.height = (pos.other.bottom - pos.other.top) * .85 + "px";
+
+      if (lineElement) {
+        var style = window.getComputedStyle(lineElement);
+        var paddingTop = parseFloat(style.paddingTop) || 0;
+        var fontSize = parseFloat(style.fontSize) || textHeight(cm.display);
+        var lineHeight = parseFloat(style.lineHeight) || fontSize;
+
+        var textOffset = paddingTop + (lineHeight - fontSize) / 2;
+        otherCursor.style.top = (pos.other.top + textOffset) + "px";
+        otherCursor.style.height = (fontSize * 0.85) + "px";
+      } else {
+        otherCursor.style.top = pos.other.top + "px";
+        otherCursor.style.height = (textHeight(cm.display) * 0.85) + "px";
+      }
     }
   }
 
