@@ -5,7 +5,8 @@
     --color-inline-code: #657b83;
     --color-inline-code-bg: #d8dae0;
     --color-link: #32302B;
-    --color-link-hover: #2a4a6b;
+    /*--color-link-hover: #2a4a6b;*/
+    --color-link-hover: #32302B;
     --color-url: #706f6b;
     --color-tx-sel: rgba(101, 123, 131, 0.2);
     --color-bg-active: #EFEFEF;

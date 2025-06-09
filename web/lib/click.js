@@ -202,7 +202,8 @@
                     var text, url;
                     // PATCHED, don't follow if we click on text inside ()
                     let noMetaIsPressed = !metaKey && !ctrlKey && !altKey;
-                    if (noMetaIsPressed && token.type === "string url") {
+                    console.log(token.type);
+                    if (noMetaIsPressed && (token.type === "string url" || token.type === "formatting formatting-link-string string url")) {
                        return;
                     }
                     if (mat = styles.match(/\s(image|link|url)\s/)) {
@@ -240,10 +241,11 @@
                                 for (var i = 0; i < siblings.length; i++) {
                                     var sibling = siblings[i];
                                     if (sibling.className) {
-                                        var hasUrlClass = sibling.className.includes('cm-string') &&
-                                            sibling.className.includes('cm-url');
-                                        var hasHiddenClass = sibling.className.includes('hmd-hidden-token');
-                                        if (hasUrlClass && !hasHiddenClass) {
+                                        let isLink = sibling.className.includes('cm-formatting') && sibling.className.includes('cm-link');
+                                        let hasHiddenLinkPart = sibling.className.includes('hmd-hidden-token');
+                                        let isUrl = sibling.className.includes('cm-formatting') && sibling.className.includes('cm-url');
+                                        let hasHiddenUrlPart = sibling.className.includes('hmd-hidden-token');
+                                        if ((isLink && !hasHiddenLinkPart) || (isUrl && !hasHiddenUrlPart)) {
                                             isUnfolded = true;
                                             break;
                                         }
