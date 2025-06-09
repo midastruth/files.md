@@ -6,7 +6,7 @@ let isSaving = false;
 let isSyncing = false;
 let isSyncingCurrent = false;
 
-// Files structure:
+// In-memory mapping of local file system:
 // {
 //   "dir": [
 //     {
