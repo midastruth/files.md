@@ -546,6 +546,7 @@ async function isContentEqual(path, content) {
     }
 }
 
+// TODO save metadata & files
 async function saveTextFile(path, content) {
     let fileHandle = await getFileHandle(path);
     if (fileHandle === null) {
@@ -554,7 +555,7 @@ async function saveTextFile(path, content) {
     }
 
     if (!await isContentEqual(path, content)) {
-        console.log("Hashes do not match, writing file...");
+        console.log("Hashes do not match, writing file...", path);
         // TODO rem
         const writable = await fileHandle.createWritable();
         await writable.write(content);
@@ -575,6 +576,28 @@ async function removeFile(path) {
     removeMetadataAndMemoryMapping(path);
     saveMetadata()
     console.log(`File ${path} removed successfully.`);
+}
+
+async function moveCurrentFile(toDir) {
+    console.log(toDir);
+    // TODO add prevent syncing?
+    const oldPath = toPath(editor.currentDir, editor.currentFile);
+    const newPath = toPath(toDir, editor.currentFile);
+
+    let content = getCurrentContent();
+    await saveTextFile(newPath, content);
+    // TODO move to saveTextFile?
+    files[toDir][editor.currentFile] = {
+        content: content,
+        lastModified: 0,
+        handle: await getFileHandle(newPath),
+    }
+    editor.currentDir = toDir;
+    setMetadata(newPath, content, 0);
+    saveMetadata();
+
+    await removeFile(oldPath);
+    await buildSidebar();
 }
 
 function getMetadata(path) {
@@ -649,10 +672,6 @@ async function syncCurrentFile() {
         return;
     }
 
-    // while (isSaving) {
-    //     await new Promise(r => setTimeout(r, 50));
-    // }
-
     if (isSyncingCurrent) {
         return;
     }
@@ -666,7 +685,7 @@ async function syncCurrentFile() {
         const newFilename = fromHeader(firstLine);
         await removeFile(`${editor.currentDir}/${editor.currentFile}`);
         console.log('Removed', `${editor.currentDir}/${editor.currentFile}`);
-        // Way to verbose, to we want to mess with it like this?
+        // TODO Way to verbose, to we want to mess with it like this?
         files[editor.currentDir][newFilename] = {
             content: getCurrentContent(),
             lastModified: 0,

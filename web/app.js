@@ -1,6 +1,7 @@
 // HyperMD/Codemirror editor
 let editor;
-let focusedItemIndex = -1;
+let focusedSearchItemIndex = -1;
+let focusedMoveItemIndex = -1;
 let debug = false;
 // let debug = {dir: "", file: "Sim.md", loaded: false};
 
@@ -389,10 +390,22 @@ function focusLastLine() {
     editor.focus();
 }
 
-function updateFocusedItem(resultsList) {
+function updateSearchFocusedItem(resultsList) {
     document.querySelectorAll('#search-results li').forEach(li => li.classList.remove('focused'));
     resultsList.forEach((item, index) => {
-        if (index === focusedItemIndex) {
+        if (index === focusedMoveItemIndex) {
+            item.classList.add('focused');
+            item.scrollIntoView({block: "nearest"});
+        } else {
+            item.classList.remove('focused');
+        }
+    });
+}
+
+function updateMoveFocusedItem(resultsList) {
+    document.querySelectorAll('#move-results li').forEach(li => li.classList.remove('focused'));
+    resultsList.forEach((item, index) => {
+        if (index === focusedMoveItemIndex) {
             item.classList.add('focused');
             item.scrollIntoView({block: "nearest"});
         } else {
@@ -406,7 +419,7 @@ function openSearchModal() {
     const inputField = document.getElementById('search-input');
     inputField.focus();
 
-    focusedItemIndex = -1;
+    focusedMoveItemIndex = -1;
     const goToFileResults = document.getElementById('search-results');
     goToFileResults.innerHTML = '';
     loadRecentFiles();
@@ -417,7 +430,7 @@ function openMoveModal() {
     const inputField = document.getElementById('move-input');
     inputField.focus();
 
-    focusedItemIndex = -1;
+    focusedMoveItemIndex = -1;
     const goToFileResults = document.getElementById('move-results');
     goToFileResults.innerHTML = '';
     showMoveResults(getMoveDestinations());
@@ -444,7 +457,6 @@ window.addEventListener('keydown', async (event) => {
     }
 
     if (isModifierKey(event) && event.key === 'd') {
-
         event.preventDefault();
         event.stopPropagation();
 
@@ -458,6 +470,7 @@ window.addEventListener('keydown', async (event) => {
 
     if (isModifierKey(event) && event.key === 'k') {
         event.preventDefault();
+        event.stopPropagation();
         document.getElementById('search-input').value = ''
         openSearchModal();
     }
@@ -476,6 +489,10 @@ window.addEventListener('focus', () => {
 
 function closeSearchModal() {
     document.getElementById('search').style.display = 'none';
+}
+
+function closeMoveModal() {
+    document.getElementById('move').style.display = 'none';
 }
 
 function loadRecentFiles() {
@@ -599,44 +616,48 @@ function showSearchResults(results) {
         }
         listItem.setAttribute('data-path', `${dir}/${filename}`);
         listItem.setAttribute('data-index', index);
-        listItem.onclick = () => {
-            openFile(dir, filename);
+        listItem.onclick = async () => {
+            await openFile(dir, filename);
             closeSearchModal();
         };
         listItem.onmouseenter = () => {
             document.querySelectorAll('#search-results li').forEach(li => li.classList.remove('focused'));
             listItem.classList.add('focused');
-            focusedItemIndex = index;
+            focusedMoveItemIndex = index;
         };
         list.appendChild(listItem);
     });
 
-    focusedItemIndex = 0;
-    updateFocusedItem(list.querySelectorAll('li'));
+    focusedMoveItemIndex = 0;
+    updateSearchFocusedItem(list.querySelectorAll('li'));
 }
 
 function showMoveResults(dirs) {
     const list = document.getElementById('move-results');
     list.innerHTML = '';
     dirs.forEach((dir, index) => {
+        let dataDir = dir;
+        if (dataDir === '/') {
+            dataDir = '';
+        }
         const listItem = document.createElement('li');
         listItem.textContent = dir;
-        listItem.setAttribute('data-path', `$dir`);
+        listItem.setAttribute('data-path', dataDir);
         listItem.setAttribute('data-index', index);
-        listItem.onclick = () => {
-            // showFile(dir, filename);
-            closeSearchModal();
+        listItem.onclick = async () => {
+            await moveCurrentFile(dir);
+            closeMoveModal();
         };
         listItem.onmouseenter = () => {
             document.querySelectorAll('#move-results li').forEach(li => li.classList.remove('focused'));
             listItem.classList.add('focused');
-            focusedItemIndex = index;
+            focusedMoveItemIndex = index;
         };
         list.appendChild(listItem);
     });
 
-    focusedItemIndex = 0;
-    updateFocusedItem(list.querySelectorAll('li'));
+    focusedMoveItemIndex = 0;
+    updateMoveFocusedItem(list.querySelectorAll('li'));
 }
 
 function closeSearch() {
@@ -679,8 +700,8 @@ document.getElementById('search').addEventListener('keydown', (event) => {
 
     if (event.key === 'Enter') {
         event.preventDefault();
-        if (resultsList[focusedItemIndex]) {
-            const [dir, filename] = resultsList[focusedItemIndex].getAttribute('data-path').split('/');
+        if (resultsList[focusedMoveItemIndex]) {
+            const [dir, filename] = resultsList[focusedMoveItemIndex].getAttribute('data-path').split('/');
             openFile(dir, filename);
             closeSearchModal();
         }
@@ -688,12 +709,35 @@ document.getElementById('search').addEventListener('keydown', (event) => {
 
     if (event.key === 'ArrowDown') {
         event.preventDefault();
-        focusedItemIndex = (focusedItemIndex + 1) % resultsList.length;
-        updateFocusedItem(resultsList);
+        focusedMoveItemIndex = (focusedMoveItemIndex + 1) % resultsList.length;
+        updateSearchFocusedItem(resultsList);
     } else if (event.key === 'ArrowUp') {
         event.preventDefault();
-        focusedItemIndex = (focusedItemIndex - 1 + resultsList.length) % resultsList.length;
-        updateFocusedItem(resultsList);
+        focusedMoveItemIndex = (focusedMoveItemIndex - 1 + resultsList.length) % resultsList.length;
+        updateSearchFocusedItem(resultsList);
+    }
+});
+
+document.getElementById('move').addEventListener('keydown', (event) => {
+    const resultsList = document.getElementById('move-results').querySelectorAll('li');
+
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        if (resultsList[focusedMoveItemIndex]) {
+            const dir = resultsList[focusedMoveItemIndex].getAttribute('data-path');
+            moveCurrentFile(dir);
+            closeMoveModal();
+        }
+    }
+
+    if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        focusedMoveItemIndex = (focusedMoveItemIndex + 1) % resultsList.length;
+        updateMoveFocusedItem(resultsList);
+    } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        focusedMoveItemIndex = (focusedMoveItemIndex - 1 + resultsList.length) % resultsList.length;
+        updateMoveFocusedItem(resultsList);
     }
 });
 
