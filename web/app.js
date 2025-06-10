@@ -846,7 +846,9 @@ document.addEventListener('mousedown', (event) => {
 
 // Reload files once the app gains focus
 window.addEventListener("focus", async () => {
-    editor.focus();
+    if (editor.currentFile !== undefined) {
+        editor.focus();
+    }
 
     // Sync media first, so that new images for current file would be loaded
     await syncMediaFilesFromServer();
