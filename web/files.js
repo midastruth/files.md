@@ -583,26 +583,34 @@ async function removeFile(path) {
 }
 
 async function moveCurrentFile(toDir) {
+    isSyncingCurrent = true;
+
     console.log(toDir);
     // TODO add prevent syncing?
     const oldPath = toPath(editor.currentDir, editor.currentFile);
     const newPath = toPath(toDir, editor.currentFile);
 
-    let content = getCurrentContent();
-    await saveTextFile(newPath, content);
-    // TODO move to saveTextFile?
-    delete files[editor.currentDir][editor.currentFile];
-    files[toDir][editor.currentFile] = {
-        content: content,
-        lastModified: 0,
-        handle: await getFileHandle(newPath),
-    }
-    editor.currentDir = toDir;
-    setMetadata(newPath, content, 0);
-    saveMetadata();
+    try {
+        let content = getCurrentContent();
+        await saveTextFile(newPath, content);
+        // TODO move to saveTextFile?
+        delete files[editor.currentDir][editor.currentFile];
+        files[toDir][editor.currentFile] = {
+            content: content,
+            lastModified: 0,
+            handle: await getFileHandle(newPath),
+        }
+        editor.currentDir = toDir;
+        setMetadata(newPath, content, 0);
+        saveMetadata();
 
-    await removeFile(oldPath);
-    await buildSidebar();
+        await removeFile(oldPath);
+        await buildSidebar();
+    } catch (error) {
+        console.error("Error moving file:", error);
+    }
+
+    isSyncingCurrent = false;
 }
 
 function getMetadata(path) {
@@ -683,29 +691,35 @@ async function syncCurrentFile() {
     }
     isSyncingCurrent = true;
 
-    // Track if filename was changed
-    // TODO track if no first line?
-    const firstLine = editor.getValue().split('\n')[0];
-    if (firstLine !== toHeader(editor.currentFile)) {
-        console.log(firstLine, toHeader(editor.currentFile));
-        const newFilename = fromHeader(firstLine);
-        await removeFile(`${editor.currentDir}/${editor.currentFile}`);
-        console.log('Removed', `${editor.currentDir}/${editor.currentFile}`);
-        // TODO Way to verbose, to we want to mess with it like this?
-        files[editor.currentDir][newFilename] = {
-            content: getCurrentContent(),
-            lastModified: 0,
-            handle: await getFileHandle(toPath(editor.currentDir, newFilename)),
-        }
-        editor.currentFile = newFilename;
+    try {
+        // Track if filename was changed
+        // TODO track if no first line?
+        const firstLine = editor.getValue().split('\n')[0];
+        if (firstLine !== toHeader(editor.currentFile)) {
+            console.log(firstLine, toHeader(editor.currentFile));
+            const newFilename = fromHeader(firstLine);
+            await removeFile(`${editor.currentDir}/${editor.currentFile}`);
+            console.log('Removed', `${editor.currentDir}/${editor.currentFile}`);
+            // TODO Way to verbose, to we want to mess with it like this?
+            files[editor.currentDir][newFilename] = {
+                content: getCurrentContent(),
+                lastModified: 0,
+                handle: await getFileHandle(toPath(editor.currentDir, newFilename)),
+            }
+            editor.currentFile = newFilename;
 
-        const path = `${editor.currentDir}/${editor.currentFile}`;
-        const content = getCurrentContent();
-        await saveTextFile(path, content);
-        setMetadata(path, content, 0);
-        saveMetadata();
-        console.log('Created', `${editor.currentDir}/${editor.currentFile}`);
-        await buildSidebar();
+            const path = `${editor.currentDir}/${editor.currentFile}`;
+            const content = getCurrentContent();
+            await saveTextFile(path, content);
+            setMetadata(path, content, 0);
+            saveMetadata();
+            console.log('Created', `${editor.currentDir}/${editor.currentFile}`);
+            await buildSidebar();
+        }
+    } catch (error) {
+        console.error("Error during filename change:", error);
+        isSyncingCurrent = false;
+        return;
     }
 
     let contentWasModifiedLocally = false;
@@ -727,7 +741,13 @@ async function syncCurrentFile() {
     if (contentWasModifiedLocally && editor.isClean()) {
         console.log("WAS MODIFIED LOCALLY");
         // Changes only from local system
-        await openFile(editor.currentDir, editor.currentFile);
+        try {
+            await openFile(editor.currentDir, editor.currentFile);
+        } catch (error) {
+            console.error("Error opening file:", error);
+            isSyncingCurrent = false;
+            return;
+        }
     } else if (!editor.isClean()) {
         isSaving = true;
         try {

@@ -239,7 +239,7 @@ a:hover {
 
 .cm-s-hypermd-light span.cm-link, .cm-s-hypermd-light .cm-string.cm-url.cm-hmd-barelink {
     color: var(--color-link) !important;
-    font-weight: 500;
+    font-weight: 460;
     border-bottom:0.04em solid rgba(50,50,50,.25);
 }
 
