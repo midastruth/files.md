@@ -711,7 +711,7 @@ document.getElementById('search').addEventListener('keydown', (event) => {
     if (event.key === 'Enter') {
         event.preventDefault();
         if (resultsList[focusedSearchItemIndex]) {
-            const [dir, filename] = resultsList[focusedMoveItemIndex].getAttribute('data-path').split('/');
+            const [dir, filename] = resultsList[focusedSearchItemIndex].getAttribute('data-path').split('/');
             openFile(dir, filename);
             closeSearchModal();
         }
