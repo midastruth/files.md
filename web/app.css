@@ -39,7 +39,6 @@ html {
 
 body {
     overscroll-behavior: none;
-    margin: 0;
     background-color: var(--color-bg-alt);
     color: var(--color-tx);
     font-size: 1.7rem;
@@ -93,9 +92,6 @@ body {
 
 #content {
     flex: 1;
-    padding-top: 1px;
-    padding-bottom: 6px;
-
     /*overflow: auto;*/
     /*flex-grow: 1;*/
     /*padding-top: 1px;*/
