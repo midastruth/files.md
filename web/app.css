@@ -453,3 +453,14 @@ body.dragging * {
 .hmd-image-preview {
     border: var(--color-border);
 }
+
+.cm-s-hypermd-light .HyperMD-codeblock::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+}
+
+.cm-s-hypermd-light .HyperMD-codeblock-bg {
+    margin-left: 4px;
+    width: calc(100% - 4px);
+}

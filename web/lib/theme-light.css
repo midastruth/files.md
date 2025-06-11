@@ -64,7 +64,7 @@
 
 .cm-s-hypermd-light span.cm-inline-code:not(.cm-formatting):not(.cm-hmd-indented-code) {
     background: color-mix(in srgb, var(--color-inline-code-bg), transparent 40%) !important;
-    border: none !important;
+    /*border: var(--color-border) !important;*/
     border-radius: 4px;
     vertical-align: baseline;
     padding: 1px 3px !important;

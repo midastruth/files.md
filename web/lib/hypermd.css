@@ -657,7 +657,8 @@
     background-color: rgba(238, 238, 238, 0.5);
     border-radius: 4px;
     vertical-align: baseline;
-    border: #ccc solid 1px;
+    /*PATCHED*/
+    border: var(--color-border) solid 1px;
     padding: 1px 0.4em;
 }
 .cm-s-hypermd-light span.cm-inline-code.hmd-hidden-token {
