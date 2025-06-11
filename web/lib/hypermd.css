@@ -181,7 +181,7 @@
     color: #00c;
 }
 .cm-s-hypermd-light span.cm-url {
-    color: #4af;
+    color: var(--color-link);
 }
 .cm-s-hypermd-light span.cm-link {
     color: #4078c0;

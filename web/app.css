@@ -444,3 +444,7 @@ body.dragging * {
     background: red !important;
     color: green;
 }
+
+.cm-formatting.cm-formatting-link-string.cm-string.cm-url, .cm-formatting.cm-formatting-link.cm-link {
+    color: var(--color-tx-alt) !important;
+}
