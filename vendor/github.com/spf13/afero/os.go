@@ -88,11 +88,12 @@ func (OsFs) Stat(name string) (os.FileInfo, error) {
 }
 
 func (OsFs) Chmod(name string, mode os.FileMode) error {
-	return os.Chmod(name, mode)
+	return nil
+	//return os.Chmod(name, mode)
 }
 
 func (OsFs) Chown(name string, uid, gid int) error {
-	return os.Chown(name, uid, gid)
+	return nil
 }
 
 func (OsFs) Chtimes(name string, atime time.Time, mtime time.Time) error {
