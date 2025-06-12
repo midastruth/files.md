@@ -6,8 +6,6 @@ import (
 	"runtime/debug"
 	"syscall/js"
 
-	"github.com/spf13/afero"
-
 	"zakirullin/stuffbot/config"
 	"zakirullin/stuffbot/internal"
 	"zakirullin/stuffbot/internal/db"
@@ -126,7 +124,7 @@ func initBot() {
 		userID := u.UserID()
 
 		userPath := ""
-		userFS, err := fs.NewFS(userPath, afero.NewOsFs())
+		userFS, err := fs.NewFS(userPath, NewJSFS())
 		if err != nil {
 			sendToJS(fmt.Sprintf("Bot error: can't create fs: %v", err))
 		}

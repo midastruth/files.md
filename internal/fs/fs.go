@@ -87,16 +87,16 @@ func newUserFS(userID int64) (*FS, error) {
 }
 
 func NewFS(absRootPath string, backend afero.Fs) (*FS, error) {
-	_, err := Exists(backend, absRootPath)
+	exists, err := Exists(backend, absRootPath)
 	if err != nil {
 		return nil, fmt.Errorf("new fs: %w", err)
 	}
-	//if !exists {
-	//	err = backend.Mkdir(absRootPath, 0o755)
-	//	if err != nil {
-	//		return nil, fmt.Errorf("new fs: %w", err)
-	//	}
-	//}
+	if !exists {
+		err = backend.Mkdir(absRootPath, 0o755)
+		if err != nil {
+			return nil, fmt.Errorf("new fs: %w", err)
+		}
+	}
 
 	return &FS{absRootPath, backend}, nil
 }
