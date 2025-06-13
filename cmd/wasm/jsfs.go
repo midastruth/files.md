@@ -72,7 +72,23 @@ func (fs *JSFS) OpenFile(name string, flag int, perm os.FileMode) (afero.File, e
 }
 
 func (fs *JSFS) Remove(name string) error {
-	return nil
+	resultChan := make(chan struct{}, 1)
+	errorChan := make(chan error, 1)
+
+	callAsync("remove", func(result js.Value, err error) {
+		if err != nil {
+			errorChan <- err
+			return
+		}
+		resultChan <- struct{}{}
+	}, name)
+
+	select {
+	case <-resultChan:
+		return nil
+	case err := <-errorChan:
+		return err
+	}
 }
 
 func (fs *JSFS) RemoveAll(path string) error {
@@ -92,8 +108,7 @@ func (fs *JSFS) Rename(oldname, newname string) error {
 	}, oldname, newname)
 
 	select {
-	case result := <-resultChan:
-		fmt.Printf("%v", result)
+	case <-resultChan:
 		return nil
 	case err := <-errorChan:
 		return err
