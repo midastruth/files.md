@@ -149,7 +149,6 @@ func readFile(_ afero.Fs, path string) ([]byte, error) {
 
 	select {
 	case result := <-resultChan:
-		fmt.Printf("%v", result)
 		return []byte(result), nil
 	case err := <-errorChan:
 		return nil, err
@@ -169,8 +168,7 @@ func writeFile(_ afero.Fs, path string, data []byte, perm os.FileMode) error {
 	}, path, string(data))
 
 	select {
-	case result := <-resultChan:
-		fmt.Printf("%v", result)
+	case <-resultChan:
 		return nil
 	case err := <-errorChan:
 		return err

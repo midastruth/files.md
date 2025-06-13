@@ -22,10 +22,6 @@ function sendMessage() {
     document.querySelector('#messages').scrollTop = messagesContainer.scrollHeight;
 }
 
-async function sendCommand(command) {
-    replyCmd(command);
-}
-
 function processResponse(response) {
     response = JSON.parse(response);
     document.querySelectorAll('.bot').forEach(element => element.remove());
@@ -167,11 +163,6 @@ function hideCommandPopup() {
     commandPopup.innerHTML = ''; // Clear the popup content
 }
 
-window.onload = () => {
-    sendCommand('/today')
-    input.focus();
-};
-
 document.addEventListener('scroll', () => {
     input.focus();
 });
@@ -256,7 +247,7 @@ document.addEventListener('keydown', function (event) {
 
 function initDB() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open('chat', 1);
+        const request = indexedDB.open('files', 1);
         request.onerror = () => reject(request.error);
         request.onsuccess = () => resolve(request.result);
         request.onupgradeneeded = () => {
@@ -421,7 +412,6 @@ async function readDir(args) {
 
 async function mkdir(args) {
     let path = args[0];
-    console.log(path);
     try {
         let currentDirHandle = await getRootDirHandle();
         await currentDirHandle.getDirectoryHandle(path, {create: true});
@@ -444,5 +434,4 @@ async function mkdirAll(args) {
 
 function receive(val) {
     processResponse(val)
-    console.log(val);
 }
