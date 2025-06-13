@@ -718,12 +718,27 @@ document.addEventListener('keydown', (event) => {
 document.addEventListener('keydown', function (event) {
     if (isModifierKey(event) && event.key === 'Enter') {
         event.preventDefault();
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar.style.display === 'none') {
-            sidebar.style.display = 'block';
-        } else {
-            sidebar.style.display = 'none'; // Hide the sidebar
+        // Check for Cmd+Enter (Mac) or Ctrl+Enter (Windows/Linux)
+        if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+            event.preventDefault(); // Prevent default behavior
+
+            const currentPath = window.location.pathname;
+
+            if (currentPath === '/' || currentPath === '') {
+                // Navigate to /chat
+                window.location.href = '/chat';
+            } else if (currentPath === '/chat') {
+                // Navigate to /
+                window.location.href = '/';
+            }
+            // For any other path, you could add more conditions or do nothing
         }
+        // const sidebar = document.getElementById('sidebar');
+        // if (sidebar.style.display === 'none') {
+        //     sidebar.style.display = 'block';
+        // } else {
+        //     sidebar.style.display = 'none'; // Hide the sidebar
+        // }
     }
 });
 
