@@ -11,7 +11,12 @@
 <div id="chat-container">
     <div id="messages"></div>
     <div id="input-container">
-        <textarea id="input-field" rows="1" placeholder="Write a message..."></textarea>
+<!--        <textarea id="input-field" rows="1" placeholder="Write a message..."></textarea>-->
+        <div class="rich-input"
+             id="input-field"
+             contenteditable="true"
+             data-placeholder="Type message... (Ctrl+B bold, Ctrl+I italic, paste files)">
+        </div>
         <button id="send-button" disabled>
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 330 330" fill="white"
                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"

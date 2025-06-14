@@ -1,5 +1,5 @@
 function sendMessage() {
-    const msg = input.value.trim();
+    const msg = toMarkdown();
     if (msg === '') return;
 
     addMessage(msg, 'user');
@@ -16,7 +16,7 @@ function sendMessage() {
             // processResponse(await window.send(update));
     }
 
-    input.value = '';
+    clearInput();
     input.rows = 1;
     sendButton.disabled = true;
     document.querySelector('#messages').scrollTop = messagesContainer.scrollHeight;
@@ -110,7 +110,7 @@ const commands = [
 ];
 
 function showCommandPopup() {
-    const inputText = input.value.trim();
+    const inputText = toMarkdown();
 
     const filteredCommands = commands.filter(cmd => cmd.command.startsWith(inputText));
 
@@ -122,6 +122,7 @@ function showCommandPopup() {
         cmdItem.setAttribute('data-index', index);
 
         cmdItem.onclick = () => {
+            // TODO lol make it easier
             input.value = cmd.command;
             input.focus();
             sendMessage();
@@ -151,7 +152,7 @@ function insertFocusedCommand() {
         const commandText = focusedCommand.textContent.trim();
         const selectedCommand = commands.find(cmd => cmd.display === commandText);
         if (selectedCommand) {
-            input.value = selectedCommand.command; // Insert the actual command into the input
+            input.value = selectedCommand.command;
             input.focus();
             hideCommandPopup();
         }
@@ -168,13 +169,14 @@ document.addEventListener('scroll', () => {
 });
 
 input.addEventListener('input', () => {
+    return;
     // When paste is happening, there could be more that one line (even not separated by \n)
     while (input.scrollHeight > input.clientHeight && input.rows < 30) {
         input.rows += 1;
     }
 
     input.style.height = 'auto';
-    sendButton.disabled = input.value.trim() === '';
+    sendButton.disabled = toMarkdown() === '';
     if (input.value.trim() === '') {
         input.rows = 1
     }
@@ -189,16 +191,11 @@ input.addEventListener('input', () => {
 input.addEventListener('keydown', (event) => {
     if (event.key === 'Enter' && !event.shiftKey) {
         event.preventDefault();
-        if (input.value.startsWith('/')) {
+        if (toMarkdown().startsWith('/')) {
             insertFocusedCommand();
         } else {
             sendMessage();
         }
-    }
-
-    if (event.key === 'Enter') {
-        event.preventDefault();
-        sendMessage();
     }
 });
 
@@ -241,7 +238,7 @@ document.addEventListener('keydown', function (event) {
 
 function initDB() {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open('files', 1);
+        const request = indexedDB.open('chat', 1);
         request.onerror = () => reject(request.error);
         request.onsuccess = () => resolve(request.result);
         request.onupgradeneeded = () => {
@@ -428,23 +425,85 @@ function receive(val) {
     processResponse(val)
 }
 
-const inputField = document.getElementById('input-field');
-
-function getImageExtension(mimeType) {
-    const mimeToExt = {
-        'image/jpeg': 'jpg',
-        'image/jpg': 'jpg',
-        'image/png': 'png',
-        'image/gif': 'gif',
-        'image/webp': 'webp',
-        'image/bmp': 'bmp'
-    };
-    return mimeToExt[mimeType] || 'png';
+function createFileElement(fileName, isImage, markdownText) {
+    const element = document.createElement('span');
+    if (isImage) {
+        element.className = 'md-image';
+        element.textContent = '🖼️';
+        element.title = fileName;
+    } else {
+        element.className = 'md-link';
+        element.textContent = '📎 ' + fileName;
+    }
+    element.contentEditable = false;
+    element.dataset.markdown = markdownText;
+    return element;
 }
 
-async function saveImageFile(fileName, file) {
+function wrapSelection(tagName) {
+    const selection = window.getSelection();
+    if (selection.rangeCount === 0 || selection.isCollapsed) return;
+
+    const range = selection.getRangeAt(0);
+    const selectedText = range.extractContents();
+
+    const wrapper = document.createElement(tagName);
+    wrapper.appendChild(selectedText);
+    range.insertNode(wrapper);
+
+    // Insert a zero-width space after the formatted element to break formatting
+    const breakNode = document.createTextNode('\u200B'); // Zero-width space
+    range.setStartAfter(wrapper);
+    range.insertNode(breakNode);
+
+    // Position cursor after the break node
+    range.setStartAfter(breakNode);
+    range.collapse(true);
+    selection.removeAllRanges();
+    selection.addRange(range);
+
+}
+
+function toMarkdown() {
+    function processNode(node) {
+        if (node.nodeType === Node.TEXT_NODE) {
+            return node.textContent;
+        } else if (node.nodeType === Node.ELEMENT_NODE) {
+            // Check for markdown data first
+            if (node.dataset && node.dataset.markdown) {
+                return node.dataset.markdown;
+            }
+
+            const text = Array.from(node.childNodes).map(processNode).join('');
+            const tagName = node.tagName.toLowerCase();
+
+            switch (tagName) {
+                case 'strong': case 'b':
+                    return `**${text}**`;
+                case 'em': case 'i':
+                    return `*${text}*`;
+                case 'br':
+                    return '\n';
+                case 'div':
+                    return text + '\n';
+                default:
+                    return text;
+            }
+        }
+        return '';
+    }
+
+    return Array.from(input.childNodes).map(processNode).join('').trim();
+}
+
+function clearInput() {
+    input.innerHTML = '';
+}
+
+async function saveFile(fileName, file) {
     try {
         const rootHandle = await getRootDirHandle();
+
         let mediaHandle;
         try {
             mediaHandle = await rootHandle.getDirectoryHandle('media');
@@ -464,33 +523,64 @@ async function saveImageFile(fileName, file) {
     }
 }
 
-inputField.addEventListener('paste', async (event) => {
+function generateSafeFileName(originalName) {
+    return originalName
+    // todo fix unsafe
+    const now = new Date();
+    const timestamp = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const safeName = (originalName || 'untitled').replace(/[<>:"/\\|?*\s]/g, '-');
+    return `${timestamp}-${safeName}`;
+}
+
+input.addEventListener('paste', async (event) => {
     const items = event.clipboardData.items;
+
     for (const item of items) {
-        if (item.kind === 'file' && item.type.startsWith('image/')) {
+        if (item.kind === 'file') {
             event.preventDefault();
+
             const file = item.getAsFile();
-            const fileName = `${new Date().toISOString().replace(/[:.]/g, '-')}.${getImageExtension(item.type)}`;
-            try {
-                const fileHandle = await saveImageFile(fileName, file);
-                if (fileHandle) {
-                    const markdownImageSyntax = `![](media/${fileName})`;
-                    const startPos = inputField.selectionStart;
-                    const endPos = inputField.selectionEnd;
-                    const textBefore = inputField.value.substring(0, startPos);
-                    const textAfter = inputField.value.substring(endPos);
+            const fileName = generateSafeFileName(file.name);
+            const isImage = file.type.startsWith('image/');
 
-                    inputField.value = textBefore + markdownImageSyntax + textAfter;
+            const loadingSpan = document.createElement('span');
+            loadingSpan.textContent = '⏳';
+            loadingSpan.style.color = '#999';
 
-                    // Set cursor position after the inserted text
-                    const newCursorPos = startPos + markdownImageSyntax.length;
-                    inputField.setSelectionRange(newCursorPos, newCursorPos);
-                } else {
-                    console.error('Failed to save the image.');
-                }
-            } catch (error) {
-                console.error('Error saving image:', error);
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                range.insertNode(loadingSpan);
+                range.collapse(false);
             }
+
+            const saved = await saveFile(fileName, file);
+            if (saved) {
+                const markdownText = isImage
+                    ? `![${fileName}](media/${fileName})`
+                    : `[${fileName}](media/${fileName})`;
+
+                const fileElement = createFileElement(fileName, isImage, markdownText);
+                loadingSpan.parentNode.replaceChild(fileElement, loadingSpan);
+            } else {
+                loadingSpan.textContent = '❌';
+                loadingSpan.style.color = 'red';
+            }
+        }
+    }
+});
+
+input.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+        switch (e.key) {
+            case 'b':
+                e.preventDefault();
+                wrapSelection('strong');
+                break;
+            case 'i':
+                e.preventDefault();
+                wrapSelection('em');
+                break;
         }
     }
 });

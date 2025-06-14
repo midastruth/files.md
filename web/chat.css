@@ -76,16 +76,17 @@ body {
 }
 
 #input-field {
-    resize: none;
-    outline: none;
-    border-radius: 5px;
-    border: 0;
-    flex: 1;
-    padding: 10px 5px 10px 5px;
-    border-radius: 5px;
-    max-height: 400px;
-    overflow-y: auto;
-    font-size: 15px;
+    /*text-align: left;*/
+    /*resize: none;*/
+    /*outline: none;*/
+    /*border-radius: 5px;*/
+    /*border: 0;*/
+    /*flex: 1;*/
+    /*padding: 10px 5px 10px 5px;*/
+    /*border-radius: 5px;*/
+    /*max-height: 400px;*/
+    /*overflow-y: auto;*/
+    /*font-size: 15px;*/
 }
 
 #send-button {
@@ -166,4 +167,50 @@ body {
 
 .command-item:hover, .command-item.focused {
     background-color: #f1f1f1;
+}
+
+.rich-input {
+    text-align: left;
+    color: black;
+    /*min-height: 40px;*/
+    overflow-y: auto;
+    flex: 1;
+    padding: 10px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.rich-input:empty::before {
+    content: attr(data-placeholder);
+    color: #999;
+    pointer-events: none;
+}
+
+.rich-input strong {
+    font-weight: bold;
+}
+
+.rich-input em {
+    font-style: italic;
+}
+
+.md-image {
+    font-size: 20px;
+    margin: 0 2px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.md-link {
+    display: inline-block;
+    background: #f0f0f0;
+    color: #333;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 12px;
+    margin: 0 2px;
+    cursor: pointer;
+    user-select: none;
 }
