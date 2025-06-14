@@ -15,6 +15,7 @@ import (
 )
 
 const (
+	// TODO remove my stroage
 	StorageDir            = "/app/mystorage"
 	StatusOK              = "ok"
 	StatusNotModified     = "notModified"
@@ -336,6 +337,7 @@ func validateAuthToken(r *http.Request) bool {
 	return token == AuthToken
 }
 
+// TODO CHECK that user id belongs to token ID, or get user id by token
 func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if !validateAuthToken(r) {

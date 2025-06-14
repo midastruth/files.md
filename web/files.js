@@ -265,8 +265,38 @@ async function syncMedia() {
     const startTime = performance.now();
 
 
-    // Send new files
     let newMedias = await collectNewMediaFiles();
+    console.log(newMedias);
+    for (const mediaFile of newMedias) {
+        try {
+            // TODo improve that hardcode :D
+            let fileHandle = await getFileHandle('media/' + mediaFile)
+            let file = await fileHandle.getFile();
+            const arrayBuffer = await file.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
+            const base64String = btoa(String.fromCharCode.apply(null, uint8Array));
+
+            const response = await fetch('https://api.files.md/syncMedia', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': localStorage.getItem('token')
+                },
+                body: JSON.stringify({
+                    path: mediaFile,
+                    data: base64String,
+                })
+            });
+
+            if (!response.ok) {
+                console.error(`Failed to sync media file ${mediaFile.filename}:`, response.statusText);
+            } else {
+                console.log(`Successfully synced media file: ${mediaFile.filename}`);
+            }
+        } catch (error) {
+            console.error(`Error syncing media file ${mediaFile.filename}:`, error);
+        }
+    }
 
     const mediaTimestamp = serverFiles['mediaTimestamp'] || 0;
     try {
@@ -453,9 +483,7 @@ async function collectNewMediaFiles() {
 
     console.log("NEW FILENAMES", newMediaFiles);
 
-    return {
-        newMedia: newMediaFiles,
-    };
+    return newMediaFiles;
 }
 
 function toPath(dir, file) {

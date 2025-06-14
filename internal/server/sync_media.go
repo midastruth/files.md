@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -12,14 +13,17 @@ import (
 )
 
 var syncMediasRequest struct {
+	UserID        int64  `json:"userId"`
 	Dir           string `json:"dir"`
 	Timestamp     int64  `json:"timestamp"`
 	FilenamesHash string `json:"filenamesHash"`
 }
 
 type media struct {
+	UserID       int64  `json:"userId"`
 	Path         string `json:"path"`
 	LastModified int64  `json:"lastModified"`
+	Data         string `json:"data"`
 }
 
 func SyncMedias(w http.ResponseWriter, r *http.Request) {
@@ -113,18 +117,36 @@ func SyncMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// decode media from json
-	var serverMedia media
-	if err := json.NewDecoder(r.Body).Decode(&serverMedia); err != nil {
+	var clientMedia media
+	if err := json.NewDecoder(r.Body).Decode(&clientMedia); err != nil {
 		log.Printf("Error parsing syncMedia Request JSON: %v", err)
 		http.Error(w, "Invalid syncMedia Request JSON", http.StatusBadRequest)
 		return
 	}
 
-	// TODO ../.. attacks
-	filePath := filepath.Join(StorageDir, fs.DirMedia, serverMedia.Path)
+	userFS, err := fs.NewUserFS(clientMedia.UserID)
+	if err != nil {
+		log.Printf("Error creating user FS: %v", err)
+		http.Error(w, "Error creating user FS", http.StatusInternalServerError)
+		return
+	}
+
+	filePath := filepath.Join(StorageDir, fs.DirMedia, clientMedia.Path)
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		http.Error(w, "file not found", http.StatusNotFound)
+		// Writing file
+		content, err := base64.StdEncoding.DecodeString(clientMedia.Data)
+		if err != nil {
+			http.Error(w, "Invalid base64 data", http.StatusBadRequest)
+			return
+		}
+
+		err = userFS.Write(fs.DirMedia, clientMedia.Path, string(content))
+		if err != nil {
+			http.Error(w, "Invalid base64 data", http.StatusBadRequest)
+			return
+		}
+
+		logSync(fmt.Sprintf("Media created: %s", filePath))
 		return
 	}
 

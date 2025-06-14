@@ -147,6 +147,7 @@ func newRouter(logger *log.Logger) *http.ServeMux {
 		}
 	})
 
+	// TODO CHECK that user id belongs to token ID, or get userID by token id
 	r.HandleFunc("/syncTexts", corsMiddleware(authMiddleware(SyncTexts)))
 	r.HandleFunc("/syncText", corsMiddleware(authMiddleware(SyncText)))
 	r.HandleFunc("/syncMedias", corsMiddleware(authMiddleware(SyncMedias)))
