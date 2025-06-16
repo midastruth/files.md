@@ -98,7 +98,7 @@ func SyncTexts(w http.ResponseWriter, r *http.Request) {
 	}
 	// TODO if a file was changed on client on oldPath, merge it with the new path
 
-	var renames map[string]string
+	renames := make(map[string]string)
 	// Don't respond renames on first sync
 	if lastSync != 0 {
 		renames = ReadLog(request.UserID, lastSync)
