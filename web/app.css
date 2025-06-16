@@ -208,7 +208,7 @@ a:hover {
     background: var(--color-bg-alt) !important;
 }
 
-.cm-inline-code {
+.cm-inline-code:not(.cm-formatting):not(.cm-hmd-indented-code) {
     background: var(--color-inline-code-bg) !important;
     color: var(--color-inline-code) !important;
     font-family: var(--font-mono) !important;
