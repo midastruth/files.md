@@ -185,7 +185,7 @@ async function syncTextsWithServer() {
 
             try {
                 await saveTextFile(path, content)
-                setMetadata(path, content, lastModified);
+                setServerFile(path, content, lastModified);
                 // Unfortunately rename is not working, so we have to delete the old file
                 const shouldRemoveOldFile = path in server.renames;
                 if (shouldRemoveOldFile) {
@@ -255,7 +255,7 @@ async function syncLocalFileWithServer(dir, filename) {
             return;
         }
         if (json.status === 'updatedOnServer') {
-            setMetadata(path, content, json.lastModified);
+            setServerFile(path, content, json.lastModified);
             console.log(`saved metadata for ${path} with timestamp ${json.lastModified}`);
             saveServerFiles();
             return;
@@ -265,7 +265,7 @@ async function syncLocalFileWithServer(dir, filename) {
         console.error("Network error occurred:", error.message);
         return;
     }
-    setMetadata(path, serverFile.content, serverFile.lastModified);
+    setServerFile(path, serverFile.content, serverFile.lastModified);
     console.log(`saved metadata2 for ${path} with timestamp ${serverFile.lastModified}`);
     saveServerFiles();
     console.log(serverFile);
@@ -731,7 +731,7 @@ async function moveCurrentFile(toDir) {
             handle: await getFileHandle(newPath),
         }
         editor.currentDir = toDir;
-        setMetadata(newPath, content, 0);
+        setServerFile(newPath, content, 0);
         saveServerFiles();
 
         await removeFile(oldPath);
@@ -755,7 +755,7 @@ function getMetadata(path) {
     }
 }
 
-function setMetadata(path, content, lastModified) {
+function setServerFile(path, content, lastModified) {
     const parts = path.split('/');
     const filename = parts.pop();
     const dir = parts.join('/');
@@ -842,7 +842,7 @@ async function syncCurrentFile() {
             const path = `${editor.currentDir}/${editor.currentFile}`;
             const content = getCurrentContent();
             await saveTextFile(path, content);
-            setMetadata(path, content, 0);
+            setServerFile(path, content, 0);
             saveServerFiles();
             console.log('Created', `${editor.currentDir}/${editor.currentFile}`);
             await buildSidebar();
