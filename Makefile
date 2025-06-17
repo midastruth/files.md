@@ -99,3 +99,6 @@ watch: # watch for changes and rebuild wasm
 
 e2e:
 	cd tests && npm run test
+
+report:
+	cd tests && npx playwright show-report
