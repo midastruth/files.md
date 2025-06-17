@@ -604,3 +604,109 @@ input.addEventListener('keydown', (e) => {
         }
     }
 });
+
+let focusedCommandIndex = 0;
+
+function showCommandPopup() {
+    const inputText = toMarkdown();
+
+    const filteredCommands = commands.filter(cmd => cmd.command.startsWith(inputText));
+
+    commandPopup.innerHTML = '';
+    filteredCommands.forEach((cmd, index) => {
+        const cmdItem = document.createElement('div');
+        cmdItem.classList.add('command-item');
+        cmdItem.textContent = cmd.display;
+        cmdItem.setAttribute('data-index', index);
+
+        cmdItem.onclick = () => {
+            replyCmd(JSON.stringify({n: cmd.command.substring(1), t: "cmd"}))
+            clearInput();
+            hideCommandPopup();
+        };
+
+        commandPopup.appendChild(cmdItem);
+    });
+
+    if (filteredCommands.length === 0) {
+        hideCommandPopup();
+        return;
+    }
+
+    focusedCommandIndex = 0;
+    updateFocusedCommand();
+
+    commandPopup.classList.remove('hidden');
+}
+
+function updateFocusedCommand() {
+    commandPopup.querySelectorAll('.command-item').forEach(item => {
+        item.classList.remove('focused');
+    });
+
+    const commandItems = commandPopup.querySelectorAll('.command-item');
+    if (commandItems[focusedCommandIndex]) {
+        commandItems[focusedCommandIndex].classList.add('focused');
+    }
+}
+
+function navigateCommands(direction) {
+    const commandItems = commandPopup.querySelectorAll('.command-item');
+    if (commandItems.length === 0) return;
+
+    if (direction === 'up') {
+        focusedCommandIndex = focusedCommandIndex === 0 ? commandItems.length - 1 : focusedCommandIndex - 1;
+    } else if (direction === 'down') {
+        focusedCommandIndex = focusedCommandIndex === commandItems.length - 1 ? 0 : focusedCommandIndex + 1;
+    }
+
+    updateFocusedCommand();
+}
+
+function insertFocusedCommand() {
+    const commandItems = commandPopup.querySelectorAll('.command-item');
+    const focusedCommand = commandItems[focusedCommandIndex];
+
+    if (focusedCommand) {
+        const commandText = focusedCommand.textContent.trim();
+        const selectedCommand = commands.find(cmd => cmd.display === commandText);
+        if (selectedCommand) {
+            replyCmd(JSON.stringify({n: selectedCommand.command.substring(1), t: "cmd"}));
+            clearInput();
+            hideCommandPopup();
+        }
+    }
+}
+
+input.addEventListener('keydown', (event) => {
+    const isCommandMode = toMarkdown().startsWith('/');
+    const popupVisible = !commandPopup.classList.contains('hidden');
+
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        if (isCommandMode && popupVisible) {
+            insertFocusedCommand();
+        } else if (isCommandMode) {
+            sendMessage();
+        } else {
+            sendMessage();
+        }
+    } else if (isCommandMode && popupVisible) {
+        if (event.key === 'ArrowUp') {
+            event.preventDefault();
+            navigateCommands('up');
+        } else if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            navigateCommands('down');
+        } else if (event.key === 'Escape') {
+            event.preventDefault();
+            hideCommandPopup();
+        }
+    }
+});
+
+function hideCommandPopup() {
+    commandPopup.classList.add('hidden');
+    commandPopup.innerHTML = '';
+    focusedCommandIndex = 0;
+}

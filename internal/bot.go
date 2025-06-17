@@ -1257,7 +1257,7 @@ func (b *Bot) showStats(_ []string) error {
 	}
 
 	kb := tg.NewKeyboard([]tg.Row{tg.NewBtn(i18n.StrToday, tg.NewCmd(consts.CmdShowToday, nil))})
-	err = b.showHTML(report, kb)
+	err = b.showHTML(strings.TrimSpace(report), kb)
 	if err != nil {
 		return fmt.Errorf("show stats: %w", err)
 	}
