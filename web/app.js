@@ -280,10 +280,6 @@ function buildSidebar() {
 
         let dirNode = new TreeNode(dir, {expanded: false});
         for (let file in files[dir]) {
-            if (file === CONFIG_FILENAME) {
-                return;
-            }
-
             let fileNode = new TreeNode(file.replace(/\.md$/, ''), {expanded: false});
             fileNode.on('click', async function (n, node) {
                 await openFile(node.parent.toString(), node.toString() + ".md");
@@ -295,7 +291,11 @@ function buildSidebar() {
 
     if (files['']) {
         // Adding root files after dirs
-        for (let file in files[""]) {
+        for (let file in files['']) {
+            if (file === CONFIG_FILENAME) {
+                continue;
+            }
+
             let fileNode = new TreeNode(file.replace(/\.md$/, ''), {expanded: false});
             fileNode.on('click', async function (n, node) {
                 await openFile("", node.toString() + ".md");
