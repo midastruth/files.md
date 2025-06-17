@@ -28,6 +28,21 @@ func Serve(apiHost, appHost, certDir, logFilename, token string) {
 	srv := ssl(logger, certDir, apiHost, appHost)
 	srv.Handler = newRouter(logger)
 
+	// For local environment.
+	if certDir == "" {
+		srv := &http.Server{
+			Addr:    ":8080",
+			Handler: newRouter(logger),
+		}
+
+		logger.Printf("Starting HTTP server on %s", srv.Addr)
+		err := srv.ListenAndServe()
+		if err != nil {
+			panic(err)
+		}
+		return
+	}
+
 	err := srv.ListenAndServeTLS("", "") // Key and cert provided automatically by autocert
 	if err != nil {
 		panic(err)
