@@ -97,7 +97,6 @@ test.describe('Files.md Text Editor Sync Tests', () => {
                 };
             });
 
-            console.log(selectionData);
             if (i === 0) {
                 expect(selectionData.left).toBe(2);
                 expect(selectionData.width).toBe(143);
@@ -115,6 +114,58 @@ test.describe('Files.md Text Editor Sync Tests', () => {
                 expect(selectionData.width).toBe(229);
                 expect(selectionData.right).toBe(231);
             }
+        }
+    });
+
+    test('should handle text selection for word-wrap content', async ({page}) => {
+        // Add some test content with various markdown elements
+        await page.click('.CodeMirror');
+        await page.keyboard.press('Control+a');
+        await page.keyboard.press('Delete');
+
+        const testContent = `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.`;
+
+        await page.keyboard.type(testContent);
+        await page.waitForTimeout(500);
+
+        // Test 1: Select all text
+        await page.keyboard.press('Control+a');
+        await page.waitForTimeout(200);
+
+        // Check if selection div is created with proper positioning
+        const allSelections = page.locator('.CodeMirror-selected');
+        let count = await allSelections.count();
+        expect(count).toEqual(9);
+
+        const expectedSelections = [
+            { left: 2, width: 741, right: 743 },
+            { left: 2, width: 728, right: 730 },
+            { left: 2, width: 752, right: 754 },
+            { left: 2, width: 716, right: 718 },
+            { left: 2, width: 734, right: 736 },
+            { left: 2, width: 734, right: 736 },
+            { left: 2, width: 753, right: 755 },
+            { left: 2, width: 730, right: 732 },
+            { left: 2, width: 624, right: 626 },
+        ];
+
+        for (let i = 0; i < count; i++) {
+            const selection = allSelections.nth(i);
+
+            const selectionData = await selection.evaluate(el => {
+                const style = window.getComputedStyle(el);
+                const left = parseInt(style.left);
+                const width = parseInt(style.width);
+                return {
+                    left: left,
+                    width: width,
+                    right: left + width
+                };
+            });
+
+            expect(selectionData.left).toBe(expectedSelections[i].left);
+            expect(selectionData.width).toBe(expectedSelections[i].width);
+            expect(selectionData.right).toBe(expectedSelections[i].right);
         }
     });
 });

@@ -3376,7 +3376,7 @@
           let firstLine = cm.lineAtHeight(fromPos.top, "div")
           let firstVisualLine = getVisualLines(cm, firstLine)[0];
           let firstLineRight = wrapXObj(cm, lineObj, firstVisualLine.startChar, dir, "before");
-          drawSelectionRect(fromPos.left, fromPos.top, (firstLineRight - fromPos.left), fromPos.bottom);
+          drawSelectionRect(fromPos.left, fromPos.top, (firstLineRight - fromPos.left) + 4, fromPos.bottom);
 
           // PATCHED
           // Draw in-between visual lines
@@ -3399,7 +3399,7 @@
                 // Only draw visual lines that are within our vertical selection range
                 if (firstCharCoords.bottom > fromPos.bottom && firstCharCoords.top < toPos.top) {
                   let width = left - right;
-                  drawSelectionRect(right, firstCharCoords.top, width, firstCharCoords.bottom);
+                  drawSelectionRect(right, firstCharCoords.top, width+4, firstCharCoords.bottom);
                 }
               });
             }
@@ -3409,7 +3409,7 @@
           let lastLine = cm.lineAtHeight(toPos.top, "div")
           let lastVisualLine = getVisualLines(cm, lastLine).pop();
           let lastLineLeft = wrapXObj(cm, lineObj, lastVisualLine.endChar, dir, "after");
-          drawSelectionRect(lastLineLeft, toPos.top, toPos.right - lastLineLeft, toPos.bottom);
+          drawSelectionRect(lastLineLeft, toPos.top, toPos.right - lastLineLeft + 4, toPos.bottom);
 
           // Above we implemented character-based selection highlighting.
           // Before it was like that, full-width highlighting:
