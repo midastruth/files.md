@@ -322,6 +322,10 @@ async function showRandomFile() {
     const allFiles = [];
     for (let dir in excludeDirs(SYSTEM_DIRS)) {
         for (let file in files[dir]) {
+            if (file === CONFIG_FILENAME) {
+                continue;
+            }
+
             allFiles.push({dir, file});
         }
     }
