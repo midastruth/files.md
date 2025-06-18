@@ -1750,7 +1750,7 @@ func (b *Bot) moveToNewFile(params []string) error {
 	// TODO test
 	b.db.SetRecentCommand(consts.CmdMoveToExistingFile)
 	b.db.SetRecentCommandParams([]string{fs.ShortHash(newFilenameFromUserInput), fs.ShortHash(fs.DirToday)})
-	
+
 	msg := txt.Emoji(i18n.Emoji("file"), fmt.Sprintf(i18n.Tr("Saved to <b>%s</b>"), fs.Title(newFilenameFromUserInput)))
 	_, _ = b.tg.Send(b.userID, msg, nil, tg.MarkupHTML)
 
