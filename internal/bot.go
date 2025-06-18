@@ -846,16 +846,14 @@ func (b *Bot) recentCmdBtn(filenameHash string) *tg.Btn {
 	targetFilenameHash := args[0]
 
 	var unhashedTarget string
-	var icon string
+	icon := "⭐️"
 	if recentCmd == consts.CmdMoveToExistingFile {
-		icon = i18n.Emoji("file")
 		var err error
 		unhashedTarget, err = b.fs.Unhash(fs.DirRoot, targetFilenameHash)
 		if err != nil {
 			return nil
 		}
 	} else if recentCmd == consts.CmdMoveToExistingNote {
-		icon = i18n.Emoji("file")
 		dir, err := b.fs.Unhash(fs.DirRoot, args[1])
 		if err != nil {
 			return nil
@@ -1023,7 +1021,7 @@ func (b *Bot) showFiles(_ []string) error {
 	var fileBtns []tg.Btn
 	for _, file := range mdFiles {
 		cmd := tg.NewCmd(consts.CmdShowFile, []string{fs.DirRoot, fs.Hash(file.Name)})
-		btn := tg.NewBtn(fmt.Sprintf("📄 %s", fs.UnsanitizeFilename(file.Title)), cmd)
+		btn := tg.NewBtn(fmt.Sprintf("%s", fs.UnsanitizeFilename(file.Title)), cmd)
 		fileBtns = append(fileBtns, btn)
 	}
 	fileBtnsByRows := slice.Chunk(fileBtns, btnsPerRow)
@@ -2227,7 +2225,7 @@ func (b *Bot) moveToFileBtns(newFilenameShortHash string) ([]tg.Btn, error) {
 
 	var buttons []tg.Btn
 	newBtn := func(title, existingFilenameHash string) tg.Btn {
-		title = fmt.Sprintf("%s %s", i18n.Emoji("file"), title)
+		title = fmt.Sprintf("%s", title)
 		params := []string{existingFilenameHash, fs.DirRoot, newFilenameShortHash}
 		return tg.NewBtn(title, tg.NewCmd(consts.CmdMoveToExistingFile, params))
 	}

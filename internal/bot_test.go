@@ -665,8 +665,8 @@ func TestFiles(t *testing.T) {
 	r.Equal("📄 Your files:"+wideSpacer, tgram.SentTexts[0])
 	r.Equal(tg.NewKeyboard([]tg.Row{
 		[]tg.Btn{
-			tg.NewBtn("📄 Doc1", tg.NewCmd("file", []string{fs.DirRoot, "c1253521ac7"})),
-			tg.NewBtn("📄 Doc2", tg.NewCmd("file", []string{fs.DirRoot, "64572c3093f"})),
+			tg.NewBtn("Doc1", tg.NewCmd("file", []string{fs.DirRoot, "c1253521ac7"})),
+			tg.NewBtn("Doc2", tg.NewCmd("file", []string{fs.DirRoot, "64572c3093f"})),
 		},
 		[]tg.Btn{
 			tg.NewBtn("🔎 Search", tg.NewCustomCmd("search", nil, "iq")),
@@ -1115,7 +1115,7 @@ func TestShowToFileNoDirs(t *testing.T) {
 	r.NoError(err)
 
 	r.Equal(tg.NewKeyboard([]tg.Row{
-		tg.NewRow(tg.NewBtn("📄 Note", tg.NewCmd("mf", []string{"345fb", "", "345fb"}))),
+		tg.NewRow(tg.NewBtn("Note", tg.NewCmd("mf", []string{"345fb", "", "345fb"}))),
 		tg.NewBtn("Search", tg.NewCustomCmd("search", nil, "iq")),
 		tg.NewRow(tg.NewBtn("🗂 New Dir", tg.NewCmd("new_dir", []string{"345fbd7ab08"}))),
 	},
@@ -1139,7 +1139,7 @@ func TestShowMoveToFile(t *testing.T) {
 	r.NoError(err)
 
 	r.Equal(tg.NewKeyboard([]tg.Row{
-		tg.NewRow(tg.NewBtn("📄 Note", tg.NewCmd("mf", []string{"345fb", "", "345fb"}))),
+		tg.NewRow(tg.NewBtn("Note", tg.NewCmd("mf", []string{"345fb", "", "345fb"}))),
 		tg.NewBtn("Search", tg.NewCustomCmd("search", nil, "iq")),
 		tg.NewRow(
 			tg.NewBtn("🗂️ Dir", tg.NewCmd("mv", []string{"73600", "", "345fbd7ab08"})),
@@ -2328,8 +2328,8 @@ func TestSaveToExistingFileIntegration(t *testing.T) {
 
 	selectFileKB := tg.NewKeyboard([]tg.Row{
 		tg.NewRow(
-			tg.NewBtn("📄 Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
-			tg.NewBtn("📄 File", tg.NewCmd("mf", []string{"7595e", "", "23200"})),
+			tg.NewBtn("Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
+			tg.NewBtn("File", tg.NewCmd("mf", []string{"7595e", "", "23200"})),
 		),
 		tg.NewBtn("Search", tg.NewCustomCmd("search", nil, "iq")),
 		tg.NewRow(
@@ -2406,7 +2406,7 @@ func TestSaveToNewFileIntegration(t *testing.T) {
 
 	selectFileKB := tg.NewKeyboard([]tg.Row{
 		tg.NewRow(
-			tg.NewBtn("📄 Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
+			tg.NewBtn("Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
 		),
 		tg.NewBtn("Search", tg.NewCustomCmd("search", nil, "iq")),
 		tg.NewRow(
@@ -2483,7 +2483,7 @@ func TestSaveToNewDirIntegration(t *testing.T) {
 
 	selectFileKB := tg.NewKeyboard([]tg.Row{
 		tg.NewRow(
-			tg.NewBtn("📄 Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
+			tg.NewBtn("Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
 		),
 		tg.NewBtn("Search", tg.NewCustomCmd("search", nil, "iq")),
 		tg.NewRow(
@@ -2567,7 +2567,7 @@ func TestSaveToNewMultilineFileIntegration(t *testing.T) {
 
 	selectFileKB := tg.NewKeyboard([]tg.Row{
 		tg.NewRow(
-			tg.NewBtn("📄 Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
+			tg.NewBtn("Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
 		),
 		tg.NewBtn("Search", tg.NewCustomCmd("search", nil, "iq")),
 		tg.NewRow(
@@ -2644,7 +2644,7 @@ func TestSaveToNewCustomFileIntegration(t *testing.T) {
 
 	selectFileKB := tg.NewKeyboard([]tg.Row{
 		tg.NewRow(
-			tg.NewBtn("📄 Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
+			tg.NewBtn("Text", tg.NewCmd("mf", []string{"23200", "", "23200"})),
 		),
 		tg.NewBtn("Search", tg.NewCustomCmd("search", nil, "iq")),
 		tg.NewRow(
@@ -2723,8 +2723,8 @@ func TestSaveToRecentFileIntegration(t *testing.T) {
 
 	selectFileKeyboard := tg.NewKeyboard([]tg.Row{
 		tg.NewRow(
-			tg.NewBtn("📄 Text", tg.NewCmd("mf", []string{"23200", "", "72e56"})),
-			tg.NewBtn("📄 New text", tg.NewCmd("mf", []string{"72e56", "", "72e56"})),
+			tg.NewBtn("Text", tg.NewCmd("mf", []string{"23200", "", "72e56"})),
+			tg.NewBtn("New text", tg.NewCmd("mf", []string{"72e56", "", "72e56"})),
 		),
 		tg.NewBtn("Search", tg.NewCustomCmd("search", nil, "iq")),
 		tg.NewRow(
@@ -2759,7 +2759,7 @@ func TestSaveToRecentFileIntegration(t *testing.T) {
 		tg.NewRow(
 			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{"76bddbd30b1"})),
 			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{"76bddbd30b1"})),
-			tg.NewBtn("📄 Text", tg.NewCmd("mf", []string{"23200", "c5e7d", "76bddbd30b1"})),
+			tg.NewBtn("⭐️ Text", tg.NewCmd("mf", []string{"23200", "c5e7d", "76bddbd30b1"})),
 		),
 		tg.NewRow(
 			tg.NewBtn("➡️ Today", tg.NewCmd("today", nil)),
