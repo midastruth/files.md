@@ -55,8 +55,6 @@ deploy: # deploy as systemd service
 	printf "$${YELLOW}Building...$${RESET}\n" && \
 	printf "$${YELLOW}Versioning current files with: $${TIMESTAMP}$${RESET}\n" && \
 	find . -name "*.html" -exec grep -l "?v=" {} \; | xargs sed -i '' 's/?v=/?v='"$(date +%s)"'/g' && \
-	printf "$${GREEN}Removing versioning$${RESET}\n" && \
-	find . -name "*.html" -exec grep -l "?v=$TIMESTAMP" {} \; | xargs sed -i '' 's/?v='"$TIMESTAMP"'/?v=/g' && \
 	make check && \
 	GOOS=linux GOARCH=amd64 go build -o /tmp/bot ./cmd/tgbot && \
 	printf "$${GREEN}Build Completed$${RESET}\n" && \
@@ -64,6 +62,8 @@ deploy: # deploy as systemd service
 	ssh $(host) "mv /app/bot.new /app/bot && systemctl restart bot.service" && \
 	rm /tmp/bot && \
 	tar --no-xattrs --disable-copyfile --no-fflags -czf web.tar.gz web && \
+	printf "$${GREEN}Removing versioning$${RESET}\n" && \
+	find . -name "*.html" -exec grep -l "?v=$TIMESTAMP" {} \; | xargs sed -i '' 's/?v='"$TIMESTAMP"'/?v=/g' && \
     scp web.tar.gz files:/app/ && \
     ssh files "cd /app && tar -xzf web.tar.gz && rm web.tar.gz" && \
     rm web.tar.gz && \
