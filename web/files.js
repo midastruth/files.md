@@ -199,6 +199,23 @@ async function syncTextsWithServer() {
 
             try {
                 await saveTextFile(path, content)
+
+                // TODO get rid of this
+                let dir, filename;
+                if (path.includes('/')) {
+                    const parts = path.split('/');
+                    filename = parts.pop();
+                    dir = parts.join('/');
+                } else {
+                    dir = '';
+                    filename = path;
+                }
+                addFileToMemory(dir, filename, {
+                    content: content,
+                    lastModified: lastModified,
+                    handle: await getFileHandle(path),
+                });
+
                 console.log('SYNC texsts: write file: ', path);
                 setServerFile(path, content, lastModified);
                 // Unfortunately rename is not working, so we have to delete the old file
