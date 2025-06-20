@@ -236,7 +236,7 @@ async function syncTextsWithServer() {
 
     isSyncing = false;
 
-    updateSidebar();
+    await updateSidebar();
 }
 
 async function syncLocalFileWithServer(dir, filename) {

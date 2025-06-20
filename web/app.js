@@ -1075,7 +1075,7 @@ document.addEventListener('mousedown', (event) => {
     }
 });
 
-// Reload files once the app gains focus
+// Reload files once the app gains focus.
 window.addEventListener('focus', async () => {
     // We don't want to do heavy stuff when chat is open.
     if (isChat) {
