@@ -54,6 +54,7 @@ func Serve(apiHost, appHost, certDir, logFilename, token, tokensDir string) {
 
 func newRouter(logger *log.Logger, tokensDir string) *http.ServeMux {
 	r := http.NewServeMux()
+
 	// TODO add hashing or secrets
 	// TODO before release habits_v2 => habits
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -64,10 +65,6 @@ func newRouter(logger *log.Logger, tokensDir string) *http.ServeMux {
 				http.ServeFile(w, r, "./web/app.html")
 				return
 			}
-			if r.URL.Path == "/chat" {
-				http.ServeFile(w, r, "./web/chat.html")
-				return
-			}
 
 			http.FileServer(http.Dir("./web")).ServeHTTP(w, r)
 			return
@@ -75,6 +72,14 @@ func newRouter(logger *log.Logger, tokensDir string) *http.ServeMux {
 
 		http.NotFound(w, r)
 	})
+
+	// TODO CHECK that user id belongs to oneTimeToken ID, or get userID by oneTimeToken id
+	// TODO for further safety, remove * cors?
+	r.HandleFunc("/syncTexts", panicMiddleware(corsMiddleware(authMiddleware(SyncTexts, tokensDir))))
+	r.HandleFunc("/syncText", panicMiddleware(corsMiddleware(authMiddleware(SyncText, tokensDir))))
+	r.HandleFunc("/syncMedias", panicMiddleware(corsMiddleware(authMiddleware(SyncMedias, tokensDir))))
+	r.HandleFunc("/syncMedia", panicMiddleware(corsMiddleware(authMiddleware(SyncMedia, tokensDir))))
+	r.HandleFunc("/token", panicMiddleware(corsMiddleware(IssueToken)))
 
 	r.HandleFunc("GET /habits_v2/{userID}", func(w http.ResponseWriter, r *http.Request) {
 		userID, err := strconv.ParseInt(r.PathValue("userID"), 10, 64)
@@ -165,14 +170,6 @@ func newRouter(logger *log.Logger, tokensDir string) *http.ServeMux {
 		}
 	})
 
-	// TODO CHECK that user id belongs to oneTimeToken ID, or get userID by oneTimeToken id
-	// TODO for further safety, remove * cors?
-	r.HandleFunc("/syncTexts", panicMiddleware(corsMiddleware(authMiddleware(SyncTexts, tokensDir))))
-	r.HandleFunc("/syncText", panicMiddleware(corsMiddleware(authMiddleware(SyncText, tokensDir))))
-	r.HandleFunc("/syncMedias", panicMiddleware(corsMiddleware(authMiddleware(SyncMedias, tokensDir))))
-	r.HandleFunc("/syncMedia", panicMiddleware(corsMiddleware(authMiddleware(SyncMedia, tokensDir))))
-	r.HandleFunc("/token", panicMiddleware(corsMiddleware(IssueToken)))
-
 	return r
 }
 
@@ -228,7 +225,7 @@ func corsMiddleware(next http.HandlerFunc) http.HandlerFunc {
 func authMiddleware(next http.HandlerFunc, tokensDir string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("Authorization")
-		userID, ok := UserID(token)
+		userID, ok := FindUserID(token)
 		if !ok {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return

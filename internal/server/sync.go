@@ -24,7 +24,6 @@ const (
 )
 
 type file struct {
-	UserID       int64  `json:"userId"`
 	Status       string `json:"status"`
 	Path         string `json:"path"`
 	LastModified int64  `json:"lastModified"`
@@ -32,7 +31,6 @@ type file struct {
 }
 
 type syncRequest struct {
-	UserID     int64            `json:"userId"`
 	Modified   []file           `json:"modified"` // New or modified files from client
 	Deleted    []string         `json:"deleted"`  // Deleted files from client
 	Timestamps map[string]int64 `json:"timestamps"`
@@ -64,7 +62,7 @@ func SyncTexts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userFS, err := fs.NewUserFS(r.Context().Value("userID").(int64))
+	userFS, err := fs.NewUserFS(userID(r))
 	if err != nil {
 		log.Printf("Error creating user FS: %v", err)
 		http.Error(w, "Error creating user FS", http.StatusInternalServerError)
@@ -98,7 +96,7 @@ func SyncTexts(w http.ResponseWriter, r *http.Request) {
 	renames := make(map[string]string)
 	// Don't respond renames on first sync
 	if lastSync != 0 {
-		renames = ReadLog(request.UserID, lastSync)
+		renames = ReadLog(userID(r), lastSync)
 	}
 
 	// If a file was renamed and changed, on client we would rename then change?
@@ -239,7 +237,7 @@ func SyncText(w http.ResponseWriter, r *http.Request) {
 	}
 
 	path := clientFile.Path
-	userFS, err := fs.NewUserFS(r.Context().Value("userID").(int64))
+	userFS, err := fs.NewUserFS(userID(r))
 	if err != nil {
 		log.Printf("Error creating user FS: %v", err)
 		http.Error(w, "Error creating user FS", http.StatusInternalServerError)
@@ -364,4 +362,8 @@ func logDelete(msg string) {
 		fmt.Println("Error writing to log file:", err)
 		return
 	}
+}
+
+func userID(r *http.Request) int64 {
+	return r.Context().Value("userID").(int64)
 }

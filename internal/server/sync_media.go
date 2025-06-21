@@ -13,14 +13,12 @@ import (
 )
 
 var syncMediasRequest struct {
-	UserID        int64  `json:"userId"` // TODO not used
 	Dir           string `json:"dir"`
 	Timestamp     int64  `json:"timestamp"`
 	FilenamesHash string `json:"filenamesHash"`
 }
 
 type media struct {
-	UserID       int64  `json:"userId"` // TODO not used
 	Path         string `json:"path"`
 	LastModified int64  `json:"lastModified"`
 	Data         string `json:"data"`
@@ -42,6 +40,7 @@ func SyncMedias(w http.ResponseWriter, r *http.Request) {
 	mediaFolder := filepath.Join(StorageDir, fs.DirMedia)
 	logSync(fmt.Sprintf("Media sync syncMediasRequest for folder: '%s', last sync: %d", syncMediasRequest.Dir, syncMediasRequest.Timestamp))
 
+	// TODO migrate to afero
 	if _, err := os.Stat(mediaFolder); os.IsNotExist(err) {
 		emptyResponse := struct {
 			Files     []interface{} `json:"files"`
@@ -124,7 +123,7 @@ func SyncMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userFS, err := fs.NewUserFS(clientMedia.UserID)
+	userFS, err := fs.NewUserFS(userID(r))
 	if err != nil {
 		log.Printf("Error creating user FS: %v", err)
 		http.Error(w, "Error creating user FS", http.StatusInternalServerError)
@@ -132,6 +131,7 @@ func SyncMedia(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filePath := filepath.Join(StorageDir, fs.DirMedia, clientMedia.Path)
+	// TODO migrate to afero
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
 		// Writing file
 		content, err := base64.StdEncoding.DecodeString(clientMedia.Data)

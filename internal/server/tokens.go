@@ -45,7 +45,7 @@ func GenerateOneTimeToken(userID int64) string {
 	return token
 }
 
-func UserID(token string) (int64, bool) {
+func FindUserID(token string) (int64, bool) {
 	tokens, err := fs.NewFS(config.BotCfg.TokensDir, afero.NewOsFs())
 	if err != nil {
 		slog.Error("Failed to create file system for tokens", "error", err)
