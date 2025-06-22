@@ -915,9 +915,9 @@ func TestCtimesInSubDir(t *testing.T) {
 
 	// Should only include .md files, not .txt or hidden files
 	r.Len(ctimes, 3)
-	r.Equal(int64(1000), ctimes["today/file1.md"])
-	r.Equal(int64(2000), ctimes["today/file2.md"])
-	r.Equal(int64(3000), ctimes["today/subdir/nested.md"])
+	r.Equal(int64(1000), ctimes["file1.md"])
+	r.Equal(int64(2000), ctimes["file2.md"])
+	r.Equal(int64(3000), ctimes["subdir/nested.md"])
 
 	// Should not include non-markdown files or hidden files
 	_, exists := ctimes["today/not-markdown.txt"]

@@ -502,7 +502,7 @@ func (fs FS) Ctimes(root, extension string) (map[string]int64, error) {
 		}
 
 		// TODO what if a file inside folder?
-		relPath, err := filepath.Rel(fs.RootPath, path)
+		relPath, err := filepath.Rel(rootPath, path)
 		if err != nil {
 			return nil
 		}
