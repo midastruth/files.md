@@ -298,6 +298,8 @@ function initEditor(el) {
     editor.getWrapperElement().addEventListener('mousedown', function(e) {
         if (!isMetaKey(e)) return;
 
+        e.preventDefault();
+
         const code = e.target.closest('.cm-inline-code');
         if (!code) return;
 

@@ -306,7 +306,6 @@
                         // PATCHED - prevent cursor placement
                         ev.preventDefault();
                         ev.stopPropagation();
-                        // return;
                     }
                     else if (styles.match(/\shashtag/)) {
                         type = "hashtag";

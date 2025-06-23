@@ -79,7 +79,7 @@ let defaultFiles = {
                 "| `Cmd+N` / `Ctrl+N` | New file |\n" +
                 "| `Cmd+M` / `Ctrl+M` | Move file |\n" +
                 "| `Cmd+D` / `Ctrl+D` | Delete file |\n" +
-                "| `Cmd+Enter` / `Ctrl+Enter` | Toggle sidebar (focus mode) |\n" +
+                "| `Cmd+Enter` / `Ctrl+Enter` | Toggle chat mode |\n" +
                 "| `Cmd+[` / `Ctrl+[`  | Go to previous file   |\n" +
                 "| `Cmd+]` / `Ctrl+]`  | Go to next file  |\n" +
                 "\n" +
@@ -90,6 +90,7 @@ let defaultFiles = {
                 "| `Cmd+B` / `Ctrl+B` | Toggle **bold** formatting |\n" +
                 "| `Cmd+I` / `Ctrl+I` | Toggle *italic* formatting |\n" +
                 "| `Cmd+Y` / `Ctrl+Y`| Insert ✅ checkbox at line start |\n" +
+                "| `Cmd` / `Ctrl`+`Click`| Copy text from `inline` element |\n" +
                 "\n" +
                 "#### Editor Functions\n" +
                 "\n" +
