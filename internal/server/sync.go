@@ -71,14 +71,14 @@ func SyncTexts(w http.ResponseWriter, r *http.Request) {
 
 	// Delete files.
 	for _, path := range request.Deleted {
-		//err = userFS.Del(fs.DirRoot, path)
-		//if err != nil {
-		//	if errors.Is(err, os.ErrNotExist) {
-		//		continue
-		//	}
-		//	log.Printf("Error deleting file '%s': %v", path, err)
-		//	continue
-		//}
+		err = userFS.Del(fs.DirRoot, path)
+		if err != nil {
+			if errors.Is(err, os.ErrNotExist) {
+				continue
+			}
+			log.Printf("Error deleting file '%s': %v", path, err)
+			continue
+		}
 		logDelete(fmt.Sprintf("Deleting file: '%s'", path))
 	}
 
