@@ -79,7 +79,7 @@ func SyncTexts(w http.ResponseWriter, r *http.Request) {
 			log.Printf("Error deleting file '%s': %v", path, err)
 			continue
 		}
-		logDelete(fmt.Sprintf("Deleting file: '%s'", path))
+		logDelete(fmt.Sprintf("Deleting file: '%s'", path), r)
 	}
 
 	// TODO using rename log first replace old paths in client request to new so other code will work okay
@@ -108,11 +108,11 @@ func SyncTexts(w http.ResponseWriter, r *http.Request) {
 		var clientContent string
 		if err != nil && !errors.Is(err, os.ErrNotExist) {
 			log.Printf("Error reading file '%s': %v", path, err)
-			logSync(fmt.Sprintf("Error reading file '%s': %v", path, err))
+			logSync(fmt.Sprintf("Error reading file '%s': %v", path, err), r)
 			// TODO All-or-nothing sync?
 			continue
 		} else if errors.Is(err, os.ErrNotExist) {
-			logSync(fmt.Sprintf("Creating: '%s'", clientFile.Path))
+			logSync(fmt.Sprintf("Creating: '%s'", clientFile.Path), r)
 			clientContent = clientFile.Content
 		} else {
 			// file locks?
@@ -123,11 +123,11 @@ func SyncTexts(w http.ResponseWriter, r *http.Request) {
 					log.Printf("Error reading file '%s': %v", path, err)
 					continue
 				}
-				logSync(fmt.Sprintf("Merging and writing: '%s'", clientFile.Path))
+				logSync(fmt.Sprintf("Merging and writing: '%s'", clientFile.Path), r)
 				clientContent = Merge(string(serverContent), clientFile.Content)
 			} else {
 				// Changed on client, unchanged on client
-				logSync(fmt.Sprintf("Writing only: '%s'", clientFile.Path))
+				logSync(fmt.Sprintf("Writing only: '%s'", clientFile.Path), r)
 				clientContent = clientFile.Content
 			}
 		}
@@ -136,7 +136,7 @@ func SyncTexts(w http.ResponseWriter, r *http.Request) {
 		err = userFS.Write(fs.DirRoot, path, clientContent)
 		if err != nil {
 			log.Printf("Error writing file '%s': %v", path, err)
-			logSync(fmt.Sprintf("Error writing file '%s': %v", path, err))
+			logSync(fmt.Sprintf("Error writing file '%s': %v", path, err), r)
 			continue
 		}
 	}
@@ -176,7 +176,7 @@ func SyncTexts(w http.ResponseWriter, r *http.Request) {
 			content, err := userFS.Read(fs.DirRoot, path)
 			if err != nil {
 				log.Printf("Error reading file %s: %v", path, err)
-				logSync(fmt.Sprintf("Error reading file %s: %v", path, err))
+				logSync(fmt.Sprintf("Error reading file %s: %v", path, err), r)
 				continue
 			}
 
@@ -208,7 +208,7 @@ func SyncTexts(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if len(deletions) > 0 {
-		logSync(fmt.Sprintf("Deleting files: %v", deletions))
+		logSync(fmt.Sprintf("Deleting files: %v", deletions), r)
 	}
 
 	response := syncResponse{
@@ -280,19 +280,19 @@ func SyncText(w http.ResponseWriter, r *http.Request) {
 	var content string
 	fileWasModifiedOnServer := false
 	if errors.Is(err, os.ErrNotExist) {
-		logSync(fmt.Sprintf("Creating one clientFile: '%s'", clientFile.Path))
+		logSync(fmt.Sprintf("Creating one clientFile: '%s'", clientFile.Path), r)
 		content = clientFile.Content
 	} else {
 		fileWasModifiedOnServer = ctime > clientFile.LastModified
 		if fileWasModifiedOnServer {
-			logSync(fmt.Sprintf("Server one clientFile '%s' was modified at %d, client timestamp is %d", path, ctime, clientFile.LastModified))
-			logSync(fmt.Sprintf("Merging and writing one clientFile: '%s'", clientFile.Path))
+			logSync(fmt.Sprintf("Server one clientFile '%s' was modified at %d, client timestamp is %d", path, ctime, clientFile.LastModified), r)
+			logSync(fmt.Sprintf("Merging and writing one clientFile: '%s'", clientFile.Path), r)
 			content = Merge(string(serverContent), clientFile.Content)
 		} else {
 			// TODO for resilience add merge here, because we had case when server saved latest TS but no conent.
 			// Also, if for some reason timestamps would change on server migration and such.
 			// Server clientFile hasn't changed since client's last sync
-			logSync(fmt.Sprintf("Writing only one clientFile: '%s'", clientFile.Path))
+			logSync(fmt.Sprintf("Writing only one clientFile: '%s'", clientFile.Path), r)
 			content = clientFile.Content
 		}
 	}
@@ -301,14 +301,14 @@ func SyncText(w http.ResponseWriter, r *http.Request) {
 	err = userFS.Write(fs.DirRoot, path, content)
 	if err != nil {
 		log.Printf("Error writing clientFile '%s': %v", path, err)
-		logSync(fmt.Sprintf("Error writing clientFile '%s': %v", path, err))
+		logSync(fmt.Sprintf("Error writing clientFile '%s': %v", path, err), r)
 		http.Error(w, "Error writing clientFile", http.StatusInternalServerError)
 		return
 	}
 
 	ctime, err = userFS.Ctime(fs.DirRoot, path)
 	// TODO what if 0?
-	logSync(fmt.Sprintf("Server timestamp for '%s': %d", path, ctime))
+	logSync(fmt.Sprintf("Server timestamp for '%s': %d", path, ctime), r)
 
 	if !fileWasModifiedOnServer {
 		response := map[string]interface{}{
@@ -335,7 +335,9 @@ func SyncText(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func logSync(msg string) {
+func logSync(msg string, r *http.Request) {
+	msg = fmt.Sprintf("%d: %s", userID(r), msg)
+
 	file, err := os.OpenFile("/tmp/sync", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Println("Error opening log file:", err)
@@ -350,7 +352,8 @@ func logSync(msg string) {
 	}
 }
 
-func logDelete(msg string) {
+func logDelete(msg string, r *http.Request) {
+	msg = fmt.Sprintf("%d: %s", userID(r), msg)
 	file, err := os.OpenFile("/tmp/del", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Println("Error opening log file:", err)

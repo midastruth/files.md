@@ -34,7 +34,7 @@ func SyncMedias(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TODO ../.. Attacks (fixed with fs.FS?)
-	logSync(fmt.Sprintf("Media sync syncMediasRequest for folder: '%s', last sync: %d", fs.DirMedia, syncMediasRequest.Timestamp))
+	logSync(fmt.Sprintf("Media sync syncMediasRequest for folder: '%s', last sync: %d", fs.DirMedia, syncMediasRequest.Timestamp), r)
 
 	userFS, err := fs.NewUserFS(userID(r))
 	if err != nil {
@@ -125,7 +125,7 @@ func SyncMedia(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		logSync(fmt.Sprintf("Media created: %s", clientMedia.Filename))
+		logSync(fmt.Sprintf("Media created: %s", clientMedia.Filename), r)
 		return
 	}
 
