@@ -214,6 +214,27 @@
                         break;
                     }
                 }
+
+                // PATCHED, if we are at the task line and before checkbox, don't hide tokens.
+                if (span.type === 'task') {
+                    var cursorPos = cm.getCursor();
+                    if (cursorPos.line === lineNo) {
+                        var tokens = cm.getLineTokens(lineNo);
+                        // Check if cursor is on list formatting that comes before this task
+                        for (var i = 0; i < tokens.length; i++) {
+                            var token = tokens[i];
+                            if (token.type && token.type.indexOf('formatting-list') !== -1) {
+                                // If cursor is on the list formatting token
+                                if (cursorPos.ch >= token.start && cursorPos.ch <= token.end) {
+                                    shallHideTokens = false; // Don't hide task when cursor is on adjacent list
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                // PATCHED
+
                 if (changeVisibilityForSpan(span, shallHideTokens, iNodeHint))
                     changed = true;
             }
@@ -233,6 +254,7 @@
             var caretAtLines = {};
             var activedLines = {};
             var lastActivedLines = this._rangesInLine;
+
             // update this._activedLines and caretAtLines
             for (var _i = 0, selections_1 = selections; _i < selections_1.length; _i++) {
                 var selection = selections_1[_i];

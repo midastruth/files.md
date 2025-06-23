@@ -297,37 +297,42 @@ a:hover {
 }
 
 
-.cm-formatting-list-ul::before {
-    content: '';
-    display: inline-block;
-    width: 24px;
-    height: 24px;
+/*.cm-formatting-list-ul::before {*/
+/*    content: '';*/
+/*    display: inline-block;*/
+/*    width: 24px;*/
+/*    height: 24px;*/
 
-    /*<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">*/
-    /*<g clip-path="url(#clip0_952_6527)">*/
-    /*<circle cx="12" cy="12" r="3"></circle>*/
-    /*</g>*/
-    /*<defs>*/
-    /*<clipPath id="clip0_952_6527">*/
-    /*<rect width="24" height="24"></rect>*/
-    /*</clipPath>*/
-    /*</defs>*/
-    /*</svg>*/
-    /*    with fill=#73777f;*/
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMF85NTJfNjUyNykiPgogICAgICA8Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIzIiBmaWxsPSIjNzM3NzdmIj48L2NpcmNsZT4KICAgIDwvZz4KICAgIDxkZWZzPgogICAgICA8Y2xpcFBhdGggaWQ9ImNsaXAwXzk1Ml82NTI3Ij4KICAgICAgICA8cmVjdCB3aWR0aD0iMjQiIGhlaWdodD0iMjQiPjwvcmVjdD4KICAgICAgPC9jbGlwUGF0aD4KICAgIDwvZGVmcz4KICA8L3N2Zz4=');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    vertical-align: middle;
-}
+/*    !*<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">*!*/
+/*    !*<g clip-path="url(#clip0_952_6527)">*!*/
+/*    !*<circle cx="12" cy="12" r="3"></circle>*!*/
+/*    !*</g>*!*/
+/*    !*<defs>*!*/
+/*    !*<clipPath id="clip0_952_6527">*!*/
+/*    !*<rect width="24" height="24"></rect>*!*/
+/*    !*</clipPath>*!*/
+/*    !*</defs>*!*/
+/*    !*</svg>*!*/
+/*    !*    with fill=#73777f;*!*/
+/*    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICAgIDxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMF85NTJfNjUyNykiPgogICAgICA8Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSIzIiBmaWxsPSIjNzM3NzdmIj48L2NpcmNsZT4KICAgIDwvZz4KICAgIDxkZWZzPgogICAgICA8Y2xpcFBhdGggaWQ9ImNsaXAwXzk1Ml82NTI3Ij4KICAgICAgICA8cmVjdCB3aWR0aD0iMjQiIGhlaWdodD0iMjQiPjwvcmVjdD4KICAgICAgPC9jbGlwUGF0aD4KICAgIDwvZGVmcz4KICA8L3N2Zz4=');*/
+/*    background-size: contain;*/
+/*    background-repeat: no-repeat;*/
+/*    background-position: center;*/
+/*    vertical-align: middle;*/
+/*}*/
 
-.cm-formatting-list-ul::before svg {
-    fill: #73777f;
+/*.cm-formatting-list-ul::before svg {*/
+/*    fill: #73777f;*/
+/*}*/
+
+.cm-formatting-list-ul {
+    /*font-size: 0; !* Hide the "-" character *!*/
+    /*color: transparent; !* Backup to hide the character *!*/
 }
 
 .cm-formatting-list-ul {
-    font-size: 0; /* Hide the "-" character */
-    color: transparent; /* Backup to hide the character */
+    position: relative;
+    top: 3px;
 }
 
 /*Hide bulletpoints when tasks*/
@@ -335,13 +340,18 @@ a:hover {
     width: 0;
 }
 
-.cm-formatting-list-ul:has(+ .cm-formatting-task)::before {
+/* Hide the list formatting only when task formatting IS hidden */
+.cm-formatting-list-ul:has(+ .cm-formatting-task.hmd-hidden-token) {
     display: none;
     width: 0;
 }
 
-.cm-formatting-list-ul:has(+ .cm-formatting-task) + .cm-formatting-task {
-    margin-left: -24px; /* Negative margin equal to the width of the ::before element */
+.cm-s-hypermd-light span.cm-formatting-task:not(.hmd-hidden-token) {
+    /*background-color: red;*/
+}
+
+.cm-formatting-list-ul:has(+ .cm-formatting-task.hmd-hidden-token) + .cm-formatting-task.hmd-hidden-token {
+    margin-left: -24px;
 }
 
 /*For some reason ``` in code aren't hidden*/
@@ -505,4 +515,12 @@ body.dragging * {
         max-width: 300px;
         margin-left: 17%;
     }
+}
+
+.cm-s-hypermd-light span.cm-formatting-task {
+    color: var(--color-tx) !important;
+}
+
+.cm-s-hypermd-light span.cm-formatting-task:not(.hmd-hidden-token) {
+    background-image: none;
 }

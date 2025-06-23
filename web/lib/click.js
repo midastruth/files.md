@@ -302,6 +302,11 @@
                         range.to.ch = cm.getLine(pos.line).length;
                         text = cm.getRange(range.from, range.to);
                         url = null;
+
+                        // PATCHED - prevent cursor placement
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        // return;
                     }
                     else if (styles.match(/\shashtag/)) {
                         type = "hashtag";
