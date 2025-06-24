@@ -528,6 +528,10 @@ function TreeView(root, container, options) {
             span_desc.classList.add("selected");
         }
 
+        if (node.isExpanded()) {
+            span_desc.classList.add("expanded");
+        }
+
         span_desc.addEventListener("dragstart", function(e) {
             if (!node.isLeaf()) return;
 

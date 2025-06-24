@@ -463,7 +463,6 @@ async function showRandomFile() {
     }
 
     const randomFile = allFiles[Math.floor(Math.random() * allFiles.length)];
-    console.log(randomFile);
 
     try {
         await openFile(randomFile.dir, randomFile.file);
@@ -616,7 +615,6 @@ function focusLastLine() {
             break;
         }
     }
-    console.log(targetLine);
     const targetChar = editor.getLine(targetLine).length;
     editor.setCursor({line: targetLine, ch: targetChar});
     // Cursor at the end, but scroll the doc to top

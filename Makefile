@@ -109,5 +109,11 @@ e2e: # make e2e test="create and move"
 e2eh: # headed e2e tests
 	cd tests && npm run test:headed $(if $(test),-g "$(test)")
 
+sync:
+	killall tgbot || true
+	go run ./cmd/tgbot & \
+	sleep 1 && \
+	cd tests && npm run test -g "sync"
+
 report:
 	cd tests && npx playwright show-report
