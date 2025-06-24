@@ -331,8 +331,6 @@ a:hover {
 }
 
 .cm-formatting-list-ul {
-    position: relative;
-    top: 3px;
     color: var(--color-tx-alt) !important;
 }
 
