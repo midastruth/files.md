@@ -142,7 +142,7 @@ async function loadLocalFiles(rootDirHandle) {
 
 // TODO add support for config.json
 async function syncTextsWithServer() {
-    if (files === undefined) {
+    if (files === undefined || Object.keys(files).length === 0) {
         return;
     }
     if (localStorage.getItem('token') === null) {
