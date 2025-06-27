@@ -46,7 +46,7 @@ async function setup(page) {
                 }
             }
 
-            await root.getFileHandle('Saved.md', { create: true });
+            await root.getFileHandle('Chat.md', { create: true });
 
             return root;
         };

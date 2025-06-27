@@ -331,6 +331,7 @@ function initEditor(el) {
 }
 
 async function initChat() {
+    console.log('INIT CHAT');
     const go = new Go();
     const wasmFile = await fetch('chat.wasm');
     const wasmModule = await WebAssembly.instantiateStreaming(wasmFile, go.importObject);
@@ -1160,6 +1161,8 @@ async function openDir() {
     await saveDirectoryHandle(dirHandle);
     files = await loadLocalFiles(dirHandle)
 
+    initChat();
+
     // Create welcome markdown file if empty
     if (Object.keys(files).length === 0) {
         const hotkeysFilename = '🎹 Hotkeys.md';
@@ -1278,7 +1281,9 @@ window.addEventListener('focus', async () => {
         return;
     }
 
-    editor.focus();
+    // editor.focus();
+    // focus chat-input
+    document.getElementById('chat-input').focus();
 
     const savedDirectoryHandle = await getRootDirHandle();
     // check if granted

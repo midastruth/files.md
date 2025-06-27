@@ -21,7 +21,7 @@ const (
 	ModeJournal = "journal"
 	ModeFull    = "full"
 
-	OneFileName = "Saved"
+	ChatFilename = "Chat"
 )
 
 var DefaultConfig = config{

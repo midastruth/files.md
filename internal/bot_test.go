@@ -3738,7 +3738,7 @@ func TestFileOnlyMode_SaveTextMessage(t *testing.T) {
 	r.NoError(err)
 	r.True(len(rootFiles) > 0)
 
-	content, err := bot.fs.Read("", "Saved.md")
+	content, err := bot.fs.Read("", "Chat.md")
 	r.NoError(err)
 	r.Equal("File content", content)
 }
