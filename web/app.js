@@ -1,7 +1,6 @@
 // HyperMD/Codemirror editor
 let editor;
 let tree;
-let focusedSearchItemIndex = -1;
 let focusedMoveItemIndex = -1;
 let isChat = false;
 let isWelcome = false;
@@ -681,6 +680,10 @@ function openSearchModal(text = '') {
     }
 }
 
+function closeSearchModal() {
+    document.getElementById('search').style.display = 'none';
+}
+
 function openMoveModal() {
     document.getElementById('move').style.display = 'block';
     const inputField = document.getElementById('move-input');
@@ -702,7 +705,14 @@ window.addEventListener('keydown', async (event) => {
         event.preventDefault();
         event.stopPropagation();
         document.getElementById('search-input').value = ''
-        openSearchModal();
+        searchModal.open();
+    }
+
+    if (isMetaKey(event) && event.key === 'k') {
+        event.preventDefault();
+        event.stopPropagation();
+        document.getElementById('search-input').value = ''
+        searchModal.open();
     }
 
     if (isMetaKey(event) && event.key === 'm') {
@@ -728,13 +738,6 @@ window.addEventListener('keydown', async (event) => {
         await updateSidebar();
     }
 
-    if (isMetaKey(event) && event.key === 'k') {
-        event.preventDefault();
-        event.stopPropagation();
-        document.getElementById('search-input').value = ''
-        openSearchModal();
-    }
-
     if (isMetaKey(event) && event.key === 'n') {
         event.preventDefault();
         event.stopPropagation();
@@ -747,10 +750,6 @@ window.addEventListener('keydown', async (event) => {
         }
     }
 }, true);
-
-function closeSearchModal() {
-    document.getElementById('search').style.display = 'none';
-}
 
 function closeMoveModal() {
     document.getElementById('move').style.display = 'none';
@@ -917,7 +916,8 @@ function search() {
         }
     }
     results = Array.from(uniqueResultsMap.values()).sort((a, b) => b.score - a.score);
-    showSearchResults(results);
+    searchModal.showResults(results);
+    // showSearchResults(results);
 }
 
 function suggestMove() {
@@ -1096,30 +1096,6 @@ window.addEventListener('popstate', (event) => {
     const state = event.state;
     if (state) {
         openFile(state['dir'], state['file'], false);
-    }
-});
-
-document.getElementById('search').addEventListener('keydown', (event) => {
-    const resultsList = document.getElementById('search-results').querySelectorAll('li');
-
-    if (event.key === 'Enter') {
-        event.preventDefault();
-        if (resultsList[focusedSearchItemIndex]) {
-            const [dir, filename] = resultsList[focusedSearchItemIndex].getAttribute('data-path').split('/');
-            openEditor(!isChat);
-            openFile(dir, filename);
-            closeSearchModal();
-        }
-    }
-
-    if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        focusedSearchItemIndex = (focusedSearchItemIndex + 1) % resultsList.length;
-        updateSearchFocusedItem(resultsList);
-    } else if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        focusedSearchItemIndex = (focusedSearchItemIndex - 1 + resultsList.length) % resultsList.length;
-        updateSearchFocusedItem(resultsList);
     }
 });
 

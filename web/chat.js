@@ -309,6 +309,32 @@ function attachEventListeners() {
 
             if (btn.classList.contains('to-file-btn') && submenu.classList.contains('show')) {
                 const searchInput = submenu.querySelector('.submenu-search-input');
+                searchInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        const searchTerm = e.target.value.trim();
+                        if (searchTerm) {
+                            const matchingFiles = Object.keys(files['']).filter(option =>
+                                option.toLowerCase().includes(searchTerm.toLowerCase())
+                            );
+
+                            if (matchingFiles.length > 0) {
+                                const messageIndex = btn.dataset.index;
+                                const targetFile = matchingFiles[0];
+
+                                console.log(`Moving message ${messageIndex} to ${targetFile}`);
+
+                                replyCmd(JSON.stringify(cmd));
+                                sendCmd("mf", [targetFile, messageIndex]);
+
+                                // Close submenu
+                                btn.querySelector('.btn-submenu').classList.remove('show');
+                            }
+                        }
+                    }
+                });
                 if (searchInput) {
                     setTimeout(() => searchInput.focus(), 0);
                 }
@@ -334,7 +360,7 @@ function attachEventListeners() {
             console.log(targetFile, targetDir);
             if (targetFile !== undefined) {
                 let cmd = {
-                    n: "mf",
+                    n: 'mf",
                     t: "cmd",
                     p: [targetFile, index.toString()]
                 }
@@ -509,4 +535,13 @@ function handleFileSearch(searchTerm, submenuItemsContainer, allOptions, dataAtt
             e.target.closest('.btn-submenu').classList.remove('show');
         });
     });
+}
+
+function sendCmd(cmd, params) {
+    let cmdObj = {
+        n: "mf",
+        t: "cmd",
+        p: params.map(p => p.toString()),
+    }
+    replyCmd(JSON.stringify(cmdObj));
 }

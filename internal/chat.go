@@ -108,7 +108,7 @@ func (b *Bot) MoveRecordFromChat(index int, callback func(content string, timest
 		return fmt.Errorf("no records found")
 	}
 
-	if index < 1 || index > len(recordIndices) {
+	if index < 0 || index >= len(recordIndices) {
 		return fmt.Errorf("index out of bounds: use 1-%d", len(recordIndices))
 	}
 
