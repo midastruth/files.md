@@ -1223,15 +1223,14 @@ func TestShowMoveToFile(t *testing.T) {
 	tgram := tg.NewFakeTG()
 
 	bot := NewBot(-1, tgram, userFS, db.NewFakeDB(), fakeConfig())
-	err = bot.showMoveToFileOrDir([]string{"345fbd7ab08"})
+	err = bot.showMoveToFileOrDir([]string{"0"})
 	r.NoError(err)
 
 	r.Equal(tg.NewKeyboard([]tg.Row{
-		tg.NewRow(tg.NewBtn("Note", tg.NewCmd("mf", []string{"345fb", "/", "345fb"}))),
 		tg.NewBtn("Search", tg.NewCustomCmd("search", nil, "iq")),
 		tg.NewRow(
-			tg.NewBtn("🗂️ Dir", tg.NewCmd("mv", []string{"73600", "/", "345fbd7ab08"})),
-			tg.NewBtn("🗂 New Dir", tg.NewCmd("new_dir", []string{"345fbd7ab08"})),
+			tg.NewBtn("🗂️ Dir", tg.NewCmd("mv", []string{"73600", "0"})),
+			tg.NewBtn("🗂 New Dir", tg.NewCmd("new_dir", []string{"0"})),
 		),
 	}), tgram.LastSentKeyboard)
 }
@@ -2450,7 +2449,7 @@ func TestSaveToExistingFile(t *testing.T) {
 
 	selectFileKB := tg.NewKeyboard([]tg.Row{
 		tg.NewRow(
-			tg.NewBtn("File", tg.NewCmd("mf", []string{"7595e"})),
+			tg.NewBtn("File", tg.NewCmd("mf", []string{"7595e", "-1"})),
 		),
 		tg.NewBtn("Search", tg.NewCustomCmd("search", nil, "iq")),
 		tg.NewRow(
@@ -2832,7 +2831,7 @@ func TestSaveToNewDir(t *testing.T) {
 //	r.Equal(3, tgram.LastSentMessageID)
 //}
 
-func TestSaveToNewMultilineFileIntegration(t *testing.T) {
+func TestSaveToNewMultilineFile(t *testing.T) {
 	r := require.New(t)
 
 	savedNow := now
@@ -2844,12 +2843,14 @@ func TestSaveToNewMultilineFileIntegration(t *testing.T) {
 	}
 
 	mode := userconfig.DefaultConfig.Mode
-	userconfig.DefaultConfig.Mode = userconfig.ModeTasks
+	userconfig.DefaultConfig.Mode = userconfig.ModeFull
 	defer func() {
 		userconfig.DefaultConfig.Mode = mode
 	}()
 
 	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
+	r.NoError(err)
+	err = userFS.Write("", "Text.md", "")
 	r.NoError(err)
 	err = userFS.CreateDirsIfNotExist()
 	r.NoError(err)
@@ -2867,46 +2868,46 @@ func TestSaveToNewMultilineFileIntegration(t *testing.T) {
 	tgram := tg.NewFakeTG()
 	database := db.NewFakeDB()
 	bot := NewBot(-1, tgram, userFS, database, cfg)
-	err = bot.Reply(tg.NewUpd(-1, "Text\nMultiline"))
+	err = bot.Reply(tg.NewUpd(-1, "Multiline\ncontent"))
 	r.NoError(err)
 
 	kb := tg.NewKeyboard([]tg.Row{
 		tg.NewRow(
-			tg.NewBtn("🌚 To tmrw", tg.NewCmd("sc_tmrw", []string{"232004794e5"})),
-			tg.NewBtn("⏳ To later", tg.NewCmd("mv_later", []string{"232004794e5"})),
-			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{"232004794e5"})),
+			tg.NewBtn("🌚 To tmrw", tg.NewCmd("sc_tmrw", []string{"0"})),
+			tg.NewBtn("⏳ To later", tg.NewCmd("mv_later", []string{"0"})),
+			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{"0"})),
 		),
 		tg.NewRow(
-			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{"232004794e5"})),
-			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{"232004794e5"})),
+			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{"0"})),
+			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{"0"})),
 			tg.NewBtn("➡️ Today", tg.NewCmd("today", nil)),
 		),
 	})
 	r.Equal(kb, tgram.LastSentKeyboard)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("to_file", []string{"232004794e5"})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("to_file", []string{"0"})))
 	r.NoError(err)
 
 	selectFileKB := tg.NewKeyboard([]tg.Row{
 		tg.NewRow(
-			tg.NewBtn("Text", tg.NewCmd("mf", []string{"23200", "/", "23200"})),
+			tg.NewBtn("Text", tg.NewCmd("mf", []string{"23200", "0"})),
 		),
 		tg.NewBtn("Search", tg.NewCustomCmd("search", nil, "iq")),
 		tg.NewRow(
-			tg.NewBtn("🗂️ Habits", tg.NewCmd("mv", []string{"51fc0", "/", "232004794e5"})),
-			tg.NewBtn("🗂 New Dir", tg.NewCmd("new_dir", []string{"232004794e5"})),
+			tg.NewBtn("🗂️ Habits", tg.NewCmd("mv", []string{"51fc0", "0"})),
+			tg.NewBtn("🗂 New Dir", tg.NewCmd("new_dir", []string{"0"})),
 		),
 	})
 	r.Equal(selectFileKB, tgram.LastEditedKeyboard)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mf", []string{"23200", "", "23200"})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mf", []string{"23200", "0"})))
 	r.NoError(err)
 
 	r.Empty(tgram.LastEditedKeyboard)
 
-	content, err := userFS.Read("", "Text.md")
+	content, err := userFS.Read("/", "Text.md")
 	r.NoError(err)
-	r.Equal("Multiline", content)
+	r.Equal("#### 1 January 1970, Thursday\nMultiline\ncontent", content)
 
 	r.Nil(database.InputExpectation())
 	msgID, ok := database.LastKeyboardMsgID()

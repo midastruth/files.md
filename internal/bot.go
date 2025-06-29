@@ -2207,24 +2207,25 @@ func (b *Bot) toADayKeyboard(filenameHash string) (*tg.Keyboard, error) {
 }
 
 func (b *Bot) showMoveToFileOrDir(params []string) error {
-	filenameHash := params[0]
+	hashOrIndex := params[0]
 	maxRecentBtns := maxGroupedBtnsInMoveTo
 
-	filename := ""
+	//filename := ""
+	//_ = filename
 	// If there's a second param that we want to show all the buttons (user clicked More...)
 	userWantedAllBtns := len(params) > 1
 	if userWantedAllBtns {
 		maxRecentBtns = maxBtns
-		var err error
-		// TODO fix unhash
-		filename, err = b.fs.Unhash(fs.DirRoot, filenameHash)
-		if err != nil {
-			return fmt.Errorf("to file dialog: %w", err)
-		}
+		//var err error
+		//// TODO fix unhash
+		//filename, err = b.fs.Unhash(fs.DirRoot, hashOrIndex)
+		//if err != nil {
+		//	return fmt.Errorf("to file dialog: %w", err)
+		//}
 	} else {
 		// For the first time we have to move file to the root directory, as this is not a task anymore
 		//var err error
-		//filename, err = b.fs.Unhash(fs.DirToday, filenameHash)
+		//filename, err = b.fs.Unhash(fs.DirToday, hashOrIndex)
 		//if err != nil {
 		//	return fmt.Errorf("to file dialog: %w", err)
 		//}
@@ -2241,7 +2242,8 @@ func (b *Bot) showMoveToFileOrDir(params []string) error {
 	kb := tg.NewKeyboard(nil)
 	skippedBtns := false
 
-	fileBtns, err := b.moveToFileBtns(fs.ShortHash(filename))
+	//fileBtns, err := b.moveToFileBtns(fs.ShortHash(filename))
+	fileBtns, err := b.moveToFileBtns(hashOrIndex)
 	if err != nil {
 		return fmt.Errorf("to file dialog: %w", err)
 	}
@@ -2258,7 +2260,7 @@ func (b *Bot) showMoveToFileOrDir(params []string) error {
 		kb.AddRow(row)
 	}
 
-	dirBtns, err := b.moveToDirBtns(filenameHash)
+	dirBtns, err := b.moveToDirBtns(hashOrIndex)
 	if err != nil {
 		return fmt.Errorf("to file dialog: %w", err)
 	}
@@ -2272,7 +2274,7 @@ func (b *Bot) showMoveToFileOrDir(params []string) error {
 		// Free up space for the new dir button
 		dirBtns = dirBtns[:len(fileBtns)-1]
 	}
-	btn := tg.NewBtn("🗂 New Dir", tg.NewCmd(consts.CmdRequestNewDir, []string{filenameHash}))
+	btn := tg.NewBtn("🗂 New Dir", tg.NewCmd(consts.CmdRequestNewDir, []string{hashOrIndex}))
 	dirBtns = append(dirBtns, btn)
 
 	//shouldAddSeparator := len(fileBtns) > 0
@@ -2286,10 +2288,10 @@ func (b *Bot) showMoveToFileOrDir(params []string) error {
 	}
 
 	if skippedBtns {
-		kb.AddRow(tg.NewBtn(i18n.Tr("More..."), tg.NewCmd(consts.CmdShowMoveToDirOrFile, []string{filenameHash, "full"})))
+		kb.AddRow(tg.NewBtn(i18n.Tr("More..."), tg.NewCmd(consts.CmdShowMoveToDirOrFile, []string{hashOrIndex, "full"})))
 	}
 
-	b.db.SetInputExpectation(tg.NewCmd(consts.CmdMoveToNewFile, []string{filenameHash, "%s"}))
+	b.db.SetInputExpectation(tg.NewCmd(consts.CmdMoveToNewFile, []string{hashOrIndex, "%s"}))
 
 	err = b.showHTML("📄 Select a file or enter a new name:", kb)
 	if err != nil {
@@ -2332,7 +2334,7 @@ func (b *Bot) moveToFileBtns(newFilenameShortHash string) ([]tg.Btn, error) {
 	newBtn := func(title, existingFilenameHash string) tg.Btn {
 		title = fmt.Sprintf("%s", title)
 		//params := []string{existingFilenameHash, fs.DirRoot, newFilenameShortHash}
-		params := []string{existingFilenameHash}
+		params := []string{existingFilenameHash, newFilenameShortHash}
 		return tg.NewBtn(title, tg.NewCmd(consts.CmdMoveToExistingFile, params))
 	}
 	for _, file := range files {
