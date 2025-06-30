@@ -112,6 +112,10 @@
     color: var(--color-link);
 }
 
+.btn-label {
+    color: var(--color-tx);
+}
+
 .action-btn:hover {
     background: var(--color-bg-active);
 }
