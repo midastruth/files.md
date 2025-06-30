@@ -414,7 +414,7 @@ func (b *Bot) saveFromTextMsg(u Update) error {
 		return b.moveToJournal([]string{strconv.Itoa(index)})
 	}
 
-	return b.showMoveTo([]string{strconv.Itoa(-index)})
+	return b.showMoveTo([]string{strconv.Itoa(index)})
 }
 
 // TODO test collapsing from both regular messages and images
@@ -1875,7 +1875,7 @@ func (b *Bot) moveToJournal(params []string) error {
 		if err != nil {
 			return fmt.Errorf("move to journal: can't convert index '%s' to int: %w", indexStr, err)
 		}
-		msgIndicies = append(msgIndicies, -index)
+		msgIndicies = append(msgIndicies, index)
 	}
 
 	err := b.moveFromChat(func(content string, t time.Time) error {
