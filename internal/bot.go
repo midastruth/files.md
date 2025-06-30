@@ -2344,11 +2344,11 @@ func (b *Bot) moveToFileBtns(newFilenameShortHash string) ([]tg.Btn, error) {
 	return buttons, nil
 }
 
-func (b *Bot) moveToDirBtns(filenameHash string) ([]tg.Btn, error) {
+func (b *Bot) moveToDirBtns(msgIndex string) ([]tg.Btn, error) {
 	newBtn := func(dir string) tg.Btn {
 		emojifiedDir := fmt.Sprintf("%s %s", i18n.Emoji("dir"), txt.Ucfirst(dir))
-		//return tg.NewBtn(emojifiedDir, tg.NewCmd(consts.CmdMoveToExistingDir, []string{fs.ShortHash(dir), fs.DirRoot, filenameHash}))
-		return tg.NewBtn(emojifiedDir, tg.NewCmd(consts.CmdMoveToExistingDir, []string{fs.ShortHash(dir), filenameHash}))
+		//return tg.NewBtn(emojifiedDir, tg.NewCmd(consts.CmdMoveToExistingDir, []string{fs.ShortHash(dir), fs.DirRoot, msgIndex}))
+		return tg.NewBtn(emojifiedDir, tg.NewCmd(consts.CmdMOveToExistingDirFromChat, []string{fs.ShortHash(dir), msgIndex}))
 	}
 
 	dirs, err := b.fs.FilesAndDirs(fs.DirRoot)
