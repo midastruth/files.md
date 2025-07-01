@@ -72,25 +72,25 @@ func TestInsertExtAfterHeader(t *testing.T) {
 func TestInsertTextAfterHeaderNoHeader(t *testing.T) {
 	r := require.New(t)
 	content := InsertTextAfterHeader("### header 1\nitem1\nitem2", "### header 5", "new item")
-	r.Equal("### header 5\nnew item\n### header 1\nitem1\nitem2", content)
+	r.Equal("### header 5\nnew item\n\n### header 1\nitem1\nitem2", content)
 }
 
 func TestInsertTextAfterHeaderAtEnd(t *testing.T) {
 	r := require.New(t)
 	content := InsertTextAfterHeader("### header 1\nitem1\nitem2\n### header 2", "### header 1", "new item")
-	r.Equal("### header 1\nitem1\nitem2\nnew item\n### header 2", content)
+	r.Equal("### header 1\nitem1\nitem2\nnew item\n\n### header 2", content)
 }
 
 func TestInsertTextAfterHeaderInMiddle(t *testing.T) {
 	r := require.New(t)
 	content := InsertTextAfterHeader("### header 0\n### header 1\nitem1\nitem2\n### header 2", "### header 1", "new item")
-	r.Equal("### header 0\n### header 1\nitem1\nitem2\nnew item\n### header 2", content)
+	r.Equal("### header 0\n### header 1\nitem1\nitem2\nnew item\n\n### header 2", content)
 }
 
 func TestInsertTextAfterHeaderWithOnlyHeader(t *testing.T) {
 	r := require.New(t)
 	content := InsertTextAfterHeader("### header 0\n### header 1\n### header 2", "### header 1", "new item")
-	r.Equal("### header 0\n### header 1\nnew item\n### header 2", content)
+	r.Equal("### header 0\n### header 1\nnew item\n\n### header 2", content)
 }
 
 func TestInsertTextAfterHeaderAtVeryEnd(t *testing.T) {
@@ -102,7 +102,7 @@ func TestInsertTextAfterHeaderAtVeryEnd(t *testing.T) {
 func TestInsertTextAfterNoHeader(t *testing.T) {
 	r := require.New(t)
 	content := InsertTextAfterHeader("item1\nitem2", "### header 1", "new item")
-	r.Equal("### header 1\nnew item\nitem1\nitem2", content)
+	r.Equal("### header 1\nnew item\n\nitem1\nitem2", content)
 }
 
 func TestSplitTextIntoChunks(t *testing.T) {

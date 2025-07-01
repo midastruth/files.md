@@ -191,7 +191,7 @@ async function receive(val) {
     if (editor.currentFile !== CHAT_FILENAME) {
         return;
     }
-    
+
     await loadData();
     renderMessages();
     scrollToBottom();

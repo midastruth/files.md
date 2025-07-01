@@ -128,7 +128,11 @@ func SplitTextIntoChunks(text string, maxLen int) []string {
 
 func InsertTextAfterHeader(existingContent, header, newContent string) string {
 	if !strings.Contains(existingContent, header) {
-		return fmt.Sprintf("%s\n%s\n\n%s", header, newContent, existingContent)
+		if existingContent == "" {
+			return fmt.Sprintf("%s\n%s", header, newContent)
+		} else {
+			return fmt.Sprintf("%s\n%s\n\n%s", header, newContent, existingContent)
+		}
 	}
 
 	lines := strings.Split(existingContent, "\n")

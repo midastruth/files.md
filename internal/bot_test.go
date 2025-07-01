@@ -382,7 +382,7 @@ func TestSaveFromRegularReply(t *testing.T) {
 
 	content, err := bot.fs.Read("today", "Existing file.md")
 	r.NoError(err)
-	r.Equal("#### 11 August, Sunday\nLine\nExisting content", content)
+	r.Equal("#### 11 August, Sunday\nLine\n\nExisting content", content)
 }
 
 func TestSaveFromPhotoWithCaption(t *testing.T) {
@@ -590,7 +590,7 @@ func TestSaveFromReplyPhotoWithCaption(t *testing.T) {
 
 	content, err := bot.fs.Read("today", "Existing file.md")
 	r.NoError(err)
-	r.Equal("#### 11 August, Sunday\n![center|400](media/tg_PHOTO_ID)\nCaption\nExisting content", content)
+	r.Equal("#### 11 August, Sunday\n![center|400](media/tg_PHOTO_ID)\nCaption\n\nExisting content", content)
 }
 
 func TestAddTaskToLater(t *testing.T) {
@@ -1513,7 +1513,7 @@ func TestMoveToExistingFileExistingRecord(t *testing.T) {
 
 	content, err := userFS.Read("", "Existing file.md")
 	r.NoError(err)
-	r.Equal("#### 11 August 2024, Sunday\nNew message\n### 11.08.2024 Sunday\nContent", content)
+	r.Equal("#### 11 August 2024, Sunday\nNew message\n\n### 11.08.2024 Sunday\nContent", content)
 }
 
 func TestShowMoveTo(t *testing.T) {
@@ -3202,7 +3202,7 @@ func TestSaveToRecentFile(t *testing.T) {
 
 	content, err := userFS.Read("", "Text.md")
 	r.NoError(err)
-	r.Equal("#### 1 January 1970, Thursday\nNew text\nText", content)
+	r.Equal("#### 1 January 1970, Thursday\nNew text\n\nText", content)
 
 	recentCMD, ok := database.RecentCommand()
 	r.Equal("mf", recentCMD)
@@ -3669,7 +3669,7 @@ func TestSaveFromImage_ReplyToExistingFile(t *testing.T) {
 
 	content, err := bot.fs.Read("today", "Existing file.md")
 	r.NoError(err)
-	r.Equal("#### 1 January, Thursday\n![center|400](media/tg_PHOTO_ID)\nImage Caption\nExisting content", content)
+	r.Equal("#### 1 January, Thursday\n![center|400](media/tg_PHOTO_ID)\nImage Caption\n\nExisting content", content)
 }
 
 func TestSaveFromImage_EmptyCaption(t *testing.T) {
@@ -3912,7 +3912,7 @@ func TestMoveToExistingNote_Success(t *testing.T) {
 
 	content, err := userFS.Read("notes", "ExistingNote.md")
 	r.NoError(err)
-	r.Equal("#### 1 January 1970, Thursday\nTask content\nExisting content", content)
+	r.Equal("#### 1 January 1970, Thursday\nTask content\n\nExisting content\n", content)
 
 	_, err = userFS.Read("today", "Task.md")
 	r.Error(err)
