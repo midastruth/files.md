@@ -5,6 +5,27 @@ let messageInput;
 const CHAT_FILENAME = 'Chat.txt';
 let chatIsClean = true; // Are there any unsaved changes?
 
+async function openChat() {
+    editor.currentDir = "";
+    editor.currentFile = CHAT_FILENAME;
+
+    chatInput.focus();
+    // if (isChat) {
+    //     return;
+    // }
+
+    const codemirror = document.querySelector('.CodeMirror-wrap');
+    codemirror.style.display = 'none';
+    chat.style.display = 'flex';
+    chatInput.style.display = 'block';
+
+    chatInput.focus();
+    isChat = true;
+    await loadData();
+    renderMessages();
+    scrollToBottom();
+}
+
 function parseFileContent(content) {
     // Normalize line endings
     content = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
@@ -167,7 +188,10 @@ async function send() {
 }
 
 async function receive(val) {
-    console.log(val);
+    if (editor.currentFile !== CHAT_FILENAME) {
+        return;
+    }
+    
     await loadData();
     renderMessages();
     scrollToBottom();

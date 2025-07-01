@@ -128,7 +128,7 @@ func SplitTextIntoChunks(text string, maxLen int) []string {
 
 func InsertTextAfterHeader(existingContent, header, newContent string) string {
 	if !strings.Contains(existingContent, header) {
-		return strings.TrimSpace(fmt.Sprintf("%s\n%s\n%s", header, newContent, existingContent))
+		return fmt.Sprintf("%s\n%s\n\n%s", header, newContent, existingContent)
 	}
 
 	lines := strings.Split(existingContent, "\n")
@@ -143,7 +143,7 @@ func InsertTextAfterHeader(existingContent, header, newContent string) string {
 	}
 
 	if headerIndex == -1 {
-		return strings.TrimSpace(fmt.Sprintf("%s\n%s\n%s", header, newContent, existingContent))
+		return fmt.Sprintf("%s\n%s\n\n%s", header, newContent, existingContent)
 	}
 
 	// Find where to insert (after the last line belonging to this header)
@@ -155,16 +155,27 @@ func InsertTextAfterHeader(existingContent, header, newContent string) string {
 			insertIndex = i
 			break
 		}
+		// If we encounter an empty line, insert before it
+		if strings.TrimSpace(lines[i]) == "" {
+			insertIndex = i
+			break
+		}
 		insertIndex = i + 1
 	}
 
 	// Insert the new content
-	newLines := make([]string, 0, len(lines)+1)
+	newLines := make([]string, 0, len(lines)+2)
 	newLines = append(newLines, lines[:insertIndex]...)
 	newLines = append(newLines, newContent)
+
+	// Add empty line after new content if there's content following and it's not empty
+	if insertIndex < len(lines) && strings.TrimSpace(lines[insertIndex]) != "" {
+		newLines = append(newLines, "")
+	}
+
 	newLines = append(newLines, lines[insertIndex:]...)
 
-	return strings.TrimSpace(strings.Join(newLines, "\n"))
+	return strings.Join(newLines, "\n")
 }
 
 func FirstWord(str string) string {

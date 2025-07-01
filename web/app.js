@@ -704,27 +704,6 @@ document.addEventListener('keydown', (event) => {
     }
 });
 
-async function openChat() {
-    editor.currentDir = "";
-    editor.currentFile = CHAT_FILENAME;
-
-    chatInput.focus();
-    // if (isChat) {
-    //     return;
-    // }
-
-    const codemirror = document.querySelector('.CodeMirror-wrap');
-    codemirror.style.display = 'none';
-    chat.style.display = 'flex';
-    chatInput.style.display = 'block';
-
-    chatInput.focus();
-    isChat = true;
-    await loadData();
-    renderMessages();
-    scrollToBottom();
-}
-
 function openBot() {
     if (isChat) {
         return;
