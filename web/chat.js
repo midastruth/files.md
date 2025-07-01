@@ -297,6 +297,18 @@ function renderMessages() {
 }
 
 function attachEventListeners() {
+    document.addEventListener('keydown', function(e) {
+        console.log('trying', isMetaKey(e), e.key);
+        if (isMetaKey(e) && e.key === 'a') {
+            if (e.target.id !== 'chat-input') {
+                e.preventDefault();
+                // Select all messages
+                const allMessages = chatContainer.querySelectorAll('.message');
+                allMessages.forEach(message => message.classList.add('selected'));
+            }
+        }
+    });
+
     chatContainer.addEventListener('mousedown', function(e) {
         // If clicking outside messages, prepare for multi-select
         if (!e.target.closest('.message')) {
@@ -346,6 +358,23 @@ function attachEventListeners() {
         if (isMetaKey(e)) {
             message.classList.toggle('selected');
             return;
+        }
+
+        if (e.shiftKey) {
+            const selectedMessages = document.querySelectorAll('.message.selected');
+            if (selectedMessages.length > 0) {
+                const allMessages = Array.from(chatContainer.querySelectorAll('.message'));
+                const lastSelected = selectedMessages[selectedMessages.length - 1];
+                const startIndex = allMessages.indexOf(lastSelected);
+                const endIndex = allMessages.indexOf(message);
+                const minIndex = Math.min(startIndex, endIndex);
+                const maxIndex = Math.max(startIndex, endIndex);
+
+                for (let i = minIndex; i <= maxIndex; i++) {
+                    allMessages[i].classList.add('selected');
+                }
+                return;
+            }
         }
 
         document.querySelectorAll('.message.selected').forEach(m => m.classList.remove('selected'));
