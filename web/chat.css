@@ -120,7 +120,7 @@
 }
 
 .action-btn svg {
-    stroke: var(--color-link) !important;
+    stroke: var(--color-link);
 }
 
 .to-recent-btn {
@@ -300,10 +300,6 @@
     justify-content: center;
     border-radius: 50%;
     transition: background-color 0.2s;
-}
-
-#close-chat:hover {
-    color: var(--color-tx) !important;
 }
 
 .modal-reversed {

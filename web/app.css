@@ -396,7 +396,6 @@ button svg circle {
 #sidebar-toolbar button:hover svg {
     border-radius: 4px;
     stroke:  var(--color-tx) !important;
-    /*background: var(--color-bg-active);*/
 }
 
 #sidebar-toolbar {

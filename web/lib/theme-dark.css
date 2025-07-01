@@ -30,4 +30,15 @@
     .button-container button {
         background-color: var(--color-bg-alt) !important;
     }
+
+    .to-recent-btn, .action-btn svg {
+        fill: var(--color-link);
+        color: var(--color-link) !important;
+        stroke: var(--color-link) !important;
+    }
+
+    #close-chat:hover {
+        color: var(--color-tx) !important;
+    }
 }
+

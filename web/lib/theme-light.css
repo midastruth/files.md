@@ -18,6 +18,36 @@
     .cm-s-hypermd-light span.cm-formatting-task {
         background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAwCAMAAAA8VkqRAAAAclBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACa4vOeAAAAJXRSTlMADcjpDswcLZOzsvOYBvWdbtvTX0D69+ORa1dRJCDtuaF7ZDkoQyuUXgAAAMhJREFUOMvt0reywjAUhOFjKxmcrgMZboL//V8Rm6GwkNUx0LClvhkVZ1fEZoqHqMwO7wuUSb0YxcJKxtLpxIt2SzJRykkQp5RgdAjaIKRJCEn6gWdA9OzRoqLVRscQnc9bdtXX/eyurOF7N3erLVDPwCGHxoVwamH1LwGUBfBbhrCvoLlMitL9DY8trLtJg7qoCj18VAN1OYE/YJBuDe1RJtBVo5wbqPb+GL5yWG1GLX0YZYw5iQ93yQ/yAHfZzu5qt/mxr97VFS15JGSVM0C6AAAAAElFTkSuQmCC");
     }
+
+    .to-recent-btn, .action-btn svg {
+        fill: var(--color-tx-alt);
+        color: var(--color-tx-alt) !important;
+        stroke: var(--color-tx-alt) !important;
+    }
+
+    .to-recent-btn:hover, .action-btn:hover svg {
+        fill: var(--color-link);
+        color: var(--color-link) !important;
+        stroke: var(--color-link) !important;
+    }
+
+    #sidebar-toolbar svg {
+        stroke: var(--color-tx-alt) !important;
+    }
+
+    #sidebar-toolbar button:hover svg {
+        border-radius: 4px;
+        stroke:  var(--color-link) !important;
+        background: var(--color-bg-active);
+    }
+
+    #close-chat {
+        color: var(--color-tx-alt) !important;
+    }
+
+    #close-chat:hover {
+        color: var(--color-link) !important;
+    }
 }
 
 .cm-s-hypermd-light .cm-header.cm-header-1 {
