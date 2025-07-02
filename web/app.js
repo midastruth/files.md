@@ -427,6 +427,15 @@ function updateSidebar(focusDir = '') {
         }
     }
 
+    if (files[''] && files[''][CHAT_FILENAME]) {
+        delete files[''][CHAT_FILENAME];
+    }
+    let chatNode = new TreeNode('Chat', {expanded: false});
+    chatNode.on('click', async function (n, node) {
+        await openFile('', CHAT_FILENAME);
+    });
+    root.addChild(chatNode);
+
     // Process root-level files
     if (files['']) {
         for (let file in files['']) {

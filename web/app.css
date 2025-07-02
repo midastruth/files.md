@@ -569,3 +569,7 @@ body.dragging * {
 #open-sidebar:hover {
     opacity: 1;
 }
+
+#sidebar:not([style*="display: none"]) ~ #open-sidebar {
+    display: none;
+}
