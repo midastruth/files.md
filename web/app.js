@@ -350,7 +350,7 @@ function createAutocompleteDict() {
 
     Object.keys(excludeDirs(SYSTEM_DIRS)).forEach(dir => {
         Object.keys(files[dir]).forEach(filename => {
-            if (filename === CONFIG_FILENAME) {
+            if (filename === CONFIG_FILENAME || filename === CHAT_FILENAME) {
                 return;
             }
             const key = `${filename.replace(/\.md$/, '')}`;
