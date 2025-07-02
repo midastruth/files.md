@@ -537,3 +537,35 @@ body.dragging * {
 #move, #search {
     z-index: 10000;
 }
+
+#close-sidebar {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    opacity: 0;
+    cursor: pointer;
+    font-size: 20px;
+    color: var(--color-link);
+    transition: opacity 0.2s;
+}
+
+#sidebar:hover #close-sidebar {
+    opacity: 1;
+}
+
+#open-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 15px;
+    height: 100vh;
+    opacity: 0;
+    cursor: pointer;
+    background: color-mix(in srgb, var(--color-bg-active) 50%, transparent);
+    transition: opacity 0.2s;
+    z-index: 1000;
+}
+
+#open-sidebar:hover {
+    opacity: 1;
+}

@@ -57,6 +57,13 @@
         stroke: #F5F5F5 !important;
     }
 
+    #close-sidebar {
+        color: var(--color-tx-alt) !important;
+    }
+
+    #open-sidebar {
+        background: var(--color-bg-active);
+    }
 }
 
 .cm-s-hypermd-light .cm-header.cm-header-1 {
@@ -131,4 +138,3 @@
 .cm-s-hypermd-light .cm-link, .cm-s-hypermd-light .cm-string.cm-url.cm-hmd-barelink {
     line-height: 1.8 !important;
 }
-

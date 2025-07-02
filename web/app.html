@@ -49,6 +49,7 @@
 <body>
 
 <div id="sidebar-container">
+    <div id="open-sidebar" onclick="toggleSidebar()"></div>
     <div id="sidebar">
         <div id="sidebar-toolbar">
             <button id="new-file" title="New file" onclick="newFile()">
@@ -79,6 +80,7 @@
             <button id="open-folder" title="Select local folder" onClick="openDir()" style="padding: 5px">
                 Open or create folder
             </button>
+            <button id="close-sidebar" onclick="toggleSidebar()">×</button>
         </div>
         <div id="sidebar-tree">
         </div>

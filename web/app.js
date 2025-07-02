@@ -760,23 +760,11 @@ document.addEventListener('keydown', function (event) {
         return;
     }
     if (isMetaKey(event) && event.key === '\\') {
-        const sidebar = document.getElementById('sidebar');
-        if (sidebar.style.display === 'none') {
-            sidebar.style.display = 'block';
-        } else {
-            sidebar.style.display = 'none'; // Hide the sidebar
-        }
+        toggleSidebar();
     }
     if (isMetaKey(event) && event.key === 'Enter') {
         event.preventDefault();
         toggleChat();
-
-        // const sidebar = document.getElementById('sidebar');
-        // if (sidebar.style.display === 'none') {
-        //     sidebar.style.display = 'block';
-        // } else {
-        //     sidebar.style.display = 'none'; // Hide the sidebar
-        // }
     }
 });
 
@@ -1041,3 +1029,16 @@ document.addEventListener('keydown', (e) => {
     //     );
     // }
 }, true);
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const openZone = document.getElementById('open-sidebar');
+
+    if (sidebar.style.display === 'none') {
+        sidebar.style.display = 'block';
+        openZone.style.display = 'none';
+    } else {
+        sidebar.style.display = 'none';
+        openZone.style.display = 'block';
+    }
+}
