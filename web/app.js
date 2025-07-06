@@ -192,7 +192,27 @@ function initEditor(el) {
 
         let parts = path.split('/');
         if (parts.length === 1) {
-            await openFile('', path + '.md', true, 'editor2-textarea');
+            path += '.md';
+            // Does file exist in root dir?
+            if (files[''] && files[''][path]) {
+                openFile('', path, true, 'editor2-textarea');
+                return;
+            }
+
+            // Does file exist in current dir?
+            if (files[editor.currentDir] && files[editor.currentDir][path]) {
+                openFile(editor.currentDir, path, true, 'editor2-textarea');
+                return;
+            }
+
+            // Loop through all 1st level dirs to find
+            for (const dir in files) {
+                if (files[dir][path]) {
+                    openFile(dir, path, true, 'editor2-textarea');
+                    return;
+                }
+            }
+
             return;
         }
 

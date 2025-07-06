@@ -545,14 +545,11 @@ function TreeView(root, container, options) {
         if (node.parent === root) {
             var siblings = root.getChildren();
             var myIndex = siblings.indexOf(node);
-            console.log("My index among root children:", myIndex, isWelcome);
 
             if (myIndex === 0) {
                 needsGroupHeader = true;
-                console.log("First root child - needs header");
             } else if (myIndex > 0 && siblings[myIndex - 1].isGroupEnd) {
                 needsGroupHeader = true;
-                console.log("Previous sibling has isGroupEnd - needs header");
             }
 
             if (needsGroupHeader) {
