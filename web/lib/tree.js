@@ -508,11 +508,62 @@ function TreeView(root, container, options) {
         });
     }
 
+    function createGroupHeader(headerText, headerClass) {
+        var li_header = document.createElement("li");
+        li_header.className = "tj_group_header " + headerClass;
+        li_header.innerHTML = '<span class="tj_group_title">' + headerText + '</span>';
+        return li_header;
+    }
+
     function renderNode(node) {
         var li_outer = document.createElement("li");
         var span_desc = document.createElement("span");
         span_desc.className = "tj_description";
         span_desc.tj_node = node;
+
+        // NEW CODE: Check if this node needs a group header
+        var needsGroupHeader = false;
+        var groupHeaderText = "";
+        var groupHeaderClass = "";
+
+        if (node.parent === root) {
+            var siblings = root.getChildren();
+            var myIndex = siblings.indexOf(node);
+            console.log("My index among root children:", myIndex);
+
+            if (myIndex === 0) {
+                needsGroupHeader = true;
+                console.log("First root child - needs header");
+            } else if (myIndex > 0 && siblings[myIndex - 1].isGroupEnd) {
+                needsGroupHeader = true;
+                console.log("Previous sibling has isGroupEnd - needs header");
+            }
+            console.log(needsGroupHeader);
+
+            if (needsGroupHeader) {
+                var nodeStr = node.toString();
+                if (nodeStr === '_read_') {
+                    groupHeaderText = "Lists";
+                    groupHeaderClass = "lists";
+                } else if (nodeStr === 'today') {
+                    groupHeaderText = "Tasks";
+                    groupHeaderClass = "tasks";
+                } else if (nodeStr === 'journal') {
+                    groupHeaderText = "Personal";
+                    groupHeaderClass = "personal";
+                } else {
+                    groupHeaderText = "Files";
+                    groupHeaderClass = "user-dirs";
+                }
+            }
+        }
+
+        // If we need a group header, we'll return a document fragment with both header and node
+        if (needsGroupHeader) {
+            var fragment = document.createDocumentFragment();
+            fragment.appendChild(createGroupHeader(groupHeaderText, groupHeaderClass));
+            // Continue with normal node rendering...
+        }
 
         if (node.isGroupEnd) {
             span_desc.classList.add("group-end");
@@ -742,6 +793,12 @@ function TreeView(root, container, options) {
 
                 li_outer.appendChild(ul_container)
             }
+        }
+
+
+        if (needsGroupHeader) {
+            fragment.appendChild(li_outer);
+            return fragment;
         }
 
         return li_outer;
