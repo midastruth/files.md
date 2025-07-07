@@ -1,44 +1,37 @@
-// HyperMD, copyright (c) by laobubu
-// Distributed under an MIT license: http://laobubu.net/HyperMD/LICENSE
-//
-// DESCRIPTION: Fold Image Markers `![](xxx)`
-//
-
-(function (mod) { //[HyperMD] UMD patched!
-    /*commonjs*/
-    ("object" == typeof exports && "undefined" != typeof module) ? mod(null, exports, require("./fold"), require("./read-link")) :
-        /*amd*/       ("function" == typeof define && define.amd) ? define(["require", "exports", "./fold", "./read-link"], mod) :
-            /*plain env*/ mod(null, (this.HyperMD.FoldImage = this.HyperMD.FoldImage || {}), HyperMD.Fold, HyperMD.ReadLink);
-})(function (require, exports, fold_1) {
+(function() {
     "use strict";
-    Object.defineProperty(exports, "__esModule", {value: true});
-    var DEBUG = true;
-    exports.ImageFolder = function (stream, token) {
-        var cm = stream.cm;
-        var imgRE = /\bimage-marker\b/;
-        var urlRE = /\bformatting-link-string\b/; // matches the parentheses
-        if (imgRE.test(token.type) && token.string === "!") {
-            var lineNo = stream.lineNo;
-            // find the begin and end of url part
-            var url_begin = stream.findNext(urlRE);
-            var url_end = stream.findNext(urlRE, url_begin.i_token + 1);
-            var from = {line: lineNo, ch: token.start};
-            var to = {line: lineNo, ch: url_end.token.end};
 
-            var rngReq = stream.requestRange(from, to, from, from);
-            if (rngReq === fold_1.RequestRangeResult.OK) {
+    if (!window.HyperMD?.Fold) {
+        return;
+    }
+    let fold = window.HyperMD.Fold;
+
+    function ImageFolder(stream, token) {
+        let cm = stream.cm;
+        let imgRE = /\bimage-marker\b/;
+        let urlRE = /\bformatting-link-string\b/; // matches the parentheses
+        if (imgRE.test(token.type) && token.string === "!") {
+            let lineNo = stream.lineNo;
+            // find the begin and end of url part
+            let url_begin = stream.findNext(urlRE);
+            let url_end = stream.findNext(urlRE, url_begin.i_token + 1);
+            let from = {line: lineNo, ch: token.start};
+            let to = {line: lineNo, ch: url_end.token.end};
+
+            let rngReq = stream.requestRange(from, to, from, from);
+            if (rngReq === fold.RequestRangeResult.OK) {
                 // That fixes blinking on select, for some reason range CI is returned even though cursor is outside of our tokens
                 if (cm.somethingSelected()) {
                     return null;
                 }
 
-                var url;
-                var title;
+                let url;
+                let title;
                 { // extract the URL
-                    var rawurl = cm.getRange(// get the URL or footnote name in the parentheses
+                    let rawurl = cm.getRange(// get the URL or footnote name in the parentheses
                         {line: lineNo, ch: url_begin.token.start + 1}, {line: lineNo, ch: url_end.token.start});
                     if (url_end.token.string === "]") {
-                        var tmp = cm.hmdReadLink(rawurl, lineNo);
+                        let tmp = cm.hmdReadLink(rawurl, lineNo);
                         if (!tmp)
                             return null; // Yup! bad URL?!
                         rawurl = tmp.content;
@@ -65,7 +58,7 @@
                     cm.setCursor({line: lineNo, ch: lineLength});
                 });
 
-                var marker = cm.markText(from, to, {
+                let marker = cm.markText(from, to, {
                     clearOnEnter: false,
                     collapsed: true,
                     // PATCHED, was img
@@ -149,7 +142,7 @@
             let to = {line: lineNo, ch: url_end.token.end};
 
             let rngReq = stream.requestRange(from, to, from, from);
-            if (rngReq === fold_1.RequestRangeResult.OK) {
+            if (rngReq === fold.RequestRangeResult.OK) {
                 // That fixes blinking on select, for some reason range CI is returned even though cursor is outside of our tokens
                 if (cm.somethingSelected()) {
                     return null;
@@ -177,7 +170,7 @@
                     cm.setCursor({line: lineNo, ch: lineLength});
                 });
 
-                var marker = cm.markText(from, to, {
+                let marker = cm.markText(from, to, {
                     clearOnEnter: false,
                     collapsed: true,
                     replacedWith: img,
@@ -235,13 +228,11 @@
                 img.className = "hmd-image hmd-image-loading";
                 img.src = url;
                 return marker;
-            } else {
-                if (DEBUG) {
-                    console.log("[image]FAILED TO REQUEST RANGE: ", rngReq);
-                }
             }
         }
         return null;
-    };
-    fold_1.registerFolder("image", exports.ImageFolder, true);
-});
+    }
+
+    // Register with HyperMD
+    fold.registerFolder("image", ImageFolder, true);
+})();
