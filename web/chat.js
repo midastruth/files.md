@@ -56,12 +56,12 @@ async function openChatModal() {
 }
 
 // Clicking outside the modal will close the modal.
-document.addEventListener('click', (event) => {
-    let isChatModal = chatContainer.classList.contains('modal');
-    if (isChatModal && !chatContainer.contains(event.target) && !chatButton.contains(event.target)) {
-        closeChatModal();
-    }
-});
+// document.addEventListener('click', (event) => {
+//     let isChatModal = chatContainer.classList.contains('modal');
+//     if (isChatModal && !chatContainer.contains(event.target) && !chatButton.contains(event.target)) {
+//         closeChatModal();
+//     }
+// });
 
 function closeChatModal() {
     chatContainer.classList.remove('modal');

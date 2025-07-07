@@ -151,7 +151,8 @@ function initEditor(el) {
     newEditor.on('focus', function() {
         currentEditor = newEditor;
         currentEditor.refresh(); // Cursor & hide tokens conflict if we don't call it
-        console.log('Switched to:', newEditor.currentFile);
+        closeChatModal();
+        console.log('Focused to:', newEditor.currentFile);
     });
 
     newEditor.hmdResolveURL = function (path) {
