@@ -597,7 +597,7 @@ function renderSidebar(focusDir = '') {
 
         // Add to parent
         const {dirPath, _ } = toDirAndFilename(path);
-        const parentNode = dirNodes[dirPath] || root;
+        const parentNode = dirNodes[dirPath + '/'] || root;
         parentNode.addChild(dirNode);
     });
 
@@ -622,7 +622,7 @@ function renderSidebar(focusDir = '') {
             await openFile(path);
         });
 
-        const parentNode = dirNodes[dirPath] || root;
+        const parentNode = dirNodes[dirPath + '/'] || root;
         parentNode.addChild(fileNode);
     });
 
