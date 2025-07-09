@@ -55,7 +55,7 @@ async function init(el) {
         files = DEFAULT_FILES;
         isWelcome = true;
         renderSidebar();
-        await openFile('', 'Welcome.md');
+        await openFile('/Welcome.md');
         return;
     } else {
         isWelcome = false;
