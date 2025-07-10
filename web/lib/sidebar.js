@@ -127,7 +127,7 @@ function renderSidebar(focusDir = '') {
 
     const groupedDirs = new Set(['_read_', '_watch_', '_shop_', 'journal', 'habits', 'insights', 'archive', 'today', 'later']);
     const underscoreDirs = [];
-    // Find all directories that match _checklist_ pattern
+    // Find all directories that match _list_ pattern
     for (const dir in dirNodes) {
         const filename = toFilename(dir);
         if (filename.startsWith('_') && filename.endsWith('_')) {
