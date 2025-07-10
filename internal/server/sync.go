@@ -72,6 +72,8 @@ func SyncTexts(w http.ResponseWriter, r *http.Request) {
 
 	// Delete files.
 	for _, path := range request.Deleted {
+		// Paths that are coming from client start with /, make them relative
+		path = strings.TrimPrefix(path, "/")
 		err = userFS.Del(fs.DirRoot, path)
 		if err != nil {
 			if errors.Is(err, os.ErrNotExist) {

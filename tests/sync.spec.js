@@ -250,8 +250,15 @@ test('delete files on client will propogate to server as well', async ({ page })
     await clickAndExpectContent(page, 'another', '# Another\n*italic*');
     await page.keyboard.press('Meta+d');
 
+    await page.waitForTimeout(1000);
     // SyncTexts should propogate deletion to server
-    await page.waitForTimeout(4000);
+    await page.evaluate(() => {
+        window.dispatchEvent(new Event('focus'));
+    });
+
+    await page.waitForTimeout(500);
+
+    await page.pause();
 
     expectFileOnServer(page, 'file.md', 'test content');
     expectNoFileOnServer(page, 'another.md');
