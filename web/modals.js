@@ -73,7 +73,7 @@ class SearchModal {
 
         let results = [];
         const lowPriorityDirs = ['archive', '_read_', '_watch_', '_shop_', 'habits', 'triggers', 'today', 'later'];
-        let searchDirs= Object.keys(excludeDirs(SYSTEM_DIRS));
+        let searchDirs= excludeDirs(SYSTEM_DIRS);
         const searchHasSlash = search.includes('/') && search.split('/').length === 2;
         if (searchHasSlash) {
             searchDirs = search.split('/')[0];
@@ -81,22 +81,11 @@ class SearchModal {
         }
 
         // Similarity matching, check for direct file matches across directories.
-        walk(files, (path, isFile) => {
-            if (!isFile) {
-                return;
-            }
-
-            const dirName = trimPostfix(dirPath(path), '/');
-            if (!SYSTEM_DIRS.includes(dirName) || dirName !== '/') {
-                return;
-            }
-
+        walkFilesExcludingSystemDirs((path) => {
             // Ignore if not in searched dirs
-            let dirPath = dirPath(path);
-            for (const dir of searchDirs) {
-                if (dirPath.startsWith('/' + dir)) {
-                    return;
-                }
+            let dirName = rootDirName(path);
+            if (!searchDirs.includes(dirName)) {
+                return;
             }
 
             const potentialMatch = toFilename(path).replace(/\.md$/, '');
@@ -175,7 +164,7 @@ class SearchModal {
                 return;
             }
 
-            const dirName = trimPostfix(dirPath(path), '/');
+            const dirName = rootDirName(path);
             if (dirName === 'media') {
                 return;
             }
@@ -369,7 +358,7 @@ class SearchModal {
 
     showRecentFiles() {
         let results = [];
-        walkFilesExcludingSystemDirs((path, isFile) => {
+        walkFilesExcludingSystemDirs((path) => {
             results.push({
                 path: path,
                 lastModified: getMemFile(path).lastModified,

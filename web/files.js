@@ -1459,7 +1459,7 @@ function walkFilesExcludingSystemDirs(callback) {
             return;
         }
 
-        callback(path, isFile);
+        callback(path);
     });
 }
 
@@ -1494,6 +1494,22 @@ function dirAndFilename(path) {
     const filename = parts.pop();
     let dirPath = '/' + parts.join('/');
     return {dirPath, filename};
+}
+
+function excludeDirs(excludedDirs) {
+    const filteredDirs = ['/'];
+    for (const dir in files) {
+        if (files[dir].isFile === true) {
+            continue;
+        }
+
+        const dirName = rootDirName(dir)
+        if (!excludedDirs.includes(dirName)) {
+            filteredDirs.push(dir);
+        }
+    }
+
+    return filteredDirs;
 }
 
 // Removes / at the end if not '/'

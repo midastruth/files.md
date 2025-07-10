@@ -473,19 +473,9 @@ function createAutocompleteDict() {
     const entries = [];
 
     // Collect all files with their metadata
-    walk(files, (path, isFile) => {
-        if (!isFile) {
-            return;
-        }
-
+    walkFilesExcludingSystemDirs((path) => {
         if (path === CONFIG_PATH || path === CHAT_PATH) {
             return;
-        }
-
-        for (const dir in SYSTEM_DIRS) {
-            if (path.startsWith(joinPath('/', SYSTEM_DIRS[dir], '/'))) {
-                return;
-            }
         }
 
         const filename = toFilename(path);
@@ -734,25 +724,22 @@ async function showRandomFile() {
     }
 
     const allFiles = [];
-    for (let dir in excludeDirs(SYSTEM_DIRS)) {
-        for (let file in files[dir]) {
-            if (file === CONFIG_PATH) {
-                continue;
-            }
-
-            allFiles.push({dir, file});
+    walkFilesExcludingSystemDirs((path) => {
+        if (path === CONFIG_PATH) {
+            return;
         }
-    }
+
+        allFiles.push(path);
+    });
 
     if (allFiles.length === 0) {
         console.error('No files found to open.');
         return;
     }
 
-    const randomFile = allFiles[Math.floor(Math.random() * allFiles.length)];
-
+    const randomPath = allFiles[Math.floor(Math.random() * allFiles.length)];
     try {
-        await openFile(randomFile.dir, randomFile.file);
+        await openFile(randomPath);
     } catch (error) {
         console.error('Failed to open random file:', error);
     }
@@ -1031,24 +1018,6 @@ window.addEventListener('popstate', (event) => {
         openFile(state['dir'], state['file'], false);
     }
 });
-
-function excludeDirs(excludedDirs) {
-    const filteredFiles = {};
-
-    for (const filename in files) {
-        if (files[filename].isFile === true) {
-            filteredFiles[filename] = files[filename];
-            continue;
-        }
-
-        const dirName = filename.replace(/\/$/, '');
-        if (!excludedDirs.includes(dirName)) {
-            filteredFiles[filename] = files[filename];
-        }
-    }
-
-    return filteredFiles;
-}
 
 async function openDir() {
     let dirHandle = await window.showDirectoryPicker({'mode': 'readwrite'});
