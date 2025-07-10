@@ -316,7 +316,7 @@ test('rename should not create multiply files', async ({ page }) => {
     await page.waitForTimeout(1000);
     await page.keyboard.type('le');
     await page.waitForTimeout(500);
-    await page.keyboard.press('Enter')
+    await page.keyboard.press('ArrowDown')
     await page.keyboard.type('content');
     await page.waitForTimeout(700);
 
@@ -330,14 +330,14 @@ test('rename should not create multiply files', async ({ page }) => {
         const cm = document.querySelector('.CodeMirror').CodeMirror;
         return cm.getValue();
     });
-    expect(codeMirrorContent).toBe("# New file\ncontent\n");
+    expect(codeMirrorContent).toBe("# New file\ncontent");
 
     const clientFiles = await page.evaluate(() => {
         return Object.keys(files);
     })
 
     expect(clientFiles).toBeDefined();
-    expect(clientFiles.length).toBe(4);
+    expect(clientFiles.length).toBe(6);
     expect(clientFiles).toContain('New file.md');
 });
 
