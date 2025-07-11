@@ -334,35 +334,35 @@ test('files exist on both client and server, serverFiles contains proper server 
             isFile: true,
             lastModified: expect.any(Number),
             lastSynced: null,
-            path: 'Chat.txt'
+            path: '/Chat.txt'
         },
         'Notes.md': {
             hash: expect.any(Number),
             isFile: true,
             lastModified: expect.any(Number),
             lastSynced: null,
-            path: 'Notes.md'
+            path: '/Notes.md'
         },
         'README.md': {
             hash: expect.any(Number),
             isFile: true,
             lastModified: expect.any(Number),
             lastSynced: null,
-            path: 'README.md'
+            path: '/README.md'
         },
         'another.md': {
             hash: expect.any(Number),
             isFile: true,
             lastModified: expect.any(Number),
             lastSynced: null,
-            path: 'another.md'
+            path: '/another.md'
         },
         'config.json': {
             hash: expect.any(Number),
             isFile: true,
             lastModified: expect.any(Number),
             lastSynced: null,
-            path: 'config.json'
+            path: '/config.json'
         },
         'dir/': {
             'file2.md': {
@@ -370,7 +370,7 @@ test('files exist on both client and server, serverFiles contains proper server 
                 isFile: true,
                 lastModified: expect.any(Number),
                 lastSynced: null,
-                path: 'dir/file2.md'
+                path: '/dir/file2.md'
             }
         },
         'file.md': {
@@ -378,7 +378,7 @@ test('files exist on both client and server, serverFiles contains proper server 
             isFile: true,
             lastModified: expect.any(Number),
             lastSynced: null,
-            path: 'file.md'
+            path: '/file.md'
         }
     });
 

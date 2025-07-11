@@ -190,15 +190,18 @@ async function syncTextsWithServer() {
         // Write files received from the server
         let failedAtLeastOnce = false;
         for (const fileInfo of server.files) {
-            const {path, content, lastModified} = fileInfo;
+            let {path, content, lastModified} = fileInfo;
             // If it is current file, skip, because we sync it separately
             // TODO if we skip current, don't take it's timestamp? We had a bug when sync was broken for 1 file
             // TODO fix missing / for root files
             // TODO multidir add /path to server
             if (path === editor.path || path === editor2.path) {
-                console.log('Skip current received from server' + path);
+                console.log('Skip current file receiving from server' + path);
                 continue;
             }
+
+            // We get relative paths from server, and in our app we use absolute paths
+            path = joinPath('/', path);
 
             try {
                 await saveTextFile(path, content)
