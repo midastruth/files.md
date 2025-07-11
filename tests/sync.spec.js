@@ -395,6 +395,7 @@ test('files exist on both client and server, serverFiles contains proper server 
         }
     });
 
+    // await page.pause();
     await clickAndExpectContent(page, 'dir/file2', '# File2\ntest content2');
 });
 
@@ -435,7 +436,7 @@ async function clickAndExpectContent(page, filePath, expectedContent) {
     for (const dir of dirs) {
         const isSelected = await page.locator(`#sidebar-tree .tj_description:text-is('${dir}')`).evaluate(el => el.classList.contains('expanded'));
         if (!isSelected) {
-            await page.click(`#sidebar-tree .tj_description:has-text('${dir}')`);
+            await page.click(`#sidebar-tree .tj_description:text-is('${dir}')`);
             await page.waitForTimeout(100);
         }
     }

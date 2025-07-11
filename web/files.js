@@ -1421,35 +1421,44 @@ async function post(endpoint, data) {
 // If there are files without isFile flag - we would have recursion.
 // Because walk would try to iterate over js object keys.
 function walk(obj, callback, path = '/') {
-    if (obj.isFile) {
-        callback(path, obj, true);
-        return;
-    }
+    // Chromium's callstack limit is 11K, so we iterate.
+    const stack = [{obj, path}];
 
-    const keys = Object.keys(obj);
-    const files = [];
-    const dirs = [];
-    for (const key of keys) {
-        if (obj[key].isFile) {
-            files.push(key);
-        } else {
-            dirs.push(key);
+    while (stack.length > 0) {
+        const {obj: currentObj, path: currentPath} = stack.pop();
+
+        if (currentObj.isFile) {
+            callback(currentPath, true);
+            continue;
         }
-    }
 
-    // Process files first, so that the order would be preserved
-    for (const key of files) {
-        const fullPath = path + key;
-        callback(fullPath, true);
-    }
+        const keys = Object.keys(currentObj);
+        const files = [];
+        const dirs = [];
 
-    // Then process directories
-    for (const key of dirs) {
-        const item = obj[key];
-        const fullPath = path + key;
-        // Once stack exceeeded
-        callback(fullPath, false);
-        walk(item, callback, fullPath);
+        for (const key of keys) {
+            if (currentObj[key].isFile) {
+                files.push(key);
+            } else {
+                dirs.push(key);
+            }
+        }
+
+        // Process files first
+        for (const key of files) {
+            const fullPath = currentPath + key;
+            callback(fullPath, true);
+        }
+
+        // Add directories to stack (in reverse order to maintain order)
+        for (let i = dirs.length - 1; i >= 0; i--) {
+            const key = dirs[i];
+            const item = currentObj[key];
+            const fullPath = currentPath + key;
+
+            callback(fullPath, false);
+            stack.push({obj: item, path: fullPath});
+        }
     }
 }
 
