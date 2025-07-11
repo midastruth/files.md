@@ -13,7 +13,7 @@ install:
 check:
 	go fmt ./... && go vet ./... && go test ./...
 
-deploy: # deploy as systemd service
+deploy: # deploy as systemd service, TODO make timestamps hussle in separate dir, add js/css minify before release
 	@GREEN='\e[32m'; \
 	YELLOW='\e[33m'; \
 	RESET='\e[0m'; \
