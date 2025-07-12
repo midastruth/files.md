@@ -376,14 +376,15 @@ async function syncMedia() {
                     })
                 });
 
-                if (!response.ok) {
-                    console.error(`Failed to sync media file ${mediaFilename}:`, response.statusText, response, await response.text());
-                } else {
+                if (response.ok) {
                     server['media'][mediaFilename] = {
+                        isFile: true,
                         lastModified: 0, // We don't track binary files modifications.
                     };
                     saveServerFiles();
                     console.log(`Successfully synced media file: ${mediaFilename}`);
+                } else {
+                    console.error(`Failed to sync media file ${mediaFilename}:`, response.statusText, response, await response.text());
                 }
             } catch (error) {
                 console.error(`Error syncing media file ${mediaFilename}:`, error);
@@ -464,6 +465,7 @@ async function saveMediaFile(path, blob, lastModified) {
                 server['mediaTimestamp'] = lastModified;
             }
             server['media'][file.name] = {
+                isFile: true,
                 lastModified: lastModified,
             }
             saveServerFiles();
@@ -486,12 +488,13 @@ async function saveMediaFile(path, blob, lastModified) {
             server['mediaTimestamp'] = lastModified;
         }
         server['media'][filename] = {
+            isFile: true,
             lastModified: lastModified,
         }
         saveServerFiles();
 
         // Load file handle into files
-        files['media/'][filename] = {handle: fileHandle};
+        files['media/'][filename] = {isFile: true, handle: fileHandle};
         fileHandle.getFile().then(file => {
             files['media/'][filename].lastModified = file.lastModified;
         });
@@ -1420,31 +1423,25 @@ async function post(endpoint, data) {
 
 // If there are files without isFile flag - we would have recursion.
 // Because walk would try to iterate over js object keys.
-let neverAgain = false;
 function walk(obj, callback, path = '/') {
-    if (neverAgain) {
-        return;
-    }
     // Chromium's callstack limit is 11K, so we iterate.
     const stack = [{obj, path}];
 
-    const maxAllowedIterations = 12000;
+    const maxAllowedIterations = 100000;
     let iterations = 0;
-    let lastStackTraces = [];
     while (stack.length > 0) {
+        const {obj: currentObj, path: currentPath} = stack.pop();
+
         // Normally that would never happen.
         // But in case of an error, a watchdog like that can prevent freezing.
+        // It once happened when I forgot isFile flag for media. And walk travelled
+        // through fileHandle's keys, which were cyclic.
         iterations++;
         if (iterations > maxAllowedIterations) {
-            console.log(obj);
-            console.log(lastStackTraces.slice(-30));
+            console.log(currentPath);
             alert("An infinite loop during files walk");
-            neverAgain = true;
             return;
         }
-
-        const {obj: currentObj, path: currentPath} = stack.pop();
-        lastStackTraces.push(currentPath);
 
         if (currentObj.isFile) {
             callback(currentPath, true);
