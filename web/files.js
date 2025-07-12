@@ -1420,7 +1420,11 @@ async function post(endpoint, data) {
 
 // If there are files without isFile flag - we would have recursion.
 // Because walk would try to iterate over js object keys.
+let neverAgain = false;
 function walk(obj, callback, path = '/') {
+    if (neverAgain) {
+        return;
+    }
     // Chromium's callstack limit is 11K, so we iterate.
     const stack = [{obj, path}];
 
@@ -1435,11 +1439,12 @@ function walk(obj, callback, path = '/') {
             console.log(files);
             console.log(lastStackTraces.slice(-30));
             alert("An infinite loop during files walk");
+            neverAgain = true;
             return;
         }
 
         const {obj: currentObj, path: currentPath} = stack.pop();
-        lastStackTraces.push([currentObj, currentPath]);
+        lastStackTraces.push(currentPath);
 
         if (currentObj.isFile) {
             callback(currentPath, true);
