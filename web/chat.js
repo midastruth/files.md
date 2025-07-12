@@ -235,10 +235,21 @@ async function receive(val) {
     renderMessages();
     scrollToBottom();
 
-    let file = await ((await getFileHandle(CHAT_PATH)).getFile());
+    const fileHandle = await getFileHandle(CHAT_PATH);
+    let file = await fileHandle.getFile();
     // TODO inmemory lastmodified should be reloaded
-    if (currentEditor !== null && currentEditor.path === CHAT_PATH && getMemFile(CHAT_PATH) !== null) {
-        getMemFile(CHAT_PATH).lastModified = file.lastModified;
+    if (currentEditor !== null && currentEditor.path === CHAT_PATH) {
+        // Update in-memory lastModified
+        if (getMemFile(CHAT_PATH) !== null) {
+            getMemFile(CHAT_PATH).lastModified = file.lastModified;
+        } else {
+            addMemFile(CHAT_PATH, {
+                isFile: true,
+                past: CHAT_PATH,
+                lastModified: file.lastModified,
+                handle: fileHandle,
+            })
+        }
     }
     chatIsClean = true;
 }

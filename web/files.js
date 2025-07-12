@@ -1034,6 +1034,7 @@ async function openFile(path, saveToHistory = true, el = 'editor-textarea') {
     }
 
     // Sync previous file
+    // TODO what if we open same file?
     if (currentEditor.path !== undefined) {
         console.log('sync previous file');
         await syncCurrentFile(false);
@@ -1248,9 +1249,9 @@ async function syncCurrentFile(syncWithServer = true) {
 
                 let localLastModified = file.lastModified;
                 // TODO inmemory lastmodified should be reloaded
-                // files[dir][filename].lastModified = localLastModified;
+                let chatFileExists = inMemoryLastModified !== undefined;
                 if (inMemoryLastModified !== localLastModified) {
-                    console.log('Chat was modified locally', CHAT_PATH);
+                    console.log(files);
                     await openFile(CHAT_PATH);
                     isSyncingCurrentFile = false;
                     return;
