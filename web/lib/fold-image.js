@@ -139,8 +139,15 @@
                 return;
             }
             let url_end = stream.findNext((token) => {return token.string === ']]'});
+            // PATCHED, for some reason https://maps.app.goo.gl/HfuMcLjYvTyZTvmM8 in the middle of the text produced
+            // an error due to url_end = null.
+            if (url_end === null) {
+                return;
+            }
+            
             let from = {line: lineNo, ch: token.start};
             let to = {line: lineNo, ch: url_end.token.end};
+
 
             let rngReq = stream.requestRange(from, to, from, from);
             if (rngReq === fold.RequestRangeResult.OK) {
