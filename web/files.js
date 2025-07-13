@@ -226,7 +226,7 @@ async function syncTextsWithServer() {
                 });
 
                 console.log('SYNC texts: write file: ', path);
-                addServerFile(path, content, lastModified);
+                setServerFile(path, content, lastModified);
                 // Unfortunately rename is not working, so we have to delete the old file
                 const shouldRemoveOldFile = relPath in response.renames;
                 // TODO write e2e for renames
@@ -282,6 +282,7 @@ async function syncLocalFileWithServer(path) {
 
     let serverFile = {};
     try {
+        const clientLastModified = file.lastModified;
         let response = await fetch(`${API_HOST}/syncText`, {
             method: 'POST',
             headers: {
@@ -292,8 +293,8 @@ async function syncLocalFileWithServer(path) {
             body: JSON.stringify({
                 path: path,
                 lastModified: serverTimestamp,
-                clientLastModified: file.lastModified,
-                clientLastSynced: getServerFile(path)?.lastSynced || 0,
+                clientLastModified: clientLastModified,
+                clientLastSynced: getServerFile(path)?.lastClientModified || 0,
                 content: content,
             })
         });
@@ -302,25 +303,33 @@ async function syncLocalFileWithServer(path) {
             return;
         }
         let json = await response.json();
+
+        // For the cases when server was updated only on server, we move lastSyncedAt pointer,
+        // meaning that there are no "dirty" changes on client.
         if (json.status === 'notModified') {
+            setServerFileLastClientModified(path, clientLastModified);
             return;
         }
         if (json.status === 'updatedOnServer') {
             // TODO maybe RC here? When file was updated, but during this time we already changed it
-            addServerFile(path, content, json.lastModified, getServerFile(path)?.lastSynced);
-            console.log(`saved metadata for ${path} with timestamp ${json.lastModified}`, json);
+            setServerFile(path, content, json.lastModified, clientLastModified);
+            console.log(`Moved lastModified for ${path} with timestamp ${json.lastModified}`, json);
             saveServerFiles();
             return;
         }
-        // if status is "ok", it means it was merged?So we proceed
+        // if status is "merged" or "ok", it means it means we have changes to write.
         serverFile = json
     } catch (error) {
         console.error('Network error occurred:', error.message);
         return;
     }
 
-    const lastSynced = await saveTextFile(path, serverFile.content);
-    addServerFile(path, serverFile.content, serverFile.lastModified, lastSynced);
+    // We have either of these:
+    // 1) New file from server
+    // 2) Modified only on server
+    // 3) Merged on server
+    const lastClientModified = await saveTextFile(path, serverFile.content);
+    setServerFile(path, serverFile.content, serverFile.lastModified, lastClientModified);
     console.log(`Saved server file for ${path} with timestamp ${serverFile.lastModified}`);
     saveServerFiles();
     console.log('Opening file after sync');
@@ -856,7 +865,7 @@ async function moveCurrentFile(toDir) {
         //     handle: await getFileHandle(newPath),
         // }
         currentEditor.path = newPath;
-        addServerFile(newPath, content, 0);
+        setServerFile(newPath, content, 0);
         saveServerFiles();
 
         await removeFile(oldPath);
@@ -924,7 +933,7 @@ async function moveFile(oldPath, newPath) {
             path: newPath,
             handle: await getFileHandle(newPath),
         });
-        addServerFile(newPath, content, 0);
+        setServerFile(newPath, content, 0);
         saveServerFiles();
 
         // Server file will be removed here.
@@ -956,7 +965,7 @@ function getServerFile(path) {
     return currentDir[filename] || null;
 }
 
-function addServerFile(path, content, lastModifiedAt, clientLastSynced = null) {
+function setServerFile(path, content, lastModifiedAt, lastClientModifiedAt = null) {
     // const parts = path.split('/');
     // const filename = parts.pop();
     // const dir = parts.join('/');
@@ -986,9 +995,26 @@ function addServerFile(path, content, lastModifiedAt, clientLastSynced = null) {
         isFile: true,
         hash: hash(content),
         lastModified: lastModifiedAt,
-        lastSynced: clientLastSynced,
+        lastClientModified: lastClientModifiedAt,
         path: path,
     }
+}
+
+function setServerFileLastClientModified(path, lastClientModified) {
+    let dirs = path.split('/');
+    dirs = dirs.filter(d => d !== '');
+    const filename = dirs.pop();
+
+    let currentDir = server['files'];
+    for (let dir of dirs) {
+        dir += '/';
+        if (!currentDir[dir]) {
+            currentDir[dir] = {};
+        }
+        currentDir = currentDir[dir];
+    }
+
+    currentDir[filename].lastClientModified = lastClientModified;
 }
 
 function removeServerFile(path) {
@@ -1213,7 +1239,7 @@ async function syncCurrentFile(syncWithServer = true) {
                     handle: await getFileHandle(newPath, true),
                 });
                 await saveTextFile(newPath, getCurrentContent());
-                addServerFile(newPath, content, 0);
+                setServerFile(newPath, content, 0);
                 saveServerFiles();
                 console.log('Created', newPath);
 

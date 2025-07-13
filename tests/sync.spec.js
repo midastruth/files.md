@@ -474,6 +474,49 @@ test('files exist on both client and server, serverFiles contains proper server 
     await clickAndExpectContent(page, 'dir/file2', '# File2\ntest content2');
 });
 
+
+test('sync changes from client, update clientLastModified & clientLastSynced', async ({ page }) => {
+    await setup(page);
+
+    await page.click('#new-file');
+    await page.waitForTimeout(100);
+    await page.keyboard.type('Content');
+    await page.waitForTimeout(3000);
+
+    await expectFileOnServer(page, 'New file.md', 'Content');
+
+    let serverFiles = await page.evaluate(() => {
+        return server['files'];
+    });
+
+    console.log(serverFiles);
+
+    expect(serverFiles['New file.md'].lastModified).not.toBeNull();
+    expect(serverFiles['New file.md'].lastSynced).toEqual(serverFiles['New file.md'].lastModified);
+
+    // // // // Trigger syncTexts, first time to get server state
+    // // // await page.evaluate(() => {
+    // // //     window.dispatchEvent(new Event('focus'));
+    // // // });
+    // // //
+    // // // await page.waitForTimeout(500);
+    // //
+    // // // Trigger syncTexts, second time to send client files
+    // // await page.evaluate(() => {
+    // //     window.dispatchEvent(new Event('focus'));
+    // // });
+    //
+    // await page.waitForTimeout(500);
+
+    // // Check that existing files from client are synced
+    // await expectFileOnServer(page, 'README.md', 'Hello world');
+    // await expectFileOnServer(page, 'Notes.md', 'Some Text');
+    //
+    // // Check that existing server files are preserved
+    // await clickAndExpectContent(page, 'file', '# File\ntest content');
+    // await clickAndExpectContent(page, 'another', '# Another\n*italic*');
+});
+
 async function createFileOnServer(filepath, content) {
     const p = path.join(getServerDir(), filepath);
 

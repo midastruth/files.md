@@ -21,6 +21,7 @@ const (
 	StatusOK              = "ok"
 	StatusNotModified     = "notModified"
 	StatusUpdatedOnServer = "updatedOnServer"
+	StatusMerged          = "merged"
 )
 
 type file struct {
@@ -292,6 +293,7 @@ func SyncText(w http.ResponseWriter, r *http.Request) {
 	// Log client times
 	logSync(fmt.Sprintf("Client file '%s': last client modified: %d, last client synced: %d", path, clientFile.ClientLastModified, clientFile.ClientLastSynced), r)
 
+	status := StatusOK
 	var content string
 	fileWasModifiedOnServer := false
 	if errors.Is(err, os.ErrNotExist) {
@@ -307,6 +309,7 @@ func SyncText(w http.ResponseWriter, r *http.Request) {
 			logSync(fmt.Sprintf("File '%s' was modified on server at %d, but on client at %d", path, serverLastModified, clientFile.LastModified), r)
 			logSync(fmt.Sprintf("Merging and writing one clientFile: '%s'", path), r)
 			content = Merge(serverContent, clientFile.Content)
+			status = StatusMerged
 		} else {
 			// TODO for resilience add merge here, because we had case when server saved latest TS but no conent.
 			// Also, if for some reason timestamps would change on server migration and such.
@@ -340,7 +343,7 @@ func SyncText(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := file{
-		Status:       StatusOK,
+		Status:       status,
 		Content:      content,
 		Path:         clientFile.Path,
 		LastModified: serverLastModified,
