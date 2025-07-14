@@ -2724,7 +2724,12 @@ func (b *Bot) fullMode(_ []string) error {
 }
 
 func (b *Bot) chatMode(_ []string) error {
-	return b.cfg.SetMode(userconfig.ModeChat)
+	err := b.cfg.SetMode(userconfig.ModeChat)
+	if err != nil {
+		return fmt.Errorf("chat only mode: can't set chat only mode %w", err)
+	}
+
+	return b.showHTML(i18n.Tr("What is on your mind?"), nil)
 }
 
 func (b *Bot) completeHabit(params []string) error {
