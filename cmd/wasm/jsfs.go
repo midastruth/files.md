@@ -11,6 +11,8 @@ import (
 	"github.com/spf13/afero"
 )
 
+var writtenFiles []string
+
 type JSFS struct{}
 
 func NewJSFS() *JSFS {
@@ -156,6 +158,7 @@ func readFile(_ afero.Fs, path string) ([]byte, error) {
 }
 
 func writeFile(_ afero.Fs, path string, data []byte, perm os.FileMode) error {
+	writtenFiles = append(writtenFiles, path)
 	resultChan := make(chan struct{}, 1)
 	errorChan := make(chan error, 1)
 

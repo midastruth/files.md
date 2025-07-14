@@ -32,8 +32,8 @@ var (
 	WriteFile = writeFile
 	ReadDir   = readDir
 
-	LogRename = func(time int64, oldPath, newPath string) {} // callback that can be used to track renames
-	LogDelete = func(time int64, path string) {}             // callback that can be used to track deletes
+	LogRename = func(time int64, oldPath, newPath string) {} // callback to track renames
+	LogDelete = func(time int64, path string) {}             // callback to track deletes
 
 	errUnsafePath   = errors.New("unsafe path, possible security issue")
 	errCannotUnhash = errors.New("cannot unhash, maybe the file is missing")

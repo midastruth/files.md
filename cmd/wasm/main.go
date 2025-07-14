@@ -113,7 +113,11 @@ func sendDueResponsesToJS() {
 }
 
 func sendToJS(vals ...any) {
-	js.Global().Call("receive", vals...)
+	var paths []any
+	for _, path := range writtenFiles {
+		paths = append(paths, "/"+path)
+	}
+	js.Global().Call("receive", paths)
 }
 
 func logToJS(vals ...any) {
