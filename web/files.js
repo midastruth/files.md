@@ -1158,6 +1158,12 @@ async function openFile(path, saveToHistory = true, el = 'editor-textarea') {
     const end = performance.now();
     console.log(`File opened in: ${(end - start).toFixed(3)} milliseconds`);
     // Get the editor instance
+
+    // Once we spent enough time in file, set viewportMargin to infinity to prevent artefacts.
+    // Artefacts can be observed during text selection (cmd+a).
+    setTimeout(() => {
+        currentEditor.setOption('viewportMargin', Infinity);
+    }, 1000);
 }
 
 // 0) Read content from local fs
