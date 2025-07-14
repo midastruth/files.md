@@ -2684,8 +2684,7 @@ func (b *Bot) setJournalOnlyMode(_ []string) error {
 		return fmt.Errorf("journal only mode: can't set notes only mode %w", err)
 	}
 
-	_, err = b.tg.Send(b.userID, i18n.Tr("What's on your mind?"), nil, tg.MarkupHTML)
-	return err
+	return b.showHTML(i18n.Tr("What's on your mind?"), nil)
 }
 
 func (b *Bot) setFullMode(_ []string) error {
@@ -2725,8 +2724,7 @@ func (b *Bot) setChatOnlyMode(_ []string) error {
 		return fmt.Errorf("chat only mode: can't set chat only mode %w", err)
 	}
 
-	_, err = b.tg.Send(b.userID, i18n.Tr("What's on your mind?"), nil, tg.MarkupHTML)
-	return err
+	return b.showHTML(i18n.Tr("What's on your mind?"), nil)
 }
 
 func (b *Bot) completeHabit(params []string) error {
