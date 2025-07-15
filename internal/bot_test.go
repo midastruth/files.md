@@ -1054,8 +1054,8 @@ func TestSettingsMainPanel(t *testing.T) {
 	r.NoError(err)
 	r.Equal("Settings:", tgram.LastSentText)
 	r.Equal(tg.NewKeyboard([]tg.Row{
-		tg.NewBtn("💬 Saved messages mode", tg.NewCmd("chat", nil)),
 		tg.NewBtn("🧠 Full mode", tg.NewCmd("full", nil)),
+		tg.NewBtn("💬 Inbox mode", tg.NewCmd("chat", nil)),
 		tg.NewBtn("📌 Notes mode", tg.NewCmd("notes_only", nil)),
 		tg.NewBtn("✅ Tasks mode", tg.NewCmd("tasks_only", nil)),
 		tg.NewBtn("💚 Journal mode", tg.NewCmd("journal_only", nil)),
