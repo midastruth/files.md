@@ -38,9 +38,9 @@ function renderSidebar(focusDir = '', modifiedPaths) {
     root = new TreeNode('');
     root.path = '/';
 
-    let inbox = new TreeNode("inbox");
+    let inbox = new TreeNode('inbox');
     inbox.path = CHAT_PATH;
-    if (currentEditor.path === undefined) {
+    if (currentEditor.path === undefined || selectedNodes.has('inbox')) {
         inbox.setSelected(true);
     }
     inbox.on('click', async function (n, node) {
