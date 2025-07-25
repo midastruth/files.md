@@ -256,13 +256,14 @@ func (b *Bot) handlers() map[string]func([]string) error {
 		consts.CmdShowMoveToDirOrFile:         b.showMoveToFileOrDir,
 		consts.CmdShowMoveToChecklist:         b.showToChecklist,
 		consts.CmdMoveToExistingDir:           b.moveToDir,
+		consts.CmdMoveToChecklist:             b.moveToChecklist,
 		consts.CmdMoveToExistingDirFromToday:  b.moveToDirFromToday,
 		consts.CmdRequestNewDir:               b.requestNewDirName,
 		consts.CmdMoveToNewDir:                b.moveToNewDir,
 		consts.CmdMoveToExistingFile:          b.moveToExistingFile,
 		consts.CmdMoveToExistingNote:          b.moveToExistingNote,
 		consts.CmdMoveToNewFile:               b.moveToNewFile,
-		consts.CmdMoveToChecklist:             b.moveToChecklist,
+		consts.CmdMoveToDirChecklist:          b.moveToDirChecklist,
 		consts.CmdMoveToRead:                  b.moveToRead,
 		consts.CmdMoveToWatch:                 b.moveToWatch,
 		consts.CmdMoveToShop:                  b.moveToShop,
@@ -876,7 +877,7 @@ func (b *Bot) showMoveTo(params []string) error {
 		userMoveToBtns = append(userMoveToBtns, *recentBtn)
 	}
 
-	toTodayCmd := tg.NewCmd(consts.CmdMoveToExistingDir, []string{fs.Hash(fs.DirToday), msgIndexStr})
+	toTodayCmd := tg.NewCmd(consts.CmdMoveToChecklist, []string{fs.Hash(fs.TodayFilename), msgIndexStr})
 	toTodayLabel := txt.Emoji(i18n.Emoji("tasks"), i18n.Tr("To Today"))
 	userMoveToBtns = append(userMoveToBtns, tg.NewBtn(toTodayLabel, toTodayCmd))
 
@@ -1721,6 +1722,54 @@ func (b *Bot) moveToDir(params []string) error {
 	return b.ShowToday(nil)
 }
 
+func (b *Bot) moveToChecklist(params []string) error {
+	toChecklistHash := params[0]
+
+	msgIndicesStr := strings.Split(params[1], ",")
+	var msgIndices []int
+	for _, msgIndexStr := range msgIndicesStr {
+		msgIndex, err := strconv.Atoi(msgIndexStr)
+		if err != nil {
+			return fmt.Errorf("move to checklist: can't parse msgIndex from params: %w", err)
+		}
+		msgIndices = append(msgIndices, msgIndex)
+	}
+
+	checklist, err := b.fs.Unhash(fs.DirRoot, toChecklistHash)
+	// Create known checklist if it doesn't exist
+	if err != nil {
+		if fs.Hash(fs.TodayFilename) == toChecklistHash {
+			checklist = fs.TodayFilename
+			err = b.fs.Write(fs.DirRoot, checklist, "")
+			if err != nil {
+				return fmt.Errorf("move to checklist: can't create today checklist: %w", err)
+			}
+		} else if fs.Hash(fs.LaterFilename) == toChecklistHash {
+			checklist = fs.LaterFilename
+			err = b.fs.Write(fs.DirRoot, checklist, "")
+			if err != nil {
+				return fmt.Errorf("move to checklist: can't create later checklist: %w", err)
+			}
+		} else {
+			return fmt.Errorf("move to checklist: can't unhash checklist %s: %w", toChecklistHash, err)
+		}
+	}
+
+	checklistMD, err := b.fs.Read(fs.DirRoot, checklist)
+	if err != nil {
+		return fmt.Errorf("move to checklist: can't read checklist %s: %w", checklist, err)
+	}
+	err = b.moveFromChat(func(content string, timestamp time.Time) error {
+		md := txt.AddChecklistItem(checklistMD, content, false)
+		return b.fs.Write(fs.DirRoot, checklist, md)
+	}, true, msgIndices...)
+	if err != nil {
+		return fmt.Errorf("move to checklist: can't move from chat: %w", err)
+	}
+
+	return b.ShowToday(nil)
+}
+
 func (b *Bot) requestNewDirName(params []string) error {
 	filenameHash := params[0]
 
@@ -1846,7 +1895,7 @@ func (b *Bot) moveToExistingNote(params []string) error {
 	return b.ShowToday(nil)
 }
 
-func (b *Bot) moveToChecklist(params []string) error {
+func (b *Bot) moveToDirChecklist(params []string) error {
 	msgIndicesStr := strings.Split(params[0], ",")
 	var msgIndices []int
 	for _, msgIndexStr := range msgIndicesStr {
@@ -1916,19 +1965,19 @@ func (b *Bot) moveToChecklist(params []string) error {
 func (b *Bot) moveToRead(params []string) error {
 	filenameHash := params[0]
 
-	return b.moveToChecklist([]string{filenameHash, fs.Hash(fs.DirRead)})
+	return b.moveToDirChecklist([]string{filenameHash, fs.Hash(fs.DirRead)})
 }
 
 func (b *Bot) moveToWatch(params []string) error {
 	filenameHash := params[0]
 
-	return b.moveToChecklist([]string{filenameHash, fs.Hash(fs.DirWatch)})
+	return b.moveToDirChecklist([]string{filenameHash, fs.Hash(fs.DirWatch)})
 }
 
 func (b *Bot) moveToShop(params []string) error {
 	filenameHash := params[0]
 
-	return b.moveToChecklist([]string{filenameHash, fs.Hash(fs.DirShop)})
+	return b.moveToDirChecklist([]string{filenameHash, fs.Hash(fs.DirShop)})
 }
 
 func (b *Bot) moveToNewFile(params []string) error {
@@ -2528,7 +2577,7 @@ func (b *Bot) moveToDirBtns(msgIndex int) ([]tg.Btn, error) {
 
 func (b *Bot) toChecklistKeyboard(filenameHash string) (*tg.Keyboard, error) {
 	newBtn := func(dir, title string) tg.Btn {
-		return tg.NewBtn(title, tg.NewCmd(consts.CmdMoveToChecklist, []string{filenameHash, dir}))
+		return tg.NewBtn(title, tg.NewCmd(consts.CmdMoveToDirChecklist, []string{filenameHash, dir}))
 	}
 
 	dirs, err := b.fs.FilesAndDirs(fs.DirRoot)

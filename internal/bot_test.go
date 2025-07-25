@@ -1736,7 +1736,7 @@ func TestMoveToChecklistSplittable(t *testing.T) {
 	r.NoError(err)
 	r.Equal("#### 11 August, Sunday\n`09:54` Item1\nitem2\n", content)
 
-	err = bot.moveToChecklist([]string{"0", "-checklist-"})
+	err = bot.moveToDirChecklist([]string{"0", "-checklist-"})
 	r.NoError(err)
 
 	files, err := userFS.FilesAndDirs("-checklist-")

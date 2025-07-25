@@ -42,6 +42,9 @@ func ChecklistItems(md string) map[string]bool {
 }
 
 func AddChecklistItem(md, item string, checked bool) string {
+	// Markdown checklist items can't have new lines
+	item = strings.ReplaceAll(NormNewLines(item), "\n", " ")
+
 	if checked {
 		md += "\n- [x] " + item
 	} else {
