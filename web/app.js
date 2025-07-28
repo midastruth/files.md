@@ -888,13 +888,13 @@ function fromHeaderToFilename(header) {
     if (header === '# Done') {
         return toFilename(DONE_PATH);
     }
-    if (header === '# Shop_') {
+    if (header === '# Shop') {
         return toFilename(SHOP_PATH);
     }
-    if (header === '# Watch_') {
+    if (header === '# Watch') {
         return toFilename(WATCH_PATH);
     }
-    if (header === '# Read_') {
+    if (header === '# Read') {
         return toFilename(READ_PATH);
     }
     if (header.startsWith('# ')) {

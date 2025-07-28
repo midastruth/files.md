@@ -57,9 +57,9 @@ const (
 	DoneFilename  = "Done.txt"
 	InboxFilename = "Inbox.txt"
 
-	ShopFilename  = "Shop_.txt"
-	WatchFilename = "Watch_.txt"
-	ReadFilename  = "Read_.txt"
+	ShopFilename  = "Shop.txt"
+	WatchFilename = "Watch.txt"
+	ReadFilename  = "Read.txt"
 
 	PomodoroTask = "Finished a break"
 

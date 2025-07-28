@@ -135,8 +135,12 @@ func OnlyChecklists(dirs []File) []File {
 	for _, entry := range entries {
 		// get filename without extension
 		filename := strings.TrimSuffix(entry.Name, filepath.Ext(entry.Name))
-		isChecklist := strings.HasSuffix(filename, "_")
-		if isChecklist {
+		hasChecklistPostfix := strings.HasSuffix(filename, "_")
+		if hasChecklistPostfix || slices.Contains([]string{
+			WatchFilename,
+			ReadFilename,
+			ShopFilename,
+		}, entry.Name) {
 			checklists = append(checklists, entry)
 		}
 	}

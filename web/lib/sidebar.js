@@ -1110,7 +1110,7 @@ function TreeView(root, container, options) {
                 ret += '<span class="tj_mod_icon">' + TreeConfig.tasks_icon + '</span>';
             } else if (node.toString() === 'later') {
                 ret += '<span class="tj_mod_icon">' + TreeConfig.tasks_icon + '</span>';
-            } else if (node.toString().endsWith('_')) {
+            } else if (node.toString().endsWith('_') || node.toString() === 'read' || node.toString() === 'watch' || node.toString() === 'shop') {
                 ret += '<span class="tj_mod_icon">' + TreeConfig.checklists_icon + '</span>';
             } else {
                 ret += '<span class="tj_icon">' + TreeConfig.leaf_icon + '</span>';
@@ -1257,6 +1257,14 @@ const TreeUtil = {
 };
 
 function isChecklist(filename) {
+    if ([
+        toFilename(WATCH_PATH),
+        toFilename(SHOP_PATH),
+        toFilename(READ_PATH)
+    ].includes(filename)) {
+        return true;
+    }
+
     return filename.endsWith('_.txt') || filename.endsWith('_.md');
 }
 
