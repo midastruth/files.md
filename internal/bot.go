@@ -996,7 +996,7 @@ func (b *Bot) ShowToday(_ []string) error {
 
 			if len(task) >= maxTitleLengthForMobile {
 				cmd := tg.NewCmd(consts.CmdShowLongItem, []string{fs.Hash(fs.TodayFilename), fs.Hash(task)})
-				btn := tg.NewBtn(i18n.AddEmoji("eyes"), cmd)
+				btn := tg.NewBtn(txt.Emoji(i18n.Emoji("eyes"), task), cmd)
 				kb.AddRow(btn)
 			} else {
 				cmd := tg.NewCmd(consts.CmdCompleteChecklistItem, []string{fs.Hash(fs.TodayFilename), fs.Hash(task)})
