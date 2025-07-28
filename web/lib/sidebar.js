@@ -173,6 +173,9 @@ function renderSidebar(focusDir = '', modifiedPaths) {
         });
         lastListNode = node;
         root.addChild(node);
+        if (modifiedPaths !== undefined && modifiedPaths.includes(path)) {
+            node.shouldBlink = true;
+        }
     });
     if (lastListNode !== null) {
         lastListNode.isGroupEnd = true;
@@ -202,6 +205,9 @@ function renderSidebar(focusDir = '', modifiedPaths) {
             await openFile(TODAY_PATH);
         });
         root.addChild(node);
+        if (modifiedPaths !== undefined && modifiedPaths.includes(TODAY_PATH)) {
+            node.shouldBlink = true;
+        }
     }
     if (files[toFilename(LATER_PATH)] !== undefined) {
         let node = new TreeNode('later', {expanded: false, dir: false});
@@ -211,6 +217,9 @@ function renderSidebar(focusDir = '', modifiedPaths) {
         });
         node.isGroupEnd = true;
         root.addChild(node);
+        if (modifiedPaths !== undefined && modifiedPaths.includes(LATER_PATH)) {
+            node.shouldBlink = true;
+        }
     }
 
     // Step 2: Personal group
@@ -302,57 +311,6 @@ function renderSidebar(focusDir = '', modifiedPaths) {
             fileNode.shouldBlink = true;
         }
     });
-
-    // Process root-level files
-    // if (files['']) {
-    //     for (let file in files['']) {
-    //         if (file === CONFIG_FILENAME || file === CHAT_FILENAME) {
-    //             continue;
-    //         }
-    //
-    //         let fileNode = new TreeNode(file.replace(/\.md$/, '').replace(/\.txt$/, ''), {expanded: false});
-    //         fileNode.on('click', async function (n, node) {
-    //             await openFile('', file);
-    //         });
-    //         root.addChild(fileNode);
-    //
-    //         // Restore selected state for root-level file nodes
-    //         if (selectedNodes.has(file.replace(/\.md$/, ''))) {
-    //             fileNode.setSelected(true);
-    //         }
-    //     }
-    // }
-    //
-
-    // Dirs first
-    function sortTreeNode(node) {
-        const children = node.getChildren();
-        if (children && children.length > 0) {
-            children.sort((a, b) => {
-                const aName = a.toString();
-                const bName = b.toString();
-                const aIsDir = a.getOptions()?.dir === true;
-                const bIsDir = b.getOptions()?.dir === true;
-
-                // Inbox always comes first
-                if (aName === 'inbox') return 1;
-                if (bName === 'inbox') return 1;
-
-                if (aName === 'today') return -1;
-
-                // Then sort by directory vs file
-                if (aIsDir && !bIsDir) return -1;
-                if (!aIsDir && bIsDir) return 1;
-
-                return 0;
-            });
-
-            // Recursively sort children
-            children.forEach(child => sortTreeNode(child));
-        }
-    }
-
-    // sortTreeNode(root);
 
     tree = new TreeView(root, '#tree', {
         show_root: false,
