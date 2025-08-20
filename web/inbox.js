@@ -209,22 +209,19 @@ function initChat() {
     chatInput.addEventListener('keydown', async function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            await sendToWasm();
+            await sendMsg();
             autoResize();
         }
     });
 }
 
-async function sendToWasm() {
+async function sendMsg() {
     const text = chatInput.value.trim();
     if (!text) return;
-    console.log('Wasm: sending', text);
 
+    await saveToInbox(text);
     chatInput.value = '';
     chatIsClean = false;
-    console.log('Wasm: waiting for reply');
-    await reply(text);
-    console.log('Wasm: reply is fullfilled');
     await loadMessages();
     renderMessages();
     scrollToBottom();
@@ -232,17 +229,6 @@ async function sendToWasm() {
 
 async function initWasm() {
     console.log('Init wasm chat');
-    let wasmReadyPromise = new Promise(resolve => {
-        window.addEventListener('wasmReady', () => {
-            console.log('Wasm is ready!');
-            resolve();
-        }, { once: true });
-    });
-    window.reply = async (msg) => {
-        await wasmReadyPromise;
-        wasmReply(msg);
-    };
-
     const go = new Go();
     const wasmFile = await fetch(`chat.wasm${window.COMMIT_HASH}`);
     const wasmModule = await WebAssembly.instantiateStreaming(wasmFile, go.importObject);
@@ -253,6 +239,19 @@ async function initWasm() {
 
 async function logWasm(val) {
     console.log(val);
+}
+
+async function saveToInbox(content) {
+    const now = new Date();
+    const timestamp = now.toLocaleTimeString('en-US', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    const formattedContent = `\n\`${timestamp}\` ${content}\n`;
+
+    await addToTextFile(INBOX_PATH, formattedContent);
 }
 
 async function receive(modifiedPaths) {

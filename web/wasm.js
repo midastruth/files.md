@@ -5,30 +5,6 @@
 // const commandPopup = document.getElementById('command-popup');
 // let focusedCommandIndex = 0;
 
-function sendMessage() {
-    const msg = toMarkdown();
-    if (msg === '') return;
-
-    addMessage(msg, 'user');
-
-    if (msg.startsWith('/')) {
-        let cmd = {
-            n: msg.substring(1),
-            t: "cmd"
-        }
-        wasmReplyCmd(JSON.stringify(cmd));
-    } else {
-        reply(msg);
-        // let update = await window.newUpdate(msg, null)
-        // processResponse(await window.send(update));
-    }
-
-    clearInput();
-    input.rows = 1;
-    sendButton.disabled = true;
-    // document.querySelector('#messages').scrollTop = messagesContainer.scrollHeight;
-}
-
 function processResponse(response) {
     response = JSON.parse(response);
     document.querySelectorAll('.bot').forEach(element => element.remove());

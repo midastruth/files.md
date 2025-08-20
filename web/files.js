@@ -800,6 +800,23 @@ async function saveTextFile(path, content) {
     return file.lastModified;
 }
 
+async function addToTextFile(path, content) {
+    let fileHandle = await getFileHandle(path, true);
+    if (fileHandle === null) {
+        // TODO fix once Chromium fixes the bug
+        throw new Error('Invalid file name');
+    }
+
+    console.log('Appending to file...', path);
+    const writable = await fileHandle.createWritable({ keepExistingData: true });
+    await writable.seek(await fileHandle.getFile().then(file => file.size));
+    await writable.write(content);
+    await writable.close();
+
+    const file = await fileHandle.getFile();
+    return file.lastModified;
+}
+
 async function saveImageFile(fileName, file) {
     try {
         const rootDirHandle = await getRootDirHandle();
