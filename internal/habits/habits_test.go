@@ -117,7 +117,7 @@ func TestLastWeekHabitsWhenWeekFallsIntoTwoMonths(t *testing.T) {
 		return time.Date(1970, time.September, 30, 0, 0, 0, 0, time.Local)
 	}
 
-	habits, err := LastWeekHabits(userFS)
+	habits, err := LastWeekHabits(userFS, time.UTC)
 	r.NoError(err)
 	r.Len(habits, 2)
 	r.Len(habits["Habit"], 7)

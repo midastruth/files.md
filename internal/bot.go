@@ -1059,7 +1059,7 @@ func (b *Bot) ShowToday(_ []string) error {
 	userHabits := make(map[string]habits.Year)
 	if b.cfg.QuickHabitsEnabled() {
 		// We can tolerate missing habits
-		userHabits, _ = habits.LastWeekHabits(b.fs)
+		userHabits, _ = habits.LastWeekHabits(b.fs, b.cfg.Timezone())
 		_, ok := userHabits[habits.MoodHabit]
 		if ok {
 			delete(userHabits, habits.MoodHabit)

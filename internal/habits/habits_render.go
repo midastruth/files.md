@@ -9,6 +9,7 @@ import (
 
 	"zakirullin/stuffbot/config"
 	"zakirullin/stuffbot/internal/fs"
+	"zakirullin/stuffbot/internal/userconfig"
 )
 
 //go:embed templates/habits.html
@@ -20,7 +21,9 @@ func Render(userID int64, userFS *fs.FS) ([]byte, error) {
 		return nil, fmt.Errorf("can't parse habits template: %w", err)
 	}
 
-	habits, err := LastWeekHabits(userFS)
+	cfg := userconfig.NewConfig(userFS, userID, config.BotCfg.ConfigFilename)
+
+	habits, err := LastWeekHabits(userFS, cfg.Timezone())
 	if err != nil {
 		return nil, fmt.Errorf("can't render habit: %w", err)
 	}
