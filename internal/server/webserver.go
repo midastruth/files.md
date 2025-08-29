@@ -25,7 +25,7 @@ import (
 // Serve TODO release graceful shutdown etc
 // All directories paths are absolute.
 func Serve(apiHost, appHost, certDir, logFilename, token, tokensDir string) {
-	err := os.Setenv("GODEBUG", "http2debug=1")
+	err := os.Setenv("GODEBUG", "http2debug=2")
 	if err != nil {
 		panic(err)
 	}
