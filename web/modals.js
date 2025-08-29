@@ -565,7 +565,7 @@ class MoveModal {
             listItem.onclick = () => this.handleClick(dir);
 
             listItem.onmousemove = () => {
-                document.querySelectorAll('#search-results li').forEach(li => li.classList.remove('focused'));
+                document.querySelectorAll('#move-results li').forEach(li => li.classList.remove('focused'));
                 listItem.classList.add('focused');
                 this.focusedIndex = index;
             };
