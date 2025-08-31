@@ -15,7 +15,13 @@ async function sendMsg() {
     const text = chatInput.value.trim();
     if (!text) return;
 
-    await saveToInbox(text);
+    if (wasmReply !== undefined) {
+        await wasmReply(text);
+    } else {
+        console.log('Fallback to direct inbox writing');
+        // Sometimes chat.wasm is not loaded during poor internet connection, so we fallback to direct writing.
+        await saveToInbox(text);
+    }
     chatInput.value = '';
     chatIsClean = false;
     await loadMessages();
