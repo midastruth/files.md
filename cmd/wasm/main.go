@@ -117,6 +117,7 @@ func sendDueResponsesToJS() {
 	if err != nil {
 		// TODO handle err
 	}
+	logToJS("Sending from WASM to JS:", string(response))
 	sendToJS(string(response))
 }
 
