@@ -76,15 +76,14 @@ async function init(el) {
     files = await loadLocalFiles(rootDirHandle);
     log(`Files loaded in ${performance.now() - perf}ms`);
 
-    initChat();
-    initWasm();
+    initInbox();
 
     perf = performance.now();
     renderSidebar();
     log(`Sidebar built in: ${(performance.now() - perf).toFixed(3)} milliseconds`);
 
     // perf = performance.now();
-    openChat();
+    openInbox();
     // showRandomFile();
     // log(`Random file opened in: ${(performance.now() - perf).toFixed(3)} milliseconds`);
 
@@ -144,7 +143,7 @@ function initEditor(el) {
     newEditor.on('focus', function() {
         currentEditor = newEditor;
         currentEditor.refresh(); // Cursor & hide tokens conflict if we don't call it
-        closeChatModal();
+        closeInboxModal();
         log('Focused to:', newEditor.path);
     });
 
@@ -717,7 +716,7 @@ document.addEventListener('keydown', (event) => {
                 return;
             }
 
-            closeChatModal();
+            closeInboxModal();
             editor.focus();
             return;
         }
@@ -769,7 +768,7 @@ document.addEventListener('keydown', function (event) {
         if (isInbox) {
             history.back();
         } else {
-            openChat();
+            openInbox();
         }
         return;
     }
@@ -818,37 +817,9 @@ async function openDir() {
     await migrateFromOPFSToLocal();
     files = await loadLocalFiles(dirHandle)
 
-    initWasm();
-
-    // Create welcome markdown file if empty
-    // if (Object.keys(files).length === 0) {
-    //     const hotkeysFilename = '🎹 Hotkeys.md';
-    //     await saveTextFile(hotkeysFilename, HOTKEYS_CONTENT);
-    //     files = {};
-    //     files[hotkeysFilename] = {
-    //         path: hotkeysFilename,
-    //         isFile: true,
-    //         lastModified: 0,
-    //         handle: await getFileHandle(hotkeysFilename),
-    //     }
-    //
-    //     const welcomeFilename = '🪴 Welcome.md';
-    //     await saveTextFile(welcomeFilename, WELCOME_CONTENT);
-    //     files[welcomeFilename] = {
-    //         path: welcomeFilename,
-    //         isFile: true,
-    //         lastModified: 0,
-    //         handle: await getFileHandle(welcomeFilename),
-    //     }
-    //     await openFile('', welcomeFilename);
-    //     isWelcome = false;
-    //     renderSidebar();
-    //     return;
-    // }
-
     isWelcome = false;
     renderSidebar();
-    await openChat();
+    await openInbox();
 }
 
 function getCurrentContent() {

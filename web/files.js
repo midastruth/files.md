@@ -931,7 +931,7 @@ async function openFile(path, saveToHistory = true, el = 'editor-textarea') {
     }
 
     if (path === INBOX_PATH) {
-        openChat();
+        openInbox();
         return;
     } else {
         const codemirror = document.querySelector('.CodeMirror-wrap');
@@ -942,7 +942,7 @@ async function openFile(path, saveToHistory = true, el = 'editor-textarea') {
     }
     chatButton.classList.remove('hidden');
     chatContainer.style.display = 'none';
-    closeChatModal();
+    closeInboxModal();
 
     const start = performance.now();
 

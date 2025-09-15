@@ -44,7 +44,7 @@ function renderSidebar(focusDir = '', modifiedPaths) {
         inbox.setSelected(true);
     }
     inbox.on('click', async function (n, node) {
-        await openChat();
+        await openInbox();
     });
     root.addChild(inbox)
 

@@ -30,8 +30,8 @@ async function sendMsg() {
     scrollToBottom();
 }
 
-async function openChat() {
-    closeChatModal();
+async function openInbox() {
+    closeInboxModal();
     chatContainer.style.display = 'flex';
     chatButton.classList.add('hidden');
 
@@ -58,7 +58,7 @@ async function openChat() {
     scrollToBottom();
 }
 
-async function openChatModal() {
+async function openInboxModal() {
     chatContainer.classList.add('modal');
     chatContainer.style.display = 'flex';
     chatButton.classList.add('hidden');
@@ -73,15 +73,7 @@ async function openChatModal() {
     scrollToBottom();
 }
 
-// Clicking outside the modal will close the modal.
-// document.addEventListener('click', (event) => {
-//     let isChatModal = chatContainer.classList.contains('modal');
-//     if (isChatModal && !chatContainer.contains(event.target) && !chatButton.contains(event.target)) {
-//         closeChatModal();
-//     }
-// });
-
-function closeChatModal() {
+function closeInboxModal() {
     chatContainer.classList.remove('modal');
     if (!isInbox) {
         chatContainer.style.display = 'none';
@@ -96,11 +88,11 @@ async function toggleChat() {
         return;
     }
 
-    let isChatModal = document.getElementById('chat-container').classList.contains('modal');
-    if (isChatModal) {
-        closeChatModal();
+    let isInboxModal = document.getElementById('chat-container').classList.contains('modal');
+    if (isInboxModal) {
+        closeInboxModal();
     } else {
-        openChatModal();
+        openInboxModal();
     }
 }
 
@@ -221,10 +213,7 @@ async function saveData() {
 
 }
 
-function initChat() {
-    // chat = document.getElementById('chat');
-    // chatInput = document.getElementById('chat-input');
-
+function initInbox() {
     chatInput.addEventListener('keydown', async function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -571,7 +560,6 @@ function attachEventListeners() {
     //         }
     //     });
     // });
-
 
     inbox.querySelectorAll('.to-file-btn').forEach(btn => {
         btn.addEventListener('click', function (e) {
