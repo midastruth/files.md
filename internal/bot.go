@@ -951,33 +951,7 @@ func (b *Bot) ShowToday(_ []string) error {
 		return nil
 	}
 
-	files, err := b.fs.FilesAndDirs(fs.DirToday)
-	if err != nil {
-		return fmt.Errorf("show today: can't get files in %s dir: %w", fs.DirToday, err)
-	}
-
-	// Adding tasks
 	var kb tg.Keyboard
-	for _, file := range files {
-		var btn tg.Btn
-		if file.IsMultiline {
-			cmd := tg.NewCmd(consts.CmdShowMultilineTask, []string{fs.DirToday, fs.Hash(file.Name)})
-			btn = tg.NewBtn(txt.Emoji(i18n.Emoji("eyes"), fs.UnsanitizeFilename(file.Title)), cmd)
-		} else {
-			cmd := tg.NewCmd(consts.CmdComplete, []string{fs.DirToday, fs.Hash(file.Name)})
-
-			emoji := angerEmoji(file)
-			// TODO add tests for all that
-			if emoji == "" {
-				emoji = i18n.Emoji(file.Title)
-			} else if b.cfg.TwoEmojisPerButtonEnabled() {
-				emoji += i18n.Emoji(file.Title)
-			}
-			btn = tg.NewBtn(txt.Emoji(emoji, fs.UnsanitizeFilename(file.Title)), cmd)
-		}
-
-		kb.AddRow(btn)
-	}
 
 	// Adding tasks from Today.txt
 	todayChecklistMD, err := b.fs.Read(fs.DirRoot, fs.TodayFilename)

@@ -3309,7 +3309,8 @@ func TestSaveToTodayTask(t *testing.T) {
 	r.NoError(err)
 	err = userFS.CreateDirsIfNotExist()
 	r.NoError(err)
-	err = userFS.Write("today", "Existing task.md", "")
+
+	err = userFS.Write("", "Today.txt", txt.AddChecklistItem("", "Existing task", false))
 	r.NoError(err)
 
 	cfg := userconfig.NewConfig(userFS, -1, "config.json")
@@ -3322,20 +3323,25 @@ func TestSaveToTodayTask(t *testing.T) {
 	err = bot.Reply(tg.NewUpd(-1, "New task"))
 	r.NoError(err)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", "0"})))
-	r.NoError(err)
-
 	kb := tg.NewKeyboard([]tg.Row{
-		tg.NewBtn("Existing task", tg.NewCmd("c", []string{"today", "1a941cef55f"})),
-		tg.NewBtn("New task", tg.NewCmd("c", []string{"today", "d0776a3e2b9"})),
+		tg.NewBtn("Existing task", tg.NewCmd("check_item", []string{"92199fc4b0c", "04fcfb3c2ef"})),
+		tg.NewBtn("New task", tg.NewCmd("c_ch", []string{"0"})),
 	})
-	r.Equal(kb, tgram.LastSentKeyboard)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("c", []string{"today", "d0776a3e2b9"})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("add_item", []string{"92199fc4b0c", "0"})))
 	r.NoError(err)
 
 	kb = tg.NewKeyboard([]tg.Row{
-		tg.NewBtn("Existing task", tg.NewCmd("c", []string{"today", "1a941cef55f"})),
+		tg.NewBtn("New task", tg.NewCmd("check_item", []string{"92199fc4b0c", "fbd6d26c256"})),
+		tg.NewBtn("Existing task", tg.NewCmd("check_item", []string{"92199fc4b0c", "04fcfb3c2ef"})),
+	})
+	r.Equal(kb, tgram.LastEditedKeyboard)
+
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("check_item", []string{"92199fc4b0c", "fbd6d26c256"})))
+	r.NoError(err)
+
+	kb = tg.NewKeyboard([]tg.Row{
+		tg.NewBtn("Existing task", tg.NewCmd("check_item", []string{"92199fc4b0c", "04fcfb3c2ef"})),
 	})
 	r.Equal(kb, tgram.LastEditedKeyboard)
 }
