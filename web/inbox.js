@@ -11,6 +11,11 @@ const READ_PATH = '/Read.txt';
 const SHOP_PATH = '/Shop.txt';
 const WATCH_PATH = '/Watch.txt';
 
+// Add event listener for input changes
+chatInput.addEventListener('input', autoResize);
+// Initial resize to set proper height
+autoResize();
+
 async function sendMsg() {
     const text = chatInput.value.trim();
     if (!text) return;
@@ -83,7 +88,7 @@ function closeInboxModal() {
     }
 }
 
-async function toggleChat() {
+async function toggleInboxModal() {
     if (isInbox) {
         return;
     }
@@ -96,7 +101,16 @@ async function toggleChat() {
     }
 }
 
-function parseFileContent(content) {
+async function moveMessagesFromInbox(msgs, moveToCallback) {
+    let allMsgs = parseMessages(await read(INBOX_PATH));
+    // TODO exclude only first occurence
+    if (moveToCallback(msgs)) {
+        allMsgs = allMsgs.filter(m => !msgs.includes(m.index.toString()));
+        await write(INBOX_PATH, formatMessages(allMsgs));
+    }
+}
+
+function parseMessages(content) {
     // Normalize line endings
     content = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     const lines = content.split('\n');
@@ -168,7 +182,7 @@ function parseFileContent(content) {
     return messages;
 }
 
-function formatFileContent(messages) {
+function formatMessages(messages) {
     if (messages.length === 0) return '';
 
     // Group messages by date
@@ -199,7 +213,7 @@ async function loadMessages() {
         const content = await file.text();
 
         // Parse the content and load messages
-        messages = parseFileContent(content);
+        messages = parseMessages(content);
 
         log(`Loaded ${messages.length} messages from ${INBOX_PATH}`);
     } catch (error) {
@@ -762,12 +776,6 @@ function autoResize() {
     chatInput.style.height = 'auto';
     chatInput.style.height = Math.min(chatInput.scrollHeight, 250) + 'px';
 }
-
-// Add event listener for input changes
-chatInput.addEventListener('input', autoResize);
-// Initial resize to set proper height
-autoResize();
-
 
 function sendCmd(cmd, params) {
     log('Sending CMD to wasm', cmd, params)

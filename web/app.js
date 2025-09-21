@@ -781,7 +781,7 @@ document.addEventListener('keydown', function (event) {
     }
     if (isMetaKey(event) && event.key === 'Enter') {
         event.preventDefault();
-        toggleChat();
+        toggleInboxModal();
     }
 });
 

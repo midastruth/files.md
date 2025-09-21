@@ -104,24 +104,6 @@ class SearchModal {
                 });
             }
         });
-        // for (let dir of searchDirs) {
-        //     dir += '/';
-        //     if (!files[dir] || dir === 'media/') continue;
-        //     for (const filename in files[dir]) {
-        //         log(filename);
-        //         const potentialMatch = filename.replace(/\.md$/, '');
-        //         let similarityScore = similarity(search, potentialMatch);
-        //
-        //         if (similarityScore >= 70) {
-        //             if (lowPriorityDirs.includes(dir)) {
-        //                 similarityScore -= 60;
-        //             }
-        //             results.push({
-        //                 filename: filename, dir: dir, score: similarityScore
-        //             });
-        //         }
-        //     }
-        // }
 
         // If search is equal to directory
         // TODO multidir?
