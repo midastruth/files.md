@@ -1,23 +1,4 @@
 (function (mod) {
-  if (typeof exports == "object" && typeof module == "object") // CommonJS
-    mod(
-        exports,
-        require('codemirror'),
-        require('hypermd/addon/fold-emoji'),
-
-        require('codemirror/addon/hint/show-hint'),
-        require('codemirror/addon/hint/show-hint.css')
-    );
-  else if (typeof define == "function" && define.amd) // AMD
-    define([
-      'exports',
-      'codemirror',
-      'hypermd/addon/fold-emoji',
-
-      'codemirror/addon/hint/show-hint',
-      'codemirror/addon/hint/show-hint.css',
-    ], mod);
-  else // Plain browser env
     mod(
         (this.CompleteEmoji = {}),
         CodeMirror,

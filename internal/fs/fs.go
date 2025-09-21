@@ -607,11 +607,3 @@ func (fs FS) SafePath(dir, filename string) (string, error) {
 
 	return filepath.Join(fs.rootPath, relativePath), nil
 }
-
-func exists(backend afero.Fs, path string) (bool, error) {
-	return afero.Exists(backend, path)
-}
-
-func readDir(backend afero.Fs, path string) ([]os.FileInfo, error) {
-	return afero.ReadDir(backend, path)
-}

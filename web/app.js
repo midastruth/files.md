@@ -1,4 +1,8 @@
-// HyperMD/Codemirror editor
+// Main application file.
+// We use HyperMD/Codemirror as an underlying text editor.
+// We read and save files using Local File System API (or in-memory FS in case of Safari).
+// We sync both text and media files with the server if there's a token key in local storage.
+
 let isInbox = false;
 let isWelcome = false;
 let debug = false;
@@ -476,8 +480,7 @@ function createAutocompleteDict() {
 
         const filename = toFilename(path);
         const key = `${filename.replace(/\.md$/, '')}`;
-        const url = path.replace(/ /g, '%20');
-        const filePath = `${filename.replace(/\.md$/, '')}](${url})`;
+        const filePath = `${key}]`;
 
         entries.push({
             key,
@@ -706,6 +709,7 @@ window.addEventListener('keydown', async (event) => {
 }, true);
 
 document.addEventListener('keydown', (event) => {
+    // TODO cursor shouldn't jump to top once we hit "esc".
     if (event.key === 'Escape') {
         if (chatContainer.style.display !== 'none') {
             const selectedMessages = inbox.querySelectorAll('.message.selected');
