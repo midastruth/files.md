@@ -2430,31 +2430,6 @@ func (b *Bot) schedule(params []string) error {
 		return fmt.Errorf("schedule: can't add to schedule: %w", err)
 	}
 
-	//err = b.moveFromChat(func(content string, timestamp time.Time) error {
-	//	scheduleTime, err := strconv.ParseInt(timeStr, 10, 64)
-	//	if err != nil {
-	//		return fmt.Errorf("schedule: can't parse timestamp: %w", err)
-	//	}
-	//
-	//	//sanitizedTitle, content, err := b.extractTitleAndContent(content, maxTitleLengthForMobile)
-	//	//if err != nil {
-	//	//	return fmt.Errorf("schedule: %w", err)
-	//	//}
-	//
-	//	//filename := fs.Filename(sanitizedTitle)
-	//	//err = b.fs.Write(fs.DirLater, filename, content)
-	//	//if err != nil {
-	//	//	return fmt.Errorf("schedule: can't write file %s: %w", filename, err)
-	//	//}
-	//	//
-	//	//err = b.cfg.AddToSchedule(filename, scheduleTime, cron)
-	//	//if err != nil {
-	//	//	return fmt.Errorf("schedule: can't add to schedule: %w", err)
-	//	//}
-	//
-	//	return nil
-	//}, false, msgIndex)
-
 	return b.ShowToday(nil)
 }
 
