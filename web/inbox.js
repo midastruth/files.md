@@ -16,18 +16,11 @@ chatInput.addEventListener('input', autoResize);
 // Initial resize to set proper height
 autoResize();
 
-async function sendMsg() {
+async function addMsg() {
     const text = chatInput.value.trim();
     if (!text) return;
 
-    log('Sending message:', text);
-    if (wasmReply !== undefined) {
-        await wasmReply(text);
-    } else {
-        log('wasmReply is not available, fallback to direct inbox writing');
-        // Sometimes chat.wasm is not loaded during poor internet connection, so we fallback to direct writing.
-        await saveToInbox(text);
-    }
+    await saveToInbox(text);
     chatInput.value = '';
     chatIsClean = false;
     await loadMessages();
@@ -233,7 +226,7 @@ function initInbox() {
     chatInput.addEventListener('keydown', async function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            await sendMsg();
+            await addMsg();
             autoResize();
         }
     });
@@ -324,7 +317,7 @@ function renderMessages() {
 
     // add own class every other message
     inbox.innerHTML = messages.map((message, i) => `
-        <div class="message ${i % 2 === 1 ? 'own' : ''}" data-index="${message.index}">
+        <div class="message ${i % 2 === 1 ? 'own' : ''}" data-text="${message.text}">
             <div class="message-content" 
                  contenteditable="true" 
                  data-index="${message.index}"
@@ -603,20 +596,25 @@ function attachEventListeners() {
     });
 
     inbox.querySelectorAll('.to-journal-btn').forEach(btn => {
-        btn.addEventListener('click', function (e) {
+        btn.addEventListener('click', async function (e) {
             e.stopPropagation();
             const selectedMessages = document.querySelectorAll('.message.selected');
-            let indices = [];
+
+            let msgs = [];
             let messagesToRemove = [];
             if (selectedMessages.length > 0) {
-                indices = Array.from(selectedMessages).map(msg => msg.dataset.index);
+                msgs = Array.from(selectedMessages).map(msg => msg.dataset.text);
                 messagesToRemove = selectedMessages;
             } else {
-                indices = [btn.dataset.index];
+                msgs = [btn.closest('.message').dataset.text];
                 messagesToRemove = [btn.closest('.message')];
             }
 
-            sendCmd('mv_to_journal', indices);
+            for (const msg of msgs) {
+                await addToJournal(msg);
+            }
+
+            // TODO only remove if previous is successful
             messagesToRemove.forEach(message => {
                 message.classList.add('removing');
                 setTimeout(() => {
@@ -859,3 +857,81 @@ chatInput.addEventListener('paste', async (e) => {
         }
     }
 });
+
+async function addToJournal(record) {
+    record = record.trim();
+
+    const journalFilename = todayJournalFilename();
+    const journalPath = `journal/${journalFilename}`;
+
+    let md = '';
+    try {
+        md = await read(journalPath);
+        md = normNewLines(md);
+        md = md.trim();
+        if (md.length !== 0) {
+            md += '\n';
+        }
+    } catch (err) {
+        // File doesn't exist, will be created
+        md = '';
+    }
+
+    const header = todayJournalHeader();
+    if (!md.includes(header)) {
+        md += header + '\n';
+    }
+
+    const now = new Date();
+    const timestamp = `\`${now.toLocaleTimeString('en-US', {
+        hour12: false,
+        hour: '2-digit',
+        minute: '2-digit'
+    })}\``;
+
+    if (hasImage(record)) {
+        // If there's an image - place timestamp under the image
+        const imgMatch = record.match(IMG_PATTERN);
+        if (imgMatch) {
+            const imgLink = imgMatch[0];
+            record = record.replace(imgLink, '').trim();
+            record = `${imgLink}\n${timestamp} ${record.trim()}\n`;
+        }
+    } else {
+        record = `${timestamp} ${record}\n`;
+    }
+
+    md += record;
+
+    await write(journalPath, md);
+}
+
+function todayJournalFilename() {
+    const now = new Date();
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    const monthIndex = parseInt(now.toLocaleDateString('en-US', { month: 'numeric', })) - 1;
+    const year = parseInt(now.toLocaleDateString('en-US', { year: 'numeric'}));
+    const month = (monthIndex + 1).toString().padStart(2, '0');
+    return `${year}.${month} ${monthNames[monthIndex]}.md`;
+}
+
+function todayJournalHeader(timezone) {
+    const now = new Date();
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    const dayNames = [
+        'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+    ];
+
+    const day = parseInt(now.toLocaleDateString('en-US', { day: 'numeric', timeZone: timezone }));
+    const monthIndex = parseInt(now.toLocaleDateString('en-US', { month: 'numeric', timeZone: timezone })) - 1;
+    const year = parseInt(now.toLocaleDateString('en-US', { year: 'numeric', timeZone: timezone }));
+    const dayIndex = new Date(now.toLocaleDateString('en-US', { timeZone: timezone })).getDay();
+
+    return `#### ${day} ${monthNames[monthIndex]} ${year}, ${dayNames[dayIndex]}`;
+}
