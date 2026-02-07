@@ -416,6 +416,12 @@ window.addEventListener('popstate', (event) => {
 });
 
 async function openDir() {
+    // Request persistent storage for site
+    if (navigator.storage && navigator.storage.persist) {
+        const isPersisted = await navigator.storage.persist();
+        console.log(`Persisted storage granted: ${isPersisted}`);
+    }
+
     let dirHandle = null;
     try {
         dirHandle = await window.showDirectoryPicker({ 'mode': 'readwrite' });
@@ -429,13 +435,6 @@ async function openDir() {
     // TODO check that permissions are given?
 
     await saveDirectoryHandle(dirHandle);
-
-
-    // Request persistent storage for site
-    if (navigator.storage && navigator.storage.persist) {
-        const isPersisted = await navigator.storage.persist();
-        console.log(`Persisted storage granted: ${isPersisted}`);
-    }
 
 
     await migrateFromOPFSToLocal();
