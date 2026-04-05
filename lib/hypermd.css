@@ -128,16 +128,17 @@
 .cm-s-hypermd-light span.cm-meta {
     color: #FF1717;
 }
+/*modified*/
 .cm-s-hypermd-light span.cm-keyword {
     line-height: 1em;
     font-weight: bold;
-    color: #7F0055;
+    color: #f60ea8;
 }
 .cm-s-hypermd-light span.cm-atom {
-    color: #219;
+    color: #988ef8;
 }
 .cm-s-hypermd-light span.cm-number {
-    color: #164;
+    color: #03e086;
 }
 .cm-s-hypermd-light span.cm-def {
     color: #00f;
