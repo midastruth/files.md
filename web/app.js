@@ -27,7 +27,7 @@ async function init() {
     if (oneTimeToken) {
         try {
             // Exchange one-time token for permanent token
-            const response = await fetch('https://api.files.md/token', {
+            const response = await fetch(`${API_HOST}/token`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
