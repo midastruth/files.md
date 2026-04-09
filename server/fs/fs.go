@@ -226,7 +226,7 @@ func (fs FS) Write(dir, filename, content string) error {
 		return fmt.Errorf("fs write to '%s/%s': %w", dir, filename, err)
 	}
 
-	addStorage(fs.rootPath, newSize-oldSize)
+	recordQuotaUsage(fs.rootPath, newSize-oldSize)
 
 	return nil
 }
@@ -261,7 +261,7 @@ func (fs FS) Del(dir, filename string) error {
 		return fmt.Errorf("fs file: can't remove '%s': %w", filePath, err)
 	}
 
-	addStorage(fs.rootPath, -fileSize)
+	recordQuotaUsage(fs.rootPath, -fileSize)
 
 	// Log deletion.
 	ctime, err := fs.Ctime(filePath, "")

@@ -342,7 +342,7 @@ func (b *Bot) handlers() map[string]func([]string) error {
 		CmdShowWatchChecklist:  b.showWatch,
 		CmdShowShopChecklist:   b.showShop,
 		CmdShowSchedule:        b.showSchedule,
-		CmdShowMoveFromToday:   b.showMoveFromToday,
+		CmdShowMoveFromToday:   b.showMoveFromTodayAndInbox,
 		CmdShowSettings:        b.showSettings,
 		CmdShowTimezone:        b.showTimezone,
 		CmdSetTimezone:         b.setTimezone,
@@ -981,25 +981,27 @@ func (b *Bot) showMoveTo(params []string) error {
 }
 
 func (b *Bot) showMoveToFromToday(params []string) error {
-	fromFilenameHash := params[0]
+	taskHash := params[0]
 
-	filename, err := b.fs.Unhash(fs.DirToday, fromFilenameHash)
+	todayMD, err := b.fs.Read(fs.DirUserRoot, fs.TodayFilename)
 	if err != nil {
-		return fmt.Errorf("move to from today: can't unhash filename %s: %w", fromFilenameHash, err)
+		return fmt.Errorf("move from today.txt: can't read today file: %w", err)
 	}
 
-	content, err := b.restoreMsg(fs.DirToday, filename)
-	if err != nil {
-		return fmt.Errorf("move to from today: can't restore msg %s: %w", filename, err)
+	todayMD, task := txt.RemoveChecklistItem(todayMD, taskHash)
+	if task == "" {
+		return fmt.Errorf("move from today.txt: task not found")
 	}
 
-	msgIndex, err := b.saveToInbox(content, b.cfg.Timezone())
+	err = b.fs.Write(fs.DirUserRoot, fs.TodayFilename, todayMD)
 	if err != nil {
-		return fmt.Errorf("move to from today: can't save to chat: %w", err)
+		return fmt.Errorf("move from today.txt: can't write today file: %w", err)
 	}
 
-	// We can't tolerate duplicates
-	_ = b.fs.Del(fs.DirToday, filename)
+	msgIndex, err := b.saveToInbox(task, b.cfg.Timezone())
+	if err != nil {
+		return fmt.Errorf("move from today.txt: can't save to inbox: %w", err)
+	}
 
 	return b.showMoveTo([]string{strconv.Itoa(msgIndex)})
 }
@@ -1378,16 +1380,46 @@ func (b *Bot) showPostpone(_ []string) error {
 	return nil
 }
 
-func (b *Bot) showMoveFromToday(_ []string) error {
-	files, err := b.fs.FilesAndDirs(fs.DirToday)
-	if err != nil {
-		return fmt.Errorf("show move from today: can't get files in '%s' dir: %w", fs.DirToday, err)
+func (b *Bot) showMoveFromTodayAndInbox(_ []string) error {
+	var kb tg.Keyboard
+
+	// Show tasks from Today.txt
+	todayMD, err := b.fs.Read(fs.DirUserRoot, fs.TodayFilename)
+	if err == nil {
+		tasks := txt.IncompleteChecklistItems(todayMD)
+		for _, task := range tasks {
+			title := strings.SplitN(task, "\n", 2)[0]
+			if len([]rune(title)) > maxHeaderLengthForMobile {
+				title = string([]rune(title)[:maxHeaderLengthForMobile]) + "…"
+			}
+			cmd := tg.NewCmd(CmdShowMoveToFromToday, []string{fs.Hash(task)})
+			kb.AddRow(tg.NewBtn("✅ "+title, cmd))
+		}
 	}
 
-	var kb tg.Keyboard
-	for _, file := range files {
-		cmd := tg.NewCmd(CmdShowMoveToFromToday, []string{fs.Hash(file.Name)})
-		kb.AddRow(tg.NewBtn(file.DisplayName, cmd))
+	// Show inbox items
+	inboxContent, err := b.fs.Read(fs.DirUserRoot, fs.InboxFilename)
+	if err == nil {
+		blocks := readBlocks(inboxContent)
+		headerRegex := regexp.MustCompile(`^#### `)
+		timestampRegex := regexp.MustCompile(`^` + "`" + `\d{2}:\d{2}` + "`" + ` `)
+		msgIndex := 0
+		for _, block := range blocks {
+			if headerRegex.MatchString(block) {
+				continue
+			}
+			preview := block
+			if timestampRegex.MatchString(preview) {
+				preview = timestampRegex.ReplaceAllString(preview, "")
+			}
+			preview = strings.SplitN(preview, "\n", 2)[0]
+			if len([]rune(preview)) > maxHeaderLengthForMobile {
+				preview = string([]rune(preview)[:maxHeaderLengthForMobile]) + "…"
+			}
+			cmd := tg.NewCmd(CmdShowMoveTo, []string{strconv.Itoa(msgIndex)})
+			kb.AddRow(tg.NewBtn("💬 "+preview, cmd))
+			msgIndex++
+		}
 	}
 
 	kb.AddRow(tg.NewRow(
@@ -1395,7 +1427,7 @@ func (b *Bot) showMoveFromToday(_ []string) error {
 		tg.NewBtn(b.tr("OK"), tg.NewCmd(CmdShowToday, []string{})),
 	))
 
-	err = b.showHTML(b.tr("🦥 Select a task to move:"), &kb)
+	err = b.showHTML(b.tr("🦥 Select an item to move:"), &kb)
 	if err != nil {
 		return fmt.Errorf("show move from today: %w", err)
 	}
