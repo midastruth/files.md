@@ -137,12 +137,9 @@
     log('Current version:', window.COMMIT_HASH);
 
     // Allow offline mode.
-    try {
-        await navigator.serviceWorker.register('offline.js?v=');
-        log('Service Worker registered');
-    } catch {
-        logError('Service Worker registration failed');
-    }
+    navigator.serviceWorker?.register('offline.js?v=')
+        .then(() => log('Service Worker registered'))
+        .catch(() => logError('Service Worker registration failed'));
 
     window.currentEditor = null;
     editor = initEditor(document.getElementById("editor-textarea"));
