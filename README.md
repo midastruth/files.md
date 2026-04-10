@@ -21,12 +21,12 @@ Maybe. But this time:
 - Works offline, Progressive Web Application
 - Local first, you own all your files
 - No telemetry or whatsoever - truly Open Source
-- Radically simple code
+- Radically simple code. Web app is just a few `.js` files
 - Portable, no build systems, just open `web/index.html` 
-- The server is just one binary
 - Out of the box synchronization
+- The server is just one binary
+- You can set up the server inside your protected network in seconds
 - Telegram Bot as an on-the-go entry point to your files
-
 
 ## Are there enough features?
 Enough to do the real work.  
@@ -34,8 +34,8 @@ Enough to do the real work.
 1) I used `files.md` to grow my knowledge about Software Development and Brain.
 2) I added new notes to the base. One idea per note.
 3) I made connections between notes. Everything should be connected, just as in our brain.
-4) I spend time travelling through notes and thinking it through.
-5) Software development and brain-related notes suddenly appeared very related.
+4) I spend time travelling through the notes and thinking it through.
+5) At some point, software development and brain-related notes suddenly appeared very related.
 6) **I got the insight**.
 7) I wrote an article about [Cognitive Load in Software Development](https://github.com/zakirullin/cognitive-load).
 
