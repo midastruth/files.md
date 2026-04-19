@@ -977,8 +977,8 @@ async function openFile(path, saveToHistory = true, el = 'editor-textarea') {
     } else if (el === 'editor2-textarea') {
         currentEditor = editor2;
     }
-    let newFileIsOpened = currentEditor.path !== undefined && currentEditor.path !== path;
-    if (newFileIsOpened) {
+    let thereIsPreviousEditorToSync = currentEditor.path !== undefined && currentEditor.path !== path;
+    if (thereIsPreviousEditorToSync) {
         log('Began syncing previous file');
         await syncCurrentEditor(true);
         log('Finished syncing previous file');
@@ -1242,12 +1242,12 @@ async function syncCurrentEditor(switchAwayEditor = false) {
 
     // Handling editor changes.
     if (contentWasModifiedLocally && currentEditor.isClean()) {
-        log('WAS MODIFIED LOCALLY, and the editor is clean', path);
+        log('Was modified locally, and the editor is clean', path);
 
         // Changes only from local system
         try {
-            isMessingWithCurrentEditor = false;
             if (!switchAwayEditor) {
+                isMessingWithCurrentEditor = false;
                 await openFile(path, false);
             }
         } catch (error) {
@@ -1256,10 +1256,11 @@ async function syncCurrentEditor(switchAwayEditor = false) {
             return;
         }
     } else if (!currentEditor.isClean()) {
+        log('Editor is not clean', path);
+
         isSaving = true;
         try {
             // const file = files[dir][filename];
-            log('Getting', path);
             const file = getMemFile(path);
             if (file && file.handle) {
                 const freshContent = getCurrentContent();
@@ -1319,19 +1320,6 @@ function hash(str) {
     }
 
     return hash;
-}
-
-function getDirs() {
-    if (files === undefined) {
-        return [];
-    }
-
-    let dirs = Object.keys(files).filter(dir => !SYSTEM_DIRS.includes(dir));
-    dirs.push('habits');
-    // replace '' with /
-    dirs = dirs.map(dir => dir === '' ? '/' : dir);
-
-    return dirs;
 }
 
 // Returns json response or null on error.
@@ -1648,7 +1636,6 @@ async function removeCurrentFile() {
 }
 
 window.addEventListener('beforeunload', function() {
-    // clearInterval(window.loader);
     clearInterval(window.saver);
 });
 

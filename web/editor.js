@@ -45,7 +45,7 @@ function initEditor(el) {
     });
     newEditor.setSize(null, '100%');
     newEditor.on('focus', function() {
-        currentEditor = newEditor;
+        currentEditor = newEditor; // FIXME possible RC here? If isMessingWithCurrentEditor is hold, this would overwrite
         currentEditor.refresh(); // Cursor & hide tokens conflict if we don't call it
         closeInboxModal();
         log('Focused to:', newEditor.path);
