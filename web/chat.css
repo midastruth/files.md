@@ -4,6 +4,7 @@
     padding: 24px;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 #chat-container {
@@ -307,23 +308,31 @@
 
 
 .empty-state {
+    position: absolute;
+    inset: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    /*color: #6b7280;*/
+}
+
+.empty-icon {
+    width: 96px;
+    height: 96px;
+    opacity: 0.35;
 }
 
 .empty-title {
-    font-size: 22px;
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-size: 26px;
+    font-weight: 500;
+    margin-bottom: 20px;
 }
 
 .empty-desc {
     font-size: 16px;
     max-width: 300px;
+    color: color-mix(in srgb, var(--col-tx-alt) 70%, transparent);
 }
 
 #chat-input {
