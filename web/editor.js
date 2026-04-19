@@ -64,6 +64,12 @@ function initEditor(el) {
             path = path.replace('../', '');
         }
 
+        // Bare domain like google.com/test — window.open treats it as a relative
+        // path without a protocol, which makes the PWA navigate to a sub-path.
+        if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$)/i.test(path) && !/\.md$/i.test(path)) {
+            return 'https://' + path;
+        }
+
         if (/^(?!http|https|\[).+\.md$/.test(path)) {
             let parts = path.split('/');
             if (parts.length === 1) {

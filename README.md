@@ -76,13 +76,13 @@ It's even better if you reuse an old, familiar pattern.
 
 For me that was chatting. It is so natural for us to share an insight with our friends through a message.  
 
-Only this time you'll write a message to the bot:
+Only this time i'll write a message to the bot:
 
 <img>
 
 And it will save our message to an `.md` file nicely.  
 
-Later you can open [app.files.md](https://app.files.md) and make some connections between new and old notes.
+Later I open [app.files.md](https://app.files.md) and make some connections between new and old notes.
 
 My friends and I have been using this approach for 5+ years.  
 
@@ -93,7 +93,8 @@ My friends and I have been using this approach for 5+ years.
 
 That's all you need to take notes.  
 
-Telegram bot: [@FilesMDBot](https://t.me/FilesMDBot) (other messengers will follow).
+Telegram bot: [@FilesMDBot](https://t.me/FilesMDBot) (other messengers will follow).  
+Or, you can use whatever is effortless for you.  
 
 ## Knowledge vs Experience
 If your goal is to:
@@ -103,7 +104,7 @@ If your goal is to:
 
 Then taking notes is perfectly fine.  
 
-However, if it is more about self-help, then collecting a lot of notes **can prevent us from actual experience.**    
+However, when it comes to self-help, collecting too many notes **can prevent us from actual experience.**  
 
 - **We don’t let new experiences emerge because we already have knowledge**
 - We think we understand, but in reality **we just know**
@@ -111,7 +112,7 @@ However, if it is more about self-help, then collecting a lot of notes **can pre
 - **At some point our knowing is so good, that we start thinking that we actually do it (or at least tried)**
 
 Do not collect techniques and advice for your future self.  
-Pure knowledge and postponed action will cause you stress.    
+Pure knowledge and postponed action will cause you stress.   
 
 When you read or listen, there is a small chance to turn an insight into experience.  
 **Do not spend your energy for just writing it down in the hope that one day you'll actually try it.**  
@@ -299,7 +300,7 @@ Read 4K randomly from SSD = 150,000 ns
 - Even though I want to store links as plain markdown links, visually I want to work with them as if they were minimal [links]. For that I decided to hide (...) part when cursor is on the line. The (...) part is only hidden for markdown-files link.
 - Brought back standart Markdown Links. I want the knowledge base to be cross-platform. It should work in GitHub.
 - Tried to move web/* stuff in the root folder for simplicity. Bad decision - there should be an explicit dir which we can use as public DOCROOT on our server.
-- Switched to [link] for links. The [link](full%20path) syntax is too overwhelming and clunky, plus we don't want to deal with path changes.
+- Switched to [link] for links. The `[link](full%20path)` syntax is too overwhelming and clunky, plus we don't want to deal with path changes.
 - Removed WASM. I had a bug when a message was removed from Inbox.txt, and was not added to a file (I pressed "move to file" button). I wasn't able to reproduce the issue, but what I found is a lot of complexity. JS -> Go (writeFile) -> Go awaiting a promise from JS -> JS Golang runtime somewhere in between -> JS (writeFile) -> Go (returning from promise) -> Sending results back to JS. And it has to be done in a separate goroutine, because both WASM and JS are running in the same thread. Also, Golang's WASM is still experimental. We have too many components and a lot of uncertainty involved. I didn't want to implement same functionality in JS back then, at the solution served for some time. Now it's time to reimplement the functionality in JS and give up all this complexity. Also, inbox.wasm is ~8MB and I wanted the application to be really small.  
 - Decided to use OPFS as an initial driver for file system. Better browsers support, less hustle for users. The app starts with OPFS driver by default, if needed, user can replace the driver with Local FileSystem API by opening a local dir. DirHandle would be saved to IndexedDB in such scenario and reused every time.
 - Root folder is now '/', not ''. All files in webapp are identified by path, not by 'dir' + 'filename', restricting to 1 level of nesting.
