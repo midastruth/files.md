@@ -262,6 +262,7 @@ const DEFAULT_FILES = {
             "| `Cmd+M` / `Ctrl+M` | Move file |\n" +
             "| `Cmd+D` / `Ctrl+D` | Delete file |\n" +
             "| `Cmd+Enter` / `Ctrl+Enter` | Open chat mode |\n" +
+            "| `Cmd+Shift+Enter` / `Ctrl+Shift+Enter` | Toggle inbox dialog |\n" +
             "| `Cmd+[` / `Ctrl+[`  | Go to previous file   |\n" +
             "| `Cmd+]` / `Ctrl+]`  | Go to next file  |\n" +
             "| `Cmd+\\` / `Ctrl+\\`  | Toggle sidebar |\n" +

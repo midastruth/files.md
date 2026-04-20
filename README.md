@@ -13,7 +13,7 @@ You can store whole your life:
 
 All in plain `.md` files, locally. LLM-friendly.
 
-You can try it out: [app.files.md](https://app.files.md).
+Try it out: [app.files.md](https://app.files.md).
 
 ## Another note-taking app?
 Maybe. But this time: 
@@ -57,7 +57,7 @@ I'll quote [I Deleted My Second Brain](https://www.joanwestenberg.com/i-deleted-
 > 
 > **Eventually, I realized I had created a new problem: deferral. The more my system grew, the more I deferred the work of thought to some future self who would sort, tag, distill, and extract the gold.**
 
-The “Second Brain” is exciting. It sounds fancy. _It is thrilling._
+The “Second Brain” is fancy. _It is thrilling._
 
 You invest a lot in structure, guru templates, AI workflows, plugins, tweaking.  
 You are very motivated to scrape the wisdom of the whole internet into your second brain.  
@@ -194,6 +194,7 @@ We're used to sending messages to friends, now we're going to send stuff to the 
 | `Cmd+M` / `Ctrl+M`         | Move file                      |
 | `Cmd+D` / `Ctrl+D`         | Delete file                    |
 | `Cmd+Enter` / `Ctrl+Enter` | Open chat mode                 |
+| `Cmd+Shift+Enter` / `Ctrl+Shift+Enter` | Toggle inbox dialog |
 | `Cmd+[` / `Ctrl+[`         | Go to previous file            |
 | `Cmd+]` / `Ctrl+]`         | Go to next file                |
 | `Cmd+\` / `Ctrl+\`         | Toggle sidebar                 |
