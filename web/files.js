@@ -1037,6 +1037,8 @@ async function openFile(path, saveToHistory = true, el = 'editor-textarea') {
         history.pushState(state, '');
     }
 
+    // New editor is initialized, even if the file is same.
+    // If we reuse an old editor - visual glitches appear.
     if (el === 'editor-textarea') {
         editor = initEditor(document.getElementById(el));
         currentEditor = editor;
