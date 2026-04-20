@@ -186,7 +186,7 @@ We're used to sending messages to friends, now we're going to send stuff to the 
 | `Cmd+Shift+Enter` / `Ctrl+Shift+Enter` | Toggle inbox dialog |
 | `Cmd+[` / `Ctrl+[`         | Go to previous file            |
 | `Cmd+]` / `Ctrl+]`         | Go to next file                |
-| `Cmd+\` / `Ctrl+\`         | Toggle sidebar                 |
+| `Cmd+~` / `Ctrl+~`         | Toggle sidebar                 |
 | `Cmd+B` / `Ctrl+B`         | Toggle **bold**                |
 | `Cmd+I` / `Ctrl+I`         | Toggle *italic*                |
 | `Cmd+Y` / `Ctrl+Y`         | Insert checkbox                |

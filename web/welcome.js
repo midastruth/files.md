@@ -265,7 +265,7 @@ const DEFAULT_FILES = {
             "| `Cmd+Shift+Enter` / `Ctrl+Shift+Enter` | Toggle inbox dialog |\n" +
             "| `Cmd+[` / `Ctrl+[`  | Go to previous file   |\n" +
             "| `Cmd+]` / `Ctrl+]`  | Go to next file  |\n" +
-            "| `Cmd+\\` / `Ctrl+\\`  | Toggle sidebar |\n" +
+            "| `Cmd+~` / `Ctrl+~` | Toggle sidebar |\n" +
             "\n" +
             "#### Text Formatting\n" +
             "\n" +

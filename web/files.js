@@ -43,7 +43,7 @@ let server = { files: {}, media: {}, timestamps: {}, mediaTimestamp: 0 }; // In-
 
 const SERVER_STORAGE_KEY = 'server'; // If scheme is migrated, I believe it's better to introduce a new key, because for now old keys aren't removed.
 const SUPPORTED_EXTENSIONS = ['md', 'txt', 'png', 'jpg', 'jpeg', 'webp', 'gif',];
-const SYSTEM_DIRS = ['media', 'archive', '_read_', '_watch_', '_shop_', 'today', 'later', 'journal', 'habits', 'triggers', 'places', 'insights'];
+const SYSTEM_DIRS = ['media', 'archive', 'today', 'later', 'journal', 'habits', 'triggers', 'insights'];
 const CONFIG_PATH = '/config.json';
 
 async function loadLocalFiles(rootDirHandle, slowMode = false) {
@@ -1657,15 +1657,3 @@ async function removeCurrentFile() {
         showRandomFile();
     }
 }
-
-window.addEventListener('beforeunload', function() {
-    clearInterval(window.saver);
-});
-
-
-// Worker to process the saving queue
-window.saver = setInterval(() => {
-    if (document.hasFocus()) {
-        syncCurrentEditor();
-    }
-}, CURRENT_FILE_SYNC_INTERVAL);

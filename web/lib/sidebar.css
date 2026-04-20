@@ -196,7 +196,7 @@
 #close-sidebar {
 	position: absolute;
 	top: 2px;
-	right: 0;
+	right: -1px;
 	opacity: 0;
 	cursor: pointer;
 	font-size: 27px;

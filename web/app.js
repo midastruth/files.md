@@ -720,11 +720,12 @@ document.addEventListener('keydown', function(event) {
         }
         return;
     }
-    // Shift+Enter to toggle sidebar
-    if (isMetaKey(event) && event.key === '\\') {
+    if (isMetaKey(event) && event.key === '~') {
+        event.preventDefault();
         toggleSidebar();
     }
-    if (isMetaKey(event) && event.key === '.') {
+    if (isMetaKey(event) && event.key === '§') {
+        event.preventDefault();
         toggleSidebar();
     }
     if (isMetaKey(event) && event.key === 'Enter') {
@@ -833,3 +834,13 @@ document.addEventListener('keydown', (e) => {
     }
 }, true);
 
+window.addEventListener('beforeunload', function() {
+    clearInterval(window.saver);
+});
+
+// Worker to process the saving queue
+window.saver = setInterval(() => {
+    if (document.hasFocus()) {
+        syncCurrentEditor();
+    }
+}, CURRENT_FILE_SYNC_INTERVAL);
