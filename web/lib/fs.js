@@ -161,6 +161,11 @@ async function renameDir(oldDirPath, newName) {
     if (newDirPath === oldDirPath) return;
 
     const filePaths = collectFilePathsInDir(oldDirPath);
+    if (filePaths.length === 0) {
+        // Empty dir: make sure the new dir exists before we drop the old one,
+        // otherwise rename silently deletes it.
+        await createDir(newDirPath);
+    }
     for (const oldFilePath of filePaths) {
         const rel = oldFilePath.slice(oldDirPath.length);
         const newFilePath = newDirPath + rel;
@@ -230,6 +235,26 @@ async function mkdirAll(path) {
             await mkdir(path)
         }
     }
+}
+
+// createDir creates an empty directory on OPFS at the given path and registers
+// it in the in-memory file tree so the sidebar picks it up.
+async function createDir(dirPath) {
+    const parts = trimPrefix(dirPath, '/').split('/').filter(Boolean);
+    if (parts.length === 0) return;
+
+    let dirHandle = await getRootDirHandle();
+    for (const seg of parts) {
+        dirHandle = await dirHandle.getDirectoryHandle(seg, { create: true });
+    }
+
+    let cur = files;
+    for (const seg of parts) {
+        const key = seg + '/';
+        if (!cur[key]) cur[key] = {};
+        cur = cur[key];
+    }
+    log(`Dir ${dirPath} created.`);
 }
 
 async function writeMediaFile(fileName, file) {

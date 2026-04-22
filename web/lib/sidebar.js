@@ -1288,23 +1288,16 @@ var TreeConfig = {
     context_menu: function (e, node) { return folderContextMenu(e, node); }
 };
 
-// folderContextMenu handles right-click on sidebar nodes. Renders a small
-// Rename/Delete menu for any directory node. Rename/Delete prompts are native
-// — they work on touch via long-press which fires the same contextmenu.
-async function folderContextMenu(e, node) {
-    const isDir = node && node.getOptions && node.getOptions().dir === true;
-    if (!isDir) return;
-
-    const dirPath = node.path;
-    if (!dirPath || dirPath === '/') return;
-    const dirName = dirPath.split('/').filter(Boolean).pop();
-
+// openContextMenu renders a small floating menu at (e.clientX, e.clientY) and
+// calls build(addItem) where addItem(label, onClick) appends a row. The menu
+// closes on outside click or Esc.
+function openContextMenu(e, build) {
     const menu = document.createElement('div');
     menu.className = 'sidebar-ctx-menu';
     menu.style.left = e.clientX + 'px';
     menu.style.top = e.clientY + 'px';
 
-    function item(label, onClick) {
+    function addItem(label, onClick) {
         const el = document.createElement('div');
         el.className = 'sidebar-ctx-menu-item';
         el.textContent = label;
@@ -1315,7 +1308,6 @@ async function folderContextMenu(e, node) {
         });
         menu.appendChild(el);
     }
-
     function close() {
         menu.remove();
         document.removeEventListener('mousedown', onOutside, true);
@@ -1324,6 +1316,92 @@ async function folderContextMenu(e, node) {
     function onOutside(ev) { if (!menu.contains(ev.target)) close(); }
     function onEsc(ev) { if (ev.key === 'Escape') close(); }
 
+    build(addItem);
+
+    document.body.appendChild(menu);
+    setTimeout(() => {
+        document.addEventListener('mousedown', onOutside, true);
+        document.addEventListener('keydown', onEsc, true);
+    });
+}
+
+// folderContextMenu handles right-click on sidebar nodes. Renders a small
+// context menu: Rename/Delete for directories, Move/Delete/Rename/New dir for
+// files. Prompts are native so this works on touch via long-press, too.
+async function folderContextMenu(e, node) {
+    const isDir = node && node.getOptions && node.getOptions().dir === true;
+    const path = node && node.path;
+    if (!path || path === '/') return;
+
+    const isFile = !isDir && !path.endsWith('/') && path !== INBOX_PATH;
+    if (!isDir && !isFile) return;
+
+    openContextMenu(e, (item) => {
+        if (isDir) {
+            buildFolderMenu(item, path);
+        } else {
+            buildFileMenu(item, path);
+        }
+    });
+}
+
+// rootContextMenu handles right-click on empty sidebar area — offers creating
+// a new file or directory at the root.
+function rootContextMenu(e) {
+    if (e.defaultPrevented) return;
+    e.preventDefault();
+    openContextMenu(e, (item) => {
+        item('New file', async () => {
+            const name = prompt('New file name:');
+            if (name === null) return;
+            const trimmed = name.trim().replace(/^\/+|\/+$/g, '');
+            if (!trimmed) return;
+            if (trimmed.includes('/')) { alert('File name cannot contain "/"'); return; }
+            const finalName = trimmed.endsWith('.md') ? trimmed : trimmed + '.md';
+            const newFilePath = '/' + finalName;
+            try {
+                await write(newFilePath, '');
+                addMemFile(newFilePath, {
+                    isFile: true,
+                    content: '',
+                    lastModified: 0,
+                    path: newFilePath,
+                    handle: await getFileHandle(newFilePath),
+                });
+                setServerFile(newFilePath, '', 0);
+                saveServerFiles();
+                await renderSidebar();
+                await openFile(newFilePath);
+            } catch (err) {
+                console.error('new file failed', err);
+                alert('Create file failed: ' + (err && err.message ? err.message : err));
+            }
+        });
+
+        item('New dir', async () => {
+            const name = prompt('New directory name:');
+            if (name === null) return;
+            const trimmed = name.trim().replace(/^\/+|\/+$/g, '');
+            if (!trimmed) return;
+            if (trimmed.includes('/')) { alert('Folder name cannot contain "/"'); return; }
+            try {
+                await createDir('/' + trimmed);
+                await renderSidebar();
+            } catch (err) {
+                console.error('new dir failed', err);
+                alert('Create dir failed: ' + (err && err.message ? err.message : err));
+            }
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const sb = document.getElementById('sidebar');
+    if (sb) sb.addEventListener('contextmenu', rootContextMenu);
+});
+
+function buildFolderMenu(item, dirPath) {
+    const dirName = dirPath.split('/').filter(Boolean).pop();
     const pathIsInsideDir = (p) => p && (p === dirPath || p.startsWith(dirPath + '/'));
 
     item('Rename', async () => {
@@ -1365,10 +1443,108 @@ async function folderContextMenu(e, node) {
             alert('Delete failed: ' + (err && err.message ? err.message : err));
         }
     });
+}
 
-    document.body.appendChild(menu);
-    setTimeout(() => {
-        document.addEventListener('mousedown', onOutside, true);
-        document.addEventListener('keydown', onEsc, true);
+function buildFileMenu(item, filePath) {
+    const fileName = filePath.split('/').filter(Boolean).pop();
+    const parentDir = filePath.substring(0, filePath.length - fileName.length - 1) || '/';
+    const isCurrent = currentEditor.path === filePath;
+
+    item('Rename', async () => {
+        const displayName = fileName.endsWith('.md') ? fileName.slice(0, -3) : fileName;
+        const newName = prompt('Rename file:', displayName);
+        if (newName === null) return;
+        const trimmed = newName.trim();
+        if (!trimmed) return;
+        if (trimmed.includes('/')) { alert('File name cannot contain "/"'); return; }
+        const finalName = fileName.endsWith('.md') && !trimmed.endsWith('.md') ? trimmed + '.md' : trimmed;
+        if (finalName === fileName) return;
+        const newPath = (parentDir === '/' ? '' : parentDir) + '/' + finalName;
+        try {
+            await moveFile(filePath, newPath);
+            if (isCurrent) currentEditor.path = newPath;
+            await renderSidebar();
+        } catch (err) {
+            console.error('rename failed', err);
+            alert('Rename failed: ' + (err && err.message ? err.message : err));
+        }
+    });
+
+    item('Move', async () => {
+        const target = prompt('Move to folder (leave empty for root):', parentDir === '/' ? '' : parentDir.replace(/^\//, ''));
+        if (target === null) return;
+        const trimmed = target.trim().replace(/^\/+|\/+$/g, '');
+        const newParent = trimmed ? '/' + trimmed : '';
+        const newPath = newParent + '/' + fileName;
+        if (newPath === filePath) return;
+        try {
+            if (isCurrent) {
+                await moveCurrentFile(trimmed);
+            } else {
+                await moveFile(filePath, newPath);
+            }
+            await renderSidebar();
+        } catch (err) {
+            console.error('move failed', err);
+            alert('Move failed: ' + (err && err.message ? err.message : err));
+        }
+    });
+
+    item('Delete', async () => {
+        if (!confirm(`Delete file "${fileName}"?`)) return;
+        try {
+            if (isCurrent && typeof removeCurrentFile === 'function') {
+                await removeCurrentFile();
+            } else {
+                await remove(filePath);
+                await renderSidebar();
+            }
+        } catch (err) {
+            console.error('delete failed', err);
+            alert('Delete failed: ' + (err && err.message ? err.message : err));
+        }
+    });
+
+    item('New file', async () => {
+        const name = prompt('New file name:');
+        if (name === null) return;
+        const trimmed = name.trim().replace(/^\/+|\/+$/g, '');
+        if (!trimmed) return;
+        if (trimmed.includes('/')) { alert('File name cannot contain "/"'); return; }
+        const finalName = trimmed.endsWith('.md') ? trimmed : trimmed + '.md';
+        const newFilePath = (parentDir === '/' ? '' : parentDir) + '/' + finalName;
+        try {
+            await write(newFilePath, '');
+            addMemFile(newFilePath, {
+                isFile: true,
+                content: '',
+                lastModified: 0,
+                path: newFilePath,
+                handle: await getFileHandle(newFilePath),
+            });
+            setServerFile(newFilePath, '', 0);
+            saveServerFiles();
+            await renderSidebar();
+            await openFile(newFilePath);
+        } catch (err) {
+            console.error('new file failed', err);
+            alert('Create file failed: ' + (err && err.message ? err.message : err));
+        }
+    });
+
+    item('New dir', async () => {
+        const name = prompt('New directory name:');
+        if (name === null) return;
+        const trimmed = name.trim().replace(/^\/+|\/+$/g, '');
+        if (!trimmed) return;
+        if (trimmed.includes('/')) { alert('Folder name cannot contain "/"'); return; }
+        const newDirPath = (parentDir === '/' ? '' : parentDir) + '/' + trimmed;
+        try {
+            await createDir(newDirPath);
+            await renderSidebar();
+        } catch (err) {
+            console.error('new dir failed', err);
+            alert('Create dir failed: ' + (err && err.message ? err.message : err));
+        }
     });
 }
