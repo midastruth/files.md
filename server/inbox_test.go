@@ -95,7 +95,7 @@ func TestSaveToChatNewFile(t *testing.T) {
 
 	bot := NewBot(-1, tg.NewFakeTG(), userFS, db.NewFakeDB(), fakeConfig())
 
-	h, err := bot.saveToInbox("Test content", time.UTC)
+	h, err := bot.appendToInbox("Test content", time.UTC)
 	r.NoError(err)
 	r.Equal(inboxBlockHash("- [ ] `01:01` Test content"), h)
 
@@ -121,7 +121,7 @@ func TestSaveToChatExistingFile(t *testing.T) {
 
 	bot := NewBot(-1, tg.NewFakeTG(), userFS, db.NewFakeDB(), fakeConfig())
 
-	h, err := bot.saveToInbox("New content", time.UTC)
+	h, err := bot.appendToInbox("New content", time.UTC)
 	r.NoError(err)
 	r.Equal(inboxBlockHash("- [ ] `01:01` New content"), h)
 
@@ -147,7 +147,7 @@ func TestSaveToChatNewDay(t *testing.T) {
 
 	bot := NewBot(-1, tg.NewFakeTG(), userFS, db.NewFakeDB(), fakeConfig())
 
-	h, err := bot.saveToInbox("Today content", time.UTC)
+	h, err := bot.appendToInbox("Today content", time.UTC)
 	r.NoError(err)
 	r.Equal(inboxBlockHash("- [ ] `01:01` Today content"), h)
 
@@ -170,7 +170,7 @@ func TestSaveToChatWithImage(t *testing.T) {
 
 	bot := NewBot(-1, tg.NewFakeTG(), userFS, db.NewFakeDB(), fakeConfig())
 
-	h, err := bot.saveToInbox("![](image.jpg) Image description", time.UTC)
+	h, err := bot.appendToInbox("![](image.jpg) Image description", time.UTC)
 	r.NoError(err)
 	r.Equal(inboxBlockHash("- [ ] `01:01` ![](image.jpg) Image description"), h)
 
@@ -196,7 +196,7 @@ func TestSaveToChatEmptyFile(t *testing.T) {
 
 	bot := NewBot(-1, tg.NewFakeTG(), userFS, db.NewFakeDB(), fakeConfig())
 
-	h, err := bot.saveToInbox("Test content", time.UTC)
+	h, err := bot.appendToInbox("Test content", time.UTC)
 	r.NoError(err)
 	r.Equal(inboxBlockHash("- [ ] `01:01` Test content"), h)
 

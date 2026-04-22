@@ -9,10 +9,13 @@ import (
 
 	"github.com/zakirullin/files.md/server/db"
 	"github.com/zakirullin/files.md/server/fs"
-	"github.com/zakirullin/files.md/server/sched"
 )
 
 var now = time.Now
+
+func beginningOfTheDay(t time.Time) time.Time {
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
+}
 
 // TODO db is necessary?
 func TodayReport(userFS *fs.FS, db any, userID int64) (string, error) {
@@ -72,7 +75,7 @@ func doneToday(userFS *fs.FS, db any, userID int64, withScheduled bool) ([]strin
 
 	var todayFiles []fs.File
 	for _, task := range files {
-		if task.Ctime > sched.BeginningOfTheDay(now()).Unix() {
+		if task.Ctime > beginningOfTheDay(now()).Unix() {
 			todayFiles = append(todayFiles, task)
 		}
 	}

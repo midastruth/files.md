@@ -31,7 +31,6 @@ import (
 	"github.com/zakirullin/files.md/server/pkg/tg"
 	"github.com/zakirullin/files.md/server/pkg/txt"
 	"github.com/zakirullin/files.md/server/plugins"
-	"github.com/zakirullin/files.md/server/sched"
 	"github.com/zakirullin/files.md/server/stats"
 	"github.com/zakirullin/files.md/server/sync"
 	"github.com/zakirullin/files.md/server/userconfig"
@@ -506,7 +505,7 @@ func (b *Bot) saveFromTextMsg(u Update) error {
 		return b.addToRepliedFile(replyMsgID, msg)
 	}
 
-	msgHash, err := b.saveToInbox(msg, b.cfg.Timezone())
+	msgHash, err := b.appendToInbox(msg, b.cfg.Timezone())
 	if err != nil {
 		return fmt.Errorf("save to chat: %w", err)
 	}
@@ -554,7 +553,7 @@ func (b *Bot) saveFromImage(u Update) error {
 		return b.addToRepliedFile(replyMsgID, content)
 	}
 
-	msgHash, err := b.saveToInbox(content, b.cfg.Timezone())
+	msgHash, err := b.appendToInbox(content, b.cfg.Timezone())
 	if err != nil {
 		return fmt.Errorf("save from image: %w", err)
 	}
@@ -981,7 +980,7 @@ func (b *Bot) showMoveToFromToday(params []string) error {
 		return fmt.Errorf("move from today.md: can't write today file: %w", err)
 	}
 
-	msgHash, err := b.saveToInbox(task, b.cfg.Timezone())
+	msgHash, err := b.appendToInbox(task, b.cfg.Timezone())
 	if err != nil {
 		return fmt.Errorf("move from today.md: can't save to inbox: %w", err)
 	}
@@ -1541,7 +1540,7 @@ func (b *Bot) showSchedule(_ []string) error {
 	if err != nil {
 		return fmt.Errorf("show schedule: %w", err)
 	}
-	schedule := sched.ScheduleReport(scheduledTasks)
+	schedule := ScheduleReport(scheduledTasks)
 	if len(schedule) == 0 {
 		schedule = i18n.Tr("You don't have any scheduled tasks! 🌴")
 	}
@@ -2295,7 +2294,7 @@ func (b *Bot) addToJournalAndContinue(params []string) error {
 	}
 
 	// Don't return - continue to save to inbox as well.
-	msgHash, err := b.saveToInbox(content, b.cfg.Timezone())
+	msgHash, err := b.appendToInbox(content, b.cfg.Timezone())
 	if err != nil {
 		return fmt.Errorf("save to inbox: %w", err)
 	}
@@ -2532,7 +2531,7 @@ func (b *Bot) schedule(params []string) error {
 }
 
 func (b *Bot) scheduleForTmrw(params []string) error {
-	return b.schedule([]string{params[0], txt.I64(sched.Tomorrow()), ""})
+	return b.schedule([]string{params[0], txt.I64(Tomorrow()), ""})
 }
 
 func (b *Bot) delAllKeyboards() {
@@ -2583,7 +2582,7 @@ func (b *Bot) showToADay(params []string) error {
 
 func (b *Bot) toADayKeyboard(filenameHash string) (*tg.Keyboard, error) {
 	newBtn := func(name, cron string) tg.Btn {
-		return tg.NewBtn(name, tg.NewCmd(CmdSchedule, []string{filenameHash, txt.I64(sched.NextExcludeToday(cron)), ""}))
+		return tg.NewBtn(name, tg.NewCmd(CmdSchedule, []string{filenameHash, txt.I64(NextExcludeToday(cron)), ""}))
 	}
 
 	kb := tg.NewKeyboard([]tg.Row{
@@ -2827,7 +2826,7 @@ func (b *Bot) showToADayRecurring(params []string) error {
 
 	newBtn := func(name, cron string) tg.Btn {
 		// We need to shorten filehash, otherwise whole payload doesn't fit telegram's restrictions (64 bytes)
-		cmd := tg.NewCmd(CmdSchedule, []string{txt.Substr(filenameHash, 0, 4), txt.I64(sched.NextExcludeToday(cron)), cron})
+		cmd := tg.NewCmd(CmdSchedule, []string{txt.Substr(filenameHash, 0, 4), txt.I64(NextExcludeToday(cron)), cron})
 		return tg.NewBtn(name, cmd)
 	}
 

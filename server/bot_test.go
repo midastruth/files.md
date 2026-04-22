@@ -17,7 +17,6 @@ import (
 	"github.com/zakirullin/files.md/server/journal"
 	"github.com/zakirullin/files.md/server/pkg/tg"
 	"github.com/zakirullin/files.md/server/pkg/txt"
-	"github.com/zakirullin/files.md/server/sched"
 	"github.com/zakirullin/files.md/server/userconfig"
 )
 
@@ -1627,11 +1626,11 @@ func TestShowSchedule(t *testing.T) {
 		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
 	}
 
-	savedSchedNow := sched.Now
+	savedSchedNow := now
 	defer func() {
-		sched.Now = savedSchedNow
+		now = savedSchedNow
 	}()
-	sched.Now = func() time.Time {
+	now = func() time.Time {
 		return time.Date(1970, 10, 1, 0, 0, 0, 0, time.UTC)
 	}
 
@@ -1995,11 +1994,11 @@ func TestAddToJournalFromShortcutRuCases(t *testing.T) {
 func TestShowForADay(t *testing.T) {
 	r := require.New(t)
 
-	savedNow := sched.Now
+	savedNow := now
 	defer func() {
-		sched.Now = savedNow
+		now = savedNow
 	}()
-	sched.Now = func() time.Time {
+	now = func() time.Time {
 		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
 	}
 
@@ -2073,11 +2072,11 @@ func TestShowForADay(t *testing.T) {
 func TestShowForADayRecurring(t *testing.T) {
 	r := require.New(t)
 
-	savedNow := sched.Now
+	savedNow := now
 	defer func() {
-		sched.Now = savedNow
+		now = savedNow
 	}()
-	sched.Now = func() time.Time {
+	now = func() time.Time {
 		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
 	}
 
@@ -4444,11 +4443,11 @@ func TestShowToday_TodayCommandModeJournal(t *testing.T) {
 func TestScheduleForTmrw(t *testing.T) {
 	r := require.New(t)
 
-	savedNow := sched.Now
+	savedNow := now
 	defer func() {
-		sched.Now = savedNow
+		now = savedNow
 	}()
-	sched.Now = func() time.Time {
+	now = func() time.Time {
 		return time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC)
 	}
 

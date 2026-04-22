@@ -45,11 +45,11 @@ func findInboxBlockByHash(content, msgHash string) (int, string, bool) {
 	return -1, "", false
 }
 
-// saveToInbox writes a new entry to Inbox.md and returns its stable hash.
-func (b *Bot) saveToInbox(content string, timezone *time.Location) (string, error) {
+// appendToInbox writes a new entry to Inbox.md and returns its stable hash.
+func (b *Bot) appendToInbox(content string, timezone *time.Location) (string, error) {
 	exists, err := b.fs.Exists(fs.DirUserRoot, fs.InboxFilename)
 	if err != nil {
-		return "", fmt.Errorf("saveToChat: %w", err)
+		return "", fmt.Errorf("appendToInbox: %w", err)
 	}
 
 	content = strings.TrimSpace(content)
@@ -58,7 +58,7 @@ func (b *Bot) saveToInbox(content string, timezone *time.Location) (string, erro
 	if exists {
 		md, err = b.fs.Read(fs.DirUserRoot, fs.InboxFilename)
 		if err != nil {
-			return "", fmt.Errorf("saveToChat: %w", err)
+			return "", fmt.Errorf("appendToInbox: %w", err)
 		}
 		md = txt.NormNewLines(md)
 		md = strings.TrimSpace(md)
@@ -80,7 +80,7 @@ func (b *Bot) saveToInbox(content string, timezone *time.Location) (string, erro
 	md += newEntry + "\n"
 
 	if err := b.fs.Write(fs.DirUserRoot, fs.InboxFilename, md); err != nil {
-		return "", fmt.Errorf("saveToChat: %w", err)
+		return "", fmt.Errorf("appendToInbox: %w", err)
 	}
 
 	return inboxBlockHash(newEntry), nil

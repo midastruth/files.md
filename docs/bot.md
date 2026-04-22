@@ -21,8 +21,8 @@ flowchart TB
         Worker[worker ticker 5s<br/>MoveDueTasks<br/>RemoveCompletedChecklistItems]
 
         UserFS[(UserFS<br/>storage/userID/*.md)]
-        DB[(per-user DB<br/>transient state)]
-        Cfg[(userconfig.json)]
+        DB[(per-user DB<br/>in-memory state)]
+        Cfg[(config.json)]
     end
 
     TG -->|long poll updates| Main
@@ -34,7 +34,6 @@ flowchart TB
     Proc --> Bot
 
     PWA <-->|POST /syncTexts, /syncText, /syncMedia| Web
-    Web -->|OnTodayUpdate callback| Bot
 
     Worker -->|due tasks| Bot
     Bot -->|read/write .md| UserFS
@@ -58,7 +57,6 @@ Everything reads and writes the same per-user filesystem tree (`UserFS`), which 
 flowchart TD
     Start([Update arrives at Bot.Reply])
     IQ{Inline query?}
-    Chan{From a channel?}
     Plug{Plugin.CanHandle?}
     ViaBot{Sent via bot?<br/>inline result}
     Cmd{extractCmd<br/>returns a command?}

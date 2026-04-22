@@ -12,11 +12,11 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/spf13/afero"
 
+	server "github.com/zakirullin/files.md/server"
 	"github.com/zakirullin/files.md/server/config"
 	"github.com/zakirullin/files.md/server/db"
 	"github.com/zakirullin/files.md/server/fs"
 	"github.com/zakirullin/files.md/server/pkg/tg"
-	"github.com/zakirullin/files.md/server/sched/worker"
 	"github.com/zakirullin/files.md/server/sync"
 	"github.com/zakirullin/files.md/server/userconfig"
 )
@@ -67,12 +67,12 @@ func main() {
 		for {
 			select {
 			case <-ticker.C:
-				err := worker.MoveDueTasks(config.ServerCfg.StorageDir, config.ServerCfg.ConfigFilename, fsBackend, telegram)
+				err := server.MoveDueTasks(config.ServerCfg.StorageDir, config.ServerCfg.ConfigFilename, fsBackend, telegram)
 				if err != nil {
 					fmt.Printf("Worker's error: %s\n", err)
 				}
 
-				err = worker.RemoveCompletedChecklistItems(config.ServerCfg.StorageDir, config.ServerCfg.ConfigFilename, fsBackend)
+				err = server.RemoveCompletedChecklistItems(config.ServerCfg.StorageDir, config.ServerCfg.ConfigFilename, fsBackend)
 				if err != nil {
 					fmt.Printf("Worker's error: %s\n", err)
 				}
