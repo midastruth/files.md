@@ -15,16 +15,6 @@ var Now = func() time.Time {
 	return time.Now()
 }
 
-type Cron struct {
-	RunAt int64
-	Cron  string
-	Cmd   string // For future use
-}
-
-func NewCron(runAt int64, cron string) Cron {
-	return Cron{runAt, cron, "move"}
-}
-
 func BeginningOfTheDay(t time.Time) time.Time {
 	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, time.UTC)
 }
@@ -76,17 +66,6 @@ func ScheduleReport(scheduledTasks []userconfig.Schedule) string {
 	}
 
 	return strings.TrimSpace(report)
-}
-
-// FilenamesAndSchedules returns filenames and schedules:
-// Filename.md => Tomorrow
-func FilenamesAndSchedules(scheduledTasks []userconfig.Schedule) map[string]string {
-	formatted := make(map[string]string)
-	for _, task := range scheduledTasks {
-		formatted[task.Filename] = formatTaskDate(task.ScheduledAt)
-	}
-
-	return formatted
 }
 
 func formatTaskDate(scheduledAt int64) string {
