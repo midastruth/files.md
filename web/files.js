@@ -39,7 +39,7 @@ let isLoadingLocalFiles = false;
 // }
 // TODO multidir rename to memFiles?
 let files = {}; // In-memory representation of local files
-let server = { files: {}, media: {}, timestamps: {}, mediaTimestamp: 0 }; // In-memory representation of server
+let server = {files: {}, media: {}, timestamps: {}, mediaTimestamp: 0}; // In-memory representation of server
 
 const SERVER_STORAGE_KEY = 'server'; // If scheme is migrated, I believe it's better to introduce a new key, because for now old keys aren't removed.
 const SUPPORTED_EXTENSIONS = ['md', 'txt', 'png', 'jpg', 'jpeg', 'webp', 'gif',];
@@ -57,6 +57,7 @@ async function loadLocalFiles(rootDirHandle, slowMode = false) {
 
     let newFiles = {};
     isLoadingLocalFiles = true;
+
     // Loads files recursively
     async function loadDir(dirHandle, path = '/', depth = 3) {
         const entries = [];
@@ -89,7 +90,7 @@ async function loadLocalFiles(rootDirHandle, slowMode = false) {
 
                 currentDir[filename + '/'] = {};
                 const dir = `${path}${filename}/`;
-                dirPromises.push({ handle: entry, path: dir, depth: depth + 1 });
+                dirPromises.push({handle: entry, path: dir, depth: depth + 1});
             } else if (entry.kind === 'file' && (isSupportedExtension || isConfig)) {
                 // Reuse existing file handle if it exists
                 let existingDir = files;
@@ -106,7 +107,7 @@ async function loadLocalFiles(rootDirHandle, slowMode = false) {
                     continue;
                 }
 
-                currentDir[filename] = { path: `${path}${filename}`, isFile: true, handle: entry };
+                currentDir[filename] = {path: `${path}${filename}`, isFile: true, handle: entry};
                 entry.getFile().then(file => {
                     currentDir[filename].lastModified = file.lastModified;
                 });
@@ -134,7 +135,7 @@ async function loadLocalFiles(rootDirHandle, slowMode = false) {
         }
 
         if (!slowMode) {
-            await Promise.all(dirPromises.map(({ handle, path, depth }) =>
+            await Promise.all(dirPromises.map(({handle, path, depth}) =>
                 loadDir(handle, path, depth)
             ));
             return;
@@ -143,7 +144,7 @@ async function loadLocalFiles(rootDirHandle, slowMode = false) {
         const batchSize = 6;
         for (let i = 0; i < dirPromises.length; i += batchSize) {
             const batch = dirPromises.slice(i, i + batchSize);
-            await Promise.all(batch.map(({ handle, path, depth }) =>
+            await Promise.all(batch.map(({handle, path, depth}) =>
                 loadDir(handle, path, depth)
             ));
             await new Promise(r => setTimeout(r, 0));
@@ -193,10 +194,11 @@ async function syncTextsWithServer() {
     let modified = [];
     let deleted = [];
     // TODO is it possible that the server has zero files? I think at least '.' is sent
-    let hasFullySyncedFilesAtLeastOnce = server['timestamps'] !== undefined && Object.keys(server['timestamps']).length > 0;;
+    let hasFullySyncedFilesAtLeastOnce = server['timestamps'] !== undefined && Object.keys(server['timestamps']).length > 0;
+    ;
     if (hasFullySyncedFilesAtLeastOnce) {
         log('SYNCED AT LEAST ONCE, collecting local files', server['timestamps']);
-        ({ modified, deleted } = await collectModifiedAndDeletedFiles());
+        ({modified, deleted} = await collectModifiedAndDeletedFiles());
     } else {
         log('NEVER SYNCED BEFORE');
     }
@@ -219,7 +221,7 @@ async function syncTextsWithServer() {
         // Write files received from the server
         let failedAtLeastOnce = false;
         for (const fileInfo of response.files) {
-            let { path, content, lastModified } = fileInfo;
+            let {path, content, lastModified} = fileInfo;
             // We get relative paths from server, and in our app we use absolute paths
             const relPath = path;
             path = joinPath('/', relPath);
@@ -461,7 +463,7 @@ async function syncMedia() {
 
         let filesProcessed = 0;
         for (const fileInfo of serverData.files) {
-            const { filename, lastModified } = fileInfo;
+            const {filename, lastModified} = fileInfo;
             log(`Downloading media file: ${filename}`);
 
             try {
@@ -545,7 +547,7 @@ async function saveMediaFile(path, blob, lastModified) {
         saveServerFiles();
 
         // Load file handle into files
-        files['media/'][filename] = { isFile: true, handle: fileHandle };
+        files['media/'][filename] = {isFile: true, handle: fileHandle};
         fileHandle.getFile().then(file => {
             files['media/'][filename].lastModified = file.lastModified;
         });
@@ -960,7 +962,7 @@ function saveServerFiles() {
 async function openFile(path, saveToHistory = true, el = 'editor-textarea') {
     // There are a few awaits during syncCurrentFile, we should not change currentEditor during that.
     while (isMessingWithCurrentEditor) {
-        log('Waiting isMessingWithCurrentEditor...');    
+        log('Waiting isMessingWithCurrentEditor...');
         await new Promise(r => setTimeout(r, 50));
     }
 
@@ -991,107 +993,108 @@ async function openFile(path, saveToHistory = true, el = 'editor-textarea') {
     // Lock the current editor during the operation, so we won't interrupt syncCurrentEditor in the middle.
     // By this time it is guaranteed to be free because we've just waited for "syncCurrentEditor".
     // We should do this before any awaits.
-    // FIXME without finally, this lock can be stalled when an error is thrown.
     isMessingWithCurrentEditor = true;
+    try {
+        if (path === INBOX_PATH) {
+            openInbox();
+            isMessingWithCurrentEditor = false;
+            return;
+        } else {
+            const codemirror = document.querySelector('.CodeMirror-wrap');
+            codemirror.style.display = 'block';
+            inbox.style.display = 'none';
+            chatInput.style.display = 'none';
+            isInbox = false;
+        }
+        // chatButton.classList.remove('hidden');
+        chatContainer.style.display = 'none';
+        closeInboxModal();
 
-    if (path === INBOX_PATH) {
-        openInbox();
+        const start = performance.now();
+
+        const isSameFile = currentEditor.path === path;
+
+        let filename = toFilename(path);
+        const header = toHeader(filename)
+        let content = '';
+        if (memFile.handle !== undefined) {
+            const file = await memFile.handle.getFile();
+            content = await file.text();
+            content = `${header}\n${content}`;
+        } else {
+            // We use welcome's files
+            content = memFile.content;
+        }
+
+        currentEditor.path = path;
+        if (saveToHistory) {
+            const state = {
+                path: path,
+                el: el,
+            };
+            history.pushState(state, '');
+        }
+
+        if (isSameFile) {
+            // Same-file reload (e.g. API sync or changes from local fs). Diff old and new content and
+            // replaceRange only the differing middle — cursor and scroll stay put
+            // naturally when the edit doesn't span them.
+            if (el === 'editor2-textarea') {
+                showEditor2();
+            }
+            currentEditor.path = path;
+            const oldContent = currentEditor.getValue();
+            if (oldContent !== content) {
+                let prefixEnd = 0;
+                const minLen = Math.min(oldContent.length, content.length);
+                while (prefixEnd < minLen && oldContent[prefixEnd] === content[prefixEnd]) {
+                    prefixEnd++;
+                }
+                let oldEnd = oldContent.length;
+                let newEnd = content.length;
+                while (oldEnd > prefixEnd && newEnd > prefixEnd
+                && oldContent[oldEnd - 1] === content[newEnd - 1]) {
+                    oldEnd--;
+                    newEnd--;
+                }
+                currentEditor.replaceRange(
+                    content.substring(prefixEnd, newEnd),
+                    currentEditor.posFromIndex(prefixEnd),
+                    currentEditor.posFromIndex(oldEnd)
+                );
+            }
+            currentEditor.markClean();
+        } else {
+            // New editors are initialized to avoid visual glitches and refresh plugins' state.
+            if (el === 'editor-textarea') {
+                editor = initEditor(document.getElementById(el));
+                currentEditor = editor;
+                hideEditor2();
+            } else if (el === 'editor2-textarea') {
+                editor2 = initEditor(document.getElementById(el));
+                currentEditor = editor2;
+                showEditor2();
+            }
+
+            currentEditor.path = path;
+            currentEditor.getDoc().setValue(content);
+            currentEditor.clearHistory();
+            currentEditor.markClean();
+            focusLastLine();
+        }
+
+        const end = performance.now();
+        log(`File ${path} opened in: ${(end - start).toFixed(3)} milliseconds, opId: ${id}`);
+
+        // Once we spent enough time in file, set viewportMargin to infinity to prevent artefacts.
+        // Artefacts can be observed during text selection (cmd+a).
+        setTimeout(() => {
+            currentEditor.setOption('viewportMargin', Infinity);
+        }, 100);
+
+    } finally {
         isMessingWithCurrentEditor = false;
-        return;
-    } else {
-        const codemirror = document.querySelector('.CodeMirror-wrap');
-        codemirror.style.display = 'block';
-        inbox.style.display = 'none';
-        chatInput.style.display = 'none';
-        isInbox = false;
     }
-    // chatButton.classList.remove('hidden');
-    chatContainer.style.display = 'none';
-    closeInboxModal();
-
-    const start = performance.now();
-
-    const isSameFile = currentEditor.path === path;
-
-    let filename = toFilename(path);
-    const header = toHeader(filename)
-    let content = '';
-    if (memFile.handle !== undefined) {
-        const file = await memFile.handle.getFile();
-        content = await file.text();
-        content = `${header}\n${content}`;
-    } else {
-        // We use welcome's files
-        content = memFile.content;
-    }
-
-    currentEditor.path = path;
-    if (saveToHistory) {
-        const state = {
-            path: path,
-            el: el,
-        };
-        history.pushState(state, '');
-    }
-
-    if (isSameFile) {
-        // Same-file reload (e.g. API sync or changes from local fs). Diff old and new content and
-        // replaceRange only the differing middle — cursor and scroll stay put
-        // naturally when the edit doesn't span them.
-        if (el === 'editor2-textarea') {
-            showEditor2();
-        }
-        currentEditor.path = path;
-        const oldContent = currentEditor.getValue();
-        if (oldContent !== content) {
-            let prefixEnd = 0;
-            const minLen = Math.min(oldContent.length, content.length);
-            while (prefixEnd < minLen && oldContent[prefixEnd] === content[prefixEnd]) {
-                prefixEnd++;
-            }
-            let oldEnd = oldContent.length;
-            let newEnd = content.length;
-            while (oldEnd > prefixEnd && newEnd > prefixEnd
-            && oldContent[oldEnd - 1] === content[newEnd - 1]) {
-                oldEnd--;
-                newEnd--;
-            }
-            currentEditor.replaceRange(
-                content.substring(prefixEnd, newEnd),
-                currentEditor.posFromIndex(prefixEnd),
-                currentEditor.posFromIndex(oldEnd)
-            );
-        }
-        currentEditor.markClean();
-    } else {
-        // New editors are initialized to avoid visual glitches and refresh plugins' state.
-        if (el === 'editor-textarea') {
-            editor = initEditor(document.getElementById(el));
-            currentEditor = editor;
-            hideEditor2();
-        } else if (el === 'editor2-textarea') {
-            editor2 = initEditor(document.getElementById(el));
-            currentEditor = editor2;
-            showEditor2();
-        }
-
-        currentEditor.path = path;
-        currentEditor.getDoc().setValue(content);
-        currentEditor.clearHistory();
-        currentEditor.markClean();
-        focusLastLine();
-    }
-
-    const end = performance.now();
-    log(`File ${path} opened in: ${(end - start).toFixed(3)} milliseconds, opId: ${id}`);
-
-    // Once we spent enough time in file, set viewportMargin to infinity to prevent artefacts.
-    // Artefacts can be observed during text selection (cmd+a).
-    setTimeout(() => {
-        currentEditor.setOption('viewportMargin', Infinity);
-    }, 100);
-
-    isMessingWithCurrentEditor = false;
 }
 
 // 0) Read content from local fs
@@ -1386,12 +1389,12 @@ async function post(endpoint, data) {
 // Return false from callback to stop walking.
 function walk(obj, callback, path = '/') {
     // Chromium's callstack limit is 11K, so we iterate.
-    const stack = [{ obj, path }];
+    const stack = [{obj, path}];
 
     const maxAllowedIterations = 100000;
     let iterations = 0;
     while (stack.length > 0) {
-        const { obj: currentObj, path: currentPath } = stack.pop();
+        const {obj: currentObj, path: currentPath} = stack.pop();
 
         // Normally that would never happen.
         // But in case of an error, a watchdog like that can prevent freezing.
@@ -1445,7 +1448,7 @@ function walk(obj, callback, path = '/') {
             if (callback(fullPath, false) === false) {
                 return;
             }
-            stack.push({ obj: item, path: fullPath });
+            stack.push({obj: item, path: fullPath});
         }
     }
 }
@@ -1470,7 +1473,7 @@ function toFilename(path) {
         return '/';
     }
 
-    const { filename } = toDirPathAndFilename(path);
+    const {filename} = toDirPathAndFilename(path);
 
     return filename;
 }
@@ -1478,7 +1481,7 @@ function toFilename(path) {
 // Dir with no slash at the end.
 // For '/' it returns '/'.
 function toDirPath(path) {
-    const { dirPath } = toDirPathAndFilename(path);
+    const {dirPath} = toDirPathAndFilename(path);
 
     return dirPath;
 }
@@ -1515,7 +1518,7 @@ function toDirPathAndFilename(path) {
 
     const filename = parts.pop();
     let dirPath = '/' + parts.join('/');
-    return { dirPath, filename };
+    return {dirPath, filename};
 }
 
 function excludeDirs(excludedDirs) {
