@@ -1,3 +1,63 @@
+// When there's no opened local dir, a temporary FS is provided.
+// Temporary FS includes welcome files, so to demonstrate the app.
+
+async function getOpfsOrInMemDirHandle() {
+    // OPFS requires a secure context (https or localhost), not available on file://
+    try {
+        const root = await navigator.storage.getDirectory();
+        const entries = [];
+        for await (const entry of root.values()) {
+            entries.push(entry);
+        }
+
+        if (entries.length === 0) {
+            async function createFiles(obj, dirHandle) {
+                for (const [name, data] of Object.entries(obj)) {
+                    if (data.isFile) {
+                        const fileHandle = await dirHandle.getFileHandle(name, { create: true });
+                        const writable = await fileHandle.createWritable();
+                        await writable.write(data.content);
+                        await writable.close();
+                    } else {
+                        const subDirHandle = await dirHandle.getDirectoryHandle(removeTrailingSlash(name), { create: true });
+                        await createFiles(data, subDirHandle);
+                    }
+                }
+            }
+            await createFiles(WELCOME_FILES, root);
+        }
+
+        return root;
+    } catch (e) {
+        console.warn('OPFS unavailable, using in-memory FS:', e.message);
+        isMemFS = true;
+        return getMemFSRoot();
+    }
+}
+
+let memFSRoot = null;
+function getMemFSRoot() {
+    if (memFSRoot) return memFSRoot;
+
+    memFSRoot = new MemDir('');
+    function populate(obj, parent) {
+        for (const [name, data] of Object.entries(obj)) {
+            if (data.isFile) {
+                const file = new MemFile(name, data.content || '');
+                file.parent = parent;
+                parent.entries[name] = file;
+            } else {
+                const dir = new MemDir(removeTrailingSlash(name));
+                parent.entries[dir.name] = dir;
+                populate(data, dir);
+            }
+        }
+    }
+    populate(WELCOME_FILES, memFSRoot);
+
+    return memFSRoot;
+}
+
 class MemFile {
     constructor(name, content = '') {
         this.kind = 'file';
@@ -72,105 +132,7 @@ class MemDir {
     }
 }
 
-let memFSRoot = null;
-function getMemFSRoot() {
-    if (memFSRoot) return memFSRoot;
-
-    memFSRoot = new MemDir('');
-    function populate(obj, parent) {
-        for (const [name, data] of Object.entries(obj)) {
-            if (data.isFile) {
-                const file = new MemFile(name, data.content || '');
-                file.parent = parent;
-                parent.entries[name] = file;
-            } else {
-                const dir = new MemDir(removeTrailingSlash(name));
-                parent.entries[dir.name] = dir;
-                populate(data, dir);
-            }
-        }
-    }
-    populate(DEFAULT_FILES, memFSRoot);
-
-    return memFSRoot;
-}
-
-async function getInMemDirHandle() {
-    // OPFS requires a secure context (https or localhost), not available on file://
-    try {
-        const root = await navigator.storage.getDirectory();
-        const entries = [];
-        for await (const entry of root.values()) {
-            entries.push(entry);
-        }
-
-        if (entries.length === 0) {
-            async function createFiles(obj, dirHandle) {
-                for (const [name, data] of Object.entries(obj)) {
-                    if (data.isFile) {
-                        const fileHandle = await dirHandle.getFileHandle(name, { create: true });
-                        const writable = await fileHandle.createWritable();
-                        await writable.write(data.content);
-                        await writable.close();
-                    } else {
-                        const subDirHandle = await dirHandle.getDirectoryHandle(removeTrailingSlash(name), { create: true });
-                        await createFiles(data, subDirHandle);
-                    }
-                }
-            }
-            await createFiles(DEFAULT_FILES, root);
-        }
-
-        return root;
-    } catch (e) {
-        console.warn('OPFS unavailable, using in-memory FS:', e.message);
-        isMemFS = true;
-        return getMemFSRoot();
-    }
-}
-
-async function getOPFSFileHandle(rootHandle, path) {
-    let dir, filename;
-    if (path.includes('/')) {
-        const parts = path.split('/');
-        filename = parts.pop();
-        dir = parts.join('/');
-    } else {
-        dir = '';
-        filename = path;
-    }
-
-    const dirs = dir.split('/');
-    for (const dirName of dirs) {
-        if (dirName) {
-            try {
-                rootHandle = await rootHandle.getDirectoryHandle(dirName);
-            } catch (error) {
-                throw error;
-            }
-        }
-    }
-
-    let fileHandle;
-    try {
-        fileHandle = await rootHandle.getFileHandle(filename);
-    } catch (error) {
-        throw error;
-    }
-
-    return fileHandle;
-}
-
-async function createDirectory(rootHandle, dirPath) {
-    const pathParts = dirPath.split('/').filter(p => p);
-
-    let currentHandle = rootHandle;
-    for (const dirName of pathParts) {
-        currentHandle = await currentHandle.getDirectoryHandle(dirName, { create: true });
-    }
-}
-
-const DEFAULT_FILES = {
+const WELCOME_FILES = {
     "brain/": {
         "We think that we understand, but in reality we just know.md": {
             "content": "Reading and rereading can easily fool us into believing that we understand a text. Rereading is especially dangerous because of the mere-exposure effect: The moment we become familiar with something, we start believing we also understand it. On top of that, we also tend to like it it more.\n\n[Brain is the most complex object in known universe](/brain/Brain%20is%20the%20most%20complex%20object%20in%20known%20universe.md)",
