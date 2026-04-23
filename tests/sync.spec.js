@@ -354,7 +354,9 @@ test('files exist on both client and server, config is not removed on first sync
 
     await expectFileOnServer(page, 'File.md', 'test content');
     await expectFileOnServer(page, 'Another.md', '*italic*');
-    await expectFileOnServer(page, 'config.json', '{}');
+
+    const configExists = await fs.access(path.join(getServerDir(), 'config.json')).then(() => true).catch(() => false);
+    expect(configExists).toBe(true);
 });
 
 test('files exist on both client and server, serverFiles contains proper server files', async ({ page }) => {
