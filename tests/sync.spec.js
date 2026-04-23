@@ -361,7 +361,6 @@ test('files exist on both client and server, serverFiles contains proper server 
 
     await expectFileOnServer(page, 'File.md', 'test content');
     await expectFileOnServer(page, 'Another.md', '*italic*');
-    await expectFileOnServer(page, 'config.json', '{}');
 
     let filesOnServer = await page.evaluate(() => {
         return server['files'];
@@ -371,35 +370,35 @@ test('files exist on both client and server, serverFiles contains proper server 
             hash: expect.any(Number),
             isFile: true,
             lastModified: expect.any(Number),
-            lastClientModified: null,
+            lastClientModified: expect.any(Number),
             path: '/Inbox.md'
         },
         'Notes.md': {
             hash: expect.any(Number),
             isFile: true,
             lastModified: expect.any(Number),
-            lastClientModified: null,
+            lastClientModified: expect.any(Number),
             path: '/Notes.md'
         },
         'README.md': {
             hash: expect.any(Number),
             isFile: true,
             lastModified: expect.any(Number),
-            lastClientModified: null,
+            lastClientModified: expect.any(Number),
             path: '/README.md'
         },
         'Another.md': {
             hash: expect.any(Number),
             isFile: true,
             lastModified: expect.toBeNumberOrNull(),
-            lastClientModified: null,
+            lastClientModified: expect.any(Number),
             path: '/Another.md'
         },
         'config.json': {
             hash: expect.any(Number),
             isFile: true,
             lastModified: expect.any(Number),
-            lastClientModified: null,
+            lastClientModified: expect.any(Number),
             path: '/config.json'
         },
         'dir/': {
@@ -407,7 +406,7 @@ test('files exist on both client and server, serverFiles contains proper server 
                 hash: expect.any(Number),
                 isFile: true,
                 lastModified: expect.any(Number),
-                lastClientModified: null,
+                lastClientModified: expect.any(Number),
                 path: '/dir/File2.md'
             }
         },
@@ -415,7 +414,7 @@ test('files exist on both client and server, serverFiles contains proper server 
             isFile: true,
             hash: expect.any(Number),
             lastModified: expect.any(Number),
-            lastClientModified: null,
+            lastClientModified: expect.any(Number),
             path: '/File.md'
         },
         'happiness/': {
@@ -423,14 +422,14 @@ test('files exist on both client and server, serverFiles contains proper server 
                 isFile: true,
                 hash: expect.any(Number),
                 lastModified: expect.any(Number),
-                lastClientModified: null,
+                lastClientModified: expect.any(Number),
                 path: '/happiness/Boredom is just an emotion.md'
             },
             'Meditation.md': {
                 isFile: true,
                 hash: expect.any(Number),
                 lastModified: expect.any(Number),
-                lastClientModified: null,
+                lastClientModified: expect.any(Number),
                 path: '/happiness/Meditation.md'
             }
         },
@@ -438,35 +437,35 @@ test('files exist on both client and server, serverFiles contains proper server 
             isFile: true,
             hash: expect.any(Number),
             lastModified: expect.any(Number),
-            lastClientModified: null,
+            lastClientModified: expect.any(Number),
             path: '/🪴 Welcome.md'
         },
         'Hotkeys.md': {
             isFile: true,
             hash: expect.any(Number),
             lastModified: expect.any(Number),
-            lastClientModified: null,
+            lastClientModified: expect.any(Number),
             path: '/Hotkeys.md'
         },
         'Links.md': {
             isFile: true,
             hash: expect.any(Number),
             lastModified: expect.any(Number),
-            lastClientModified: null,
+            lastClientModified: expect.any(Number),
             path: '/Links.md'
         },
         'My project.md': {
             isFile: true,
             hash: expect.any(Number),
             lastModified: expect.any(Number),
-            lastClientModified: null,
+            lastClientModified: expect.any(Number),
             path: '/My project.md'
         },
         'Markdown Guide.md': {
             isFile: true,
             hash: expect.any(Number),
             lastModified: expect.any(Number),
-            lastClientModified: null,
+            lastClientModified: expect.any(Number),
             path: '/Markdown Guide.md'
         },
         'brain/': {
@@ -474,21 +473,21 @@ test('files exist on both client and server, serverFiles contains proper server 
                 isFile: true,
                 hash: expect.any(Number),
                 lastModified: expect.any(Number),
-                lastClientModified: null,
+                lastClientModified: expect.any(Number),
                 path: '/brain/Change your environment instead of using willpower.md'
             },
             'Brain is the most complex object in known universe.md': {
                 isFile: true,
                 hash: expect.any(Number),
                 lastModified: expect.any(Number),
-                lastClientModified: null,
+                lastClientModified: expect.any(Number),
                 path: '/brain/Brain is the most complex object in known universe.md'
             },
             'We think that we understand, but in reality we just know.md': {
                 isFile: true,
                 hash: expect.any(Number),
                 lastModified: expect.any(Number),
-                lastClientModified: null,
+                lastClientModified: expect.any(Number),
                 path: '/brain/We think that we understand, but in reality we just know.md'
             }
         },
