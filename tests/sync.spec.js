@@ -119,30 +119,30 @@ test('sync new files from client, ignore current file in syncTexts', async ({ pa
 
     const consoleMessages = [];
     page.on('console', msg => {
-        consoleMessages.push({
-            type: msg.type(),
-            text: msg.text()
-        });
+        consoleMessages.push({ type: msg.type(), text: msg.text() });
     });
 
     await page.click('#new-file');
     await page.waitForTimeout(100);
     await page.keyboard.type('Content');
 
-    // Trigger syncTexts
-    await page.evaluate(() => {
-        window.dispatchEvent(new Event('focus'));
-    });
-
-    await page.waitForTimeout(3000);
+    // Two blurs: first primes server timestamps (syncTexts takes the
+    // "NEVER SYNCED BEFORE" path on the very first call), second is the
+    // one where the receive-side skip at files.js:229 actually fires —
+    // server echoes the current file and client should log the skip.
+    await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+    await page.waitForTimeout(1500);
+    await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+    await page.waitForTimeout(2000);
 
     await expectFileOnServer(page, 'New file.md', 'Content');
 
-    expect(consoleMessages).toContainEqual({
-        type: 'log',
-        text: 'Skip receiving current file during bath sync /New file.md'
-    });
-
+    // log() in app.js wraps messages with %c style directives, so match
+    // the substring rather than an exact text.
+    const skipped = consoleMessages.some(m =>
+        m.type === 'log' && m.text.includes('Skip receiving current file during bath sync /New file.md')
+    );
+    expect(skipped).toBe(true);
 });
 
 test('sync existing files from client', async ({ page }) => {
