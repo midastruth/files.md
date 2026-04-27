@@ -107,6 +107,7 @@ However, the first brain never actually gets smarter. _The actual job is postpon
 
 ## Self-help through reading and taking notes?
 **Harm caused at the emotional level must be healed at the emotional level.**  
+
 Not through intellectual work.  
 No amount of self-help books can heal emotional wounds.  
 What can help is psychotherapy, rescripting and chair work. Meditation.  
@@ -154,7 +155,7 @@ At the same time, chatting with friends is effortless for me. That's how the bot
 
 ## No productivity, no complexity, no stress
 The only thing that matters is your calmness.  
-**We reuse same well-familiar messaging pattern is reused for everything.**     
+**We reuse same well-familiar messaging pattern for everything.**     
 
 ## Tasks ✅
 You're in the flow.  
