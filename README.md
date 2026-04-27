@@ -76,7 +76,7 @@ We'll reuse a well familiar pattern: chatter with friends.
 Only this time, we are going to messages to the bot:  
 
 <div align="center">
-    <img src="https://github.com/zakirullin/files.md/raw/main/docs/img/bot.gif" alt="Telegram Bot" title="Telegram Bot" width="350"/>
+    <img src="https://github.com/zakirullin/files.md/raw/main/web/img/bot.gif" alt="Telegram Bot" title="Telegram Bot" width="350"/>
 </div>
 
 That's it, the `.md` note is saved in the `brain` directory.  
@@ -106,7 +106,7 @@ No amount of self-help books can heal emotional wounds.
 What can help is psychotherapy, rescripting and chair work. Meditation.  
 **Healing happens by feeling.**    
 
-## Knowledge vs Experience
+## Notes can prevent experience
 If your goal is to:
 - Do research
 - Write an article or a book
@@ -157,7 +157,7 @@ You don't hold this task in your head, it takes energy.
 You drop a message and continue being in the flow.  
 
 <div align="center">
-    <img src="https://github.com/zakirullin/files.md/raw/main/docs/img/task.png" title="Adding a task" width="350"/>
+    <img src="https://github.com/zakirullin/files.md/raw/main/web/img/task.png" title="Adding a task" width="350"/>
 </div>
 
 No energy is spent, no flow is interrupted.   
@@ -168,7 +168,7 @@ Are you feeling good about something? Send a message.
 Hover over a bubble and press "To Journal".  
 
 <div align="center">
-    <img src="https://github.com/zakirullin/files.md/raw/main/docs/img/journal.png" title="Journaling" width="450"/>
+    <img src="https://github.com/zakirullin/files.md/raw/main/web/img/journal.png" title="Journaling" width="450"/>
 </div>
 
 Or just use ` jj` or ` жж` at the end of your message.   
@@ -199,7 +199,7 @@ You can copy-paste it into `CLAUDE.md` or `AGENTS.md`, so that your AI agent wou
 ## Telegram Bot 🤖
 Use `/app` to link your bot the the web app.  
 
-<img src="https://github.com/zakirullin/files.md/raw/main/web/bot.png" alt="Telegram Bot screenshot" title="Telegram Bot"/>
+<img src="https://github.com/zakirullin/files.md/raw/main/web/img/bot.png" alt="Telegram Bot screenshot" title="Telegram Bot"/>
 
 When we are focused and distracting information comes in, we want to get rid of it as quickly as possible.  
 To do that, just send whatever is distracting you to the bot. Then choose how you want to save it - as a task, a note, or a journal entry.  

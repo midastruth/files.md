@@ -762,7 +762,7 @@ async function renderMessages() {
     if (messages.length === 0) {
         inbox.innerHTML = `
             <div class="empty-state">
-                <img class="empty-icon" src="icon.png" alt="">
+                <img class="empty-icon" src="img/icon.png" alt="">
                 <div class="empty-title">Free your head</div>
                 <div class="empty-desc">Drop whatever’s on your mind here</div>
             </div>
