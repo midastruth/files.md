@@ -90,6 +90,8 @@ func TestSaveFromLongTextMsg(t *testing.T) {
 	r.NoError(err)
 	err = userFS.CreateSystemDirs()
 	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
 
 	tgram := tg.NewFakeTG()
 
@@ -103,19 +105,19 @@ func TestSaveFromLongTextMsg(t *testing.T) {
 	err = bot.Reply(tg.NewUpd(-1, strings.Repeat("a", 34)))
 	r.NoError(err)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	tasks, err := bot.fs.FilesAndDirs("today")
+	tasks, err := bot.fs.FilesAndDirs("notes")
 	r.NoError(err)
 	r.Len(tasks, 1)
 
-	filename := fmt.Sprintf("A%s....md", strings.Repeat("a", 32))
+	filename := "A" + strings.Repeat("a", 33) + ".md"
 	r.Equal(filename, tasks[0].Name)
 
-	content, err := bot.fs.Read("today", filename)
+	content, err := bot.fs.Read("notes", filename)
 	r.NoError(err)
-	r.Equal("A"+strings.Repeat("a", 33), content)
+	r.Equal("", content)
 }
 
 // TODO today.md
@@ -165,7 +167,7 @@ func TestSaveFromLongTextMsg(t *testing.T) {
 //		},
 //		), tgram.LastSentKeyboard)
 //	}
-func TestAddMultilineTaskToToday(t *testing.T) {
+func TestAddMultilineNoteToNotes(t *testing.T) {
 	r := require.New(t)
 
 	mode := userconfig.DefaultConfig.Mode
@@ -178,6 +180,8 @@ func TestAddMultilineTaskToToday(t *testing.T) {
 	r.NoError(err)
 	err = userFS.CreateSystemDirs()
 	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
 
 	tgram := tg.NewFakeTG()
 
@@ -185,22 +189,22 @@ func TestAddMultilineTaskToToday(t *testing.T) {
 	err = bot.Reply(tg.NewUpd(-1, "New task\nContent"))
 	r.NoError(err)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	tasks, err := bot.fs.FilesAndDirs("today")
+	tasks, err := bot.fs.FilesAndDirs("notes")
 	r.NoError(err)
 
 	r.Len(tasks, 1)
 	r.Equal("New task.md", tasks[0].Name)
 	r.True(tasks[0].IsMultiline)
 
-	content, err := bot.fs.Read("today", "New task.md")
+	content, err := bot.fs.Read("notes", "New task.md")
 	r.NoError(err)
 	r.Equal("Content", content)
 }
 
-func TestAddTaskWithSpecCharsToToday(t *testing.T) {
+func TestAddNoteWithSpecCharsToNotes(t *testing.T) {
 	r := require.New(t)
 
 	mode := userconfig.DefaultConfig.Mode
@@ -212,6 +216,8 @@ func TestAddTaskWithSpecCharsToToday(t *testing.T) {
 	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
 	r.NoError(err)
 	userFS.CreateSystemDirs()
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
 
 	tgram := tg.NewFakeTG()
 
@@ -219,22 +225,22 @@ func TestAddTaskWithSpecCharsToToday(t *testing.T) {
 	err = bot.Reply(tg.NewUpd(-1, "New task\nUrl! https://g.com (Also_text] ##header\n-item1\n-item2\n1+1=2"))
 	r.NoError(err)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	tasks, err := bot.fs.FilesAndDirs("today")
+	tasks, err := bot.fs.FilesAndDirs("notes")
 	r.NoError(err)
 
 	r.Len(tasks, 1)
 	r.Equal("New task.md", tasks[0].Name)
 	r.True(tasks[0].IsMultiline)
 
-	content, err := bot.fs.Read("today", "New task.md")
+	content, err := bot.fs.Read("notes", "New task.md")
 	r.NoError(err)
 	r.Equal("Url! https://g.com (Also_text] ##header\n-item1\n-item2\n1+1=2", content)
 }
 
-func TestAddTaskWithOnlyWhitespace(t *testing.T) {
+func TestAddNoteWithOnlyWhitespace(t *testing.T) {
 	// Test adding a task that contains only whitespace characters
 	r := require.New(t)
 
@@ -248,23 +254,25 @@ func TestAddTaskWithOnlyWhitespace(t *testing.T) {
 	r.NoError(err)
 	err = userFS.CreateSystemDirs()
 	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
 
 	tgram := tg.NewFakeTG()
 
 	bot := NewBot(-1, tgram, userFS, db.NewFakeDB(), fakeConfig())
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
 	err = bot.Reply(tg.NewUpd(-1, "   \t\n"))
 	r.EqualError(err, "save: empty message")
 
-	tasks, err := bot.fs.FilesAndDirs("today")
+	tasks, err := bot.fs.FilesAndDirs("notes")
 	r.NoError(err)
 	r.Len(tasks, 0)
 }
 
-func TestAddTaskWithLeadingAndTrailingSpaces(t *testing.T) {
+func TestAddNoteWithLeadingAndTrailingSpaces(t *testing.T) {
 	// Test adding a task with leading and trailing spaces in the name
 	r := require.New(t)
 
@@ -277,6 +285,8 @@ func TestAddTaskWithLeadingAndTrailingSpaces(t *testing.T) {
 	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
 	r.NoError(err)
 	userFS.CreateSystemDirs()
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
 
 	tgram := tg.NewFakeTG()
 
@@ -285,10 +295,10 @@ func TestAddTaskWithLeadingAndTrailingSpaces(t *testing.T) {
 	err = bot.Reply(tg.NewUpd(-1, "   Task with spaces   "))
 	r.NoError(err)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	tasks, err := bot.fs.FilesAndDirs("today")
+	tasks, err := bot.fs.FilesAndDirs("notes")
 	r.NoError(err)
 	r.Len(tasks, 1)
 	r.Equal("Task with spaces.md", tasks[0].Name)
@@ -332,6 +342,8 @@ func TestSaveFromTextMsgWithUnicodeCharacters(t *testing.T) {
 	r.NoError(err)
 	err = userFS.CreateSystemDirs()
 	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
 
 	tgram := tg.NewFakeTG()
 
@@ -340,10 +352,10 @@ func TestSaveFromTextMsgWithUnicodeCharacters(t *testing.T) {
 	err = bot.Reply(tg.NewUpd(-1, unicodeText))
 	r.NoError(err)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	tasks, err := bot.fs.FilesAndDirs("today")
+	tasks, err := bot.fs.FilesAndDirs("notes")
 	r.NoError(err)
 	r.Len(tasks, 1)
 	r.Equal("测试含有Unicode字符的文本🚀🌟.md", tasks[0].Name)
@@ -432,6 +444,8 @@ func TestSaveFromPhotoWithCaption(t *testing.T) {
 	r.NoError(err)
 	err = userFS.CreateSystemDirs()
 	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
 
 	tgram := tg.NewFakeTG()
 
@@ -446,16 +460,16 @@ func TestSaveFromPhotoWithCaption(t *testing.T) {
 	r.NoError(err)
 	r.Equal("#### 11 August, Sunday\n- [ ] `09:54` ![](media/tg_PHOTO_ID)\nCaption\n", content)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	files, err := bot.fs.FilesAndDirs("today")
+	files, err := bot.fs.FilesAndDirs("notes")
 	r.NoError(err)
 	r.Len(files, 1)
 	r.Equal("Caption.md", files[0].Name)
 	r.True(files[0].IsMultiline)
 
-	content, err = bot.fs.Read("today", "Caption.md")
+	content, err = bot.fs.Read("notes", "Caption.md")
 	r.NoError(err)
 	r.Equal("![](media/tg_PHOTO_ID)\nCaption", content)
 }
@@ -475,6 +489,8 @@ func TestSaveFromPhotoWithLongCaption(t *testing.T) {
 	r.NoError(err)
 	err = userFS.CreateSystemDirs()
 	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
 
 	tgram := tg.NewFakeTG()
 
@@ -489,10 +505,10 @@ func TestSaveFromPhotoWithLongCaption(t *testing.T) {
 	r.NoError(err)
 	r.Equal("#### 11 August, Sunday\n- [ ] `09:54` ![](media/tg_PHOTO_ID)\nAaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n", content)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	content, err = bot.fs.Read("today", fmt.Sprintf("A%s....md", strings.Repeat("a", 32)))
+	content, err = bot.fs.Read("notes", "A"+strings.Repeat("a", 33)+".md")
 	r.NoError(err)
 	r.Equal(fmt.Sprintf("![](media/tg_PHOTO_ID)\nA%s", strings.Repeat("a", 33)), content)
 }
@@ -512,6 +528,8 @@ func TestSaveFromPhotoWithSanitizedCaption(t *testing.T) {
 	r.NoError(err)
 	err = userFS.CreateSystemDirs()
 	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
 
 	tgram := tg.NewFakeTG()
 
@@ -526,17 +544,17 @@ func TestSaveFromPhotoWithSanitizedCaption(t *testing.T) {
 	r.NoError(err)
 	r.Equal("#### 11 August, Sunday\n- [ ] `09:54` ![](media/tg_PHOTO_ID)\nCaption/\n", content)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	files, err := bot.fs.FilesAndDirs("today")
+	files, err := bot.fs.FilesAndDirs("notes")
 	r.NoError(err)
 
 	r.Len(files, 1)
 	r.Equal("Caption／.md", files[0].Name)
 	r.True(files[0].IsMultiline)
 
-	content, err = bot.fs.Read("today", "Caption／.md")
+	content, err = bot.fs.Read("notes", "Caption／.md")
 	r.NoError(err)
 	r.Equal("![](media/tg_PHOTO_ID)\nCaption/", content)
 }
@@ -560,7 +578,9 @@ func TestSaveFromPhotoWithoutCaption(t *testing.T) {
 
 	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
 	r.NoError(err)
-	userFS.CreateDirsIfNotExist("today")
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
+	userFS.CreateDirsIfNotExist("notes")
 
 	tgram := tg.NewFakeTG()
 
@@ -574,10 +594,10 @@ func TestSaveFromPhotoWithoutCaption(t *testing.T) {
 	r.NoError(err)
 	r.Equal("#### 11 August, Sunday\n- [ ] `09:54` ![](media/tg_PHOTO_ID)\n", content)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	files, err := bot.fs.FilesAndDirs("today")
+	files, err := bot.fs.FilesAndDirs("notes")
 	r.NoError(err)
 
 	r.Len(files, 1)
@@ -586,7 +606,7 @@ func TestSaveFromPhotoWithoutCaption(t *testing.T) {
 	r.True(files[0].IsMultiline)
 
 	// Be aware that it's not regular ꞉
-	content, err = bot.fs.Read("today", "Img 11.08.24 09꞉54.md")
+	content, err = bot.fs.Read("notes", "Img 11.08.24 09꞉54.md")
 	r.NoError(err)
 	r.Equal("![](media/tg_PHOTO_ID)", content)
 }
@@ -1363,7 +1383,7 @@ func TestShowMoveToFile(t *testing.T) {
 
 	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
 	r.NoError(err)
-	err = userFS.Write("today", "Note.md", "")
+	err = userFS.Write("notes", "Note.md", "")
 	r.NoError(err)
 	err = userFS.MakeDir("dir")
 	r.NoError(err)
@@ -1379,6 +1399,7 @@ func TestShowMoveToFile(t *testing.T) {
 		tg.NewBtn("Search", tg.NewCustomCmd("search", nil, "iq")),
 		tg.NewRow(
 			tg.NewBtn("🗂️ Dir", tg.NewCmd("mv", []string{"73600", h})),
+			tg.NewBtn("🗂️ Notes", tg.NewCmd("mv", []string{"4358b", h})),
 			tg.NewBtn("🗂 New Dir", tg.NewCmd("new_dir", []string{h})),
 		),
 	}), tgram.LastSentKeyboard)
@@ -2725,6 +2746,8 @@ func TestSaveToNewTask(t *testing.T) {
 	r.NoError(err)
 	err = userFS.CreateSystemDirs()
 	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
 
 	cfg := userconfig.NewConfig(userFS, -1, "config.json")
 	err = cfg.CreateDefaultIfNotExists()
@@ -2756,10 +2779,10 @@ func TestSaveToNewTask(t *testing.T) {
 	})
 	r.Equal(kb, tgram.LastSentKeyboard)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	content, err := userFS.Read("today", "New task.md")
+	content, err := userFS.Read("notes", "New task.md")
 	r.NoError(err)
 	r.Equal("", content)
 
@@ -3779,7 +3802,9 @@ func TestSaveFromImage_NewFile(t *testing.T) {
 	}()
 
 	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
-	userFS.CreateDirsIfNotExist("today")
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
+	userFS.CreateDirsIfNotExist("notes")
 	r.NoError(err)
 
 	tgram := tg.NewFakeTG()
@@ -3792,15 +3817,15 @@ func TestSaveFromImage_NewFile(t *testing.T) {
 	err = bot.saveFromImage(upd)
 	r.NoError(err)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	files, err := bot.fs.FilesAndDirs("today")
+	files, err := bot.fs.FilesAndDirs("notes")
 	r.NoError(err)
 	r.Len(files, 1)
 	r.Equal("New Image.md", files[0].Name)
 
-	content, err := bot.fs.Read("today", "New Image.md")
+	content, err := bot.fs.Read("notes", "New Image.md")
 	r.NoError(err)
 	r.Equal("![](media/tg_PHOTO_ID)\nNew Image", content)
 }
@@ -3815,7 +3840,9 @@ func TestSaveFromImage_LongCaption(t *testing.T) {
 	}()
 
 	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
-	userFS.CreateDirsIfNotExist("today")
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
+	userFS.CreateDirsIfNotExist("notes")
 	r.NoError(err)
 
 	tgram := tg.NewFakeTG()
@@ -3828,11 +3855,11 @@ func TestSaveFromImage_LongCaption(t *testing.T) {
 	err = bot.saveFromImage(upd)
 	r.NoError(err)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	filename := fmt.Sprintf("A%s....md", strings.Repeat("a", 32))
-	content, err := bot.fs.Read("today", filename)
+	filename := "A" + strings.Repeat("a", 33) + ".md"
+	content, err := bot.fs.Read("notes", filename)
 	r.NoError(err)
 	r.Equal(fmt.Sprintf("![](media/tg_PHOTO_ID)\nA%s", strings.Repeat("a", 33)), content)
 }
@@ -3858,6 +3885,8 @@ func TestSaveFromImage_MultilineCaption(t *testing.T) {
 	r.NoError(err)
 	err = userFS.CreateSystemDirs()
 	r.NoError(err)
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
 
 	tgram := tg.NewFakeTG()
 	bot := NewBot(-1, tgram, userFS, db.NewFakeDB(), fakeConfig())
@@ -3873,11 +3902,11 @@ func TestSaveFromImage_MultilineCaption(t *testing.T) {
 	r.NoError(err)
 	r.Equal("#### 11 August, Sunday\n- [ ] `09:54` ![](media/tg_PHOTO_ID)\nAbc\ndef\n", content)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
 	filename := fmt.Sprintf("Abc.md")
-	content, err = bot.fs.Read("today", filename)
+	content, err = bot.fs.Read("notes", filename)
 	r.NoError(err)
 	r.Equal("![](media/tg_PHOTO_ID)\nAbc\ndef", content)
 }
@@ -3937,7 +3966,9 @@ func TestSaveFromImage_EmptyCaption(t *testing.T) {
 
 	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
 	r.NoError(err)
-	userFS.CreateDirsIfNotExist("today")
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
+	userFS.CreateDirsIfNotExist("notes")
 
 	tgram := tg.NewFakeTG()
 	bot := NewBot(-1, tgram, userFS, db.NewFakeDB(), fakeConfig())
@@ -3948,15 +3979,15 @@ func TestSaveFromImage_EmptyCaption(t *testing.T) {
 	err = bot.saveFromImage(upd)
 	r.NoError(err)
 
-	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	files, err := bot.fs.FilesAndDirs("today")
+	files, err := bot.fs.FilesAndDirs("notes")
 	r.NoError(err)
 	r.Len(files, 1)
 	r.Equal("Img 01.01.70 00꞉00.md", files[0].Name)
 
-	content, err := bot.fs.Read("today", "Img 01.01.70 00꞉00.md")
+	content, err := bot.fs.Read("notes", "Img 01.01.70 00꞉00.md")
 	r.NoError(err)
 	r.Equal("![](media/tg_PHOTO_ID)", content)
 }
@@ -4265,10 +4296,12 @@ func FuzzSaveFromTextMsg(f *testing.F) {
 		memfs := afero.NewMemMapFs()
 		_ = memfs.Mkdir("/user", 0o755)
 		userFS, err := fs.NewFS("/user", memfs)
-		userFS.CreateDirsIfNotExist("today")
+		userFS.CreateDirsIfNotExist("notes")
 		r.NoError(err)
 		err = userFS.CreateSystemDirs()
 		r.NoError(err)
+	err = userFS.CreateDirsIfNotExist("notes")
+	r.NoError(err)
 
 		tgram := tg.NewFakeTG()
 
@@ -4288,10 +4321,10 @@ func FuzzSaveFromTextMsg(f *testing.F) {
 			return
 		}
 
-		err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"c5e7dfaf771", inboxMsgHash(t, userFS, 0)})))
+		err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv", []string{"4358b5009c6", inboxMsgHash(t, userFS, 0)})))
 		r.NoError(err)
 
-		tasks, err := bot.fs.FilesAndDirs("today")
+		tasks, err := bot.fs.FilesAndDirs("notes")
 		r.NoError(err)
 
 		if input == "" {
@@ -4300,16 +4333,14 @@ func FuzzSaveFromTextMsg(f *testing.F) {
 		}
 
 		r.Len(tasks, 1, "No tasks created for input %q", input)
-		filename := strings.SplitN(strings.TrimSpace(input), "\n", 2)[0]
-		filename = strings.TrimSpace(filename)
-		if utf8.RuneCountInString(filename) > 33 {
-			filename = txt.Substr(filename, 0, 33) + "..."
+		title := txt.Ucfirst(strings.TrimSpace(strings.SplitN(strings.TrimSpace(input), "\n", 2)[0]))
+		if utf8.RuneCountInString(title) > 100 {
+			title = txt.Substr(title, 0, 100) + "..."
 		}
-
-		filename = fs.Filename(fs.SanitizeFilename(filename))
+		filename := fs.SanitizeFilename(title) + ".md"
 		r.Equal(filename, tasks[0].Name)
 
-		_, err = bot.fs.Read("today", filename)
+		_, err = bot.fs.Read("notes", filename)
 		r.NoError(err)
 	})
 }

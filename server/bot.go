@@ -1878,11 +1878,7 @@ func (b *Bot) moveToDir(params []string) error {
 
 	err = b.moveFromInbox(func(content string, timestamp time.Time) error {
 		var sanitizedTitle string
-		if toDir == fs.DirToday || toDir == fs.DirLater {
-			sanitizedTitle, content, err = b.extractHeaderAndBody(content, maxHeaderLengthForMobile)
-		} else {
-			sanitizedTitle, content, err = b.extractHeaderAndBody(content, maxHeaderLength)
-		}
+		sanitizedTitle, content, err = b.extractHeaderAndBody(content, maxHeaderLength)
 		if err != nil {
 			return fmt.Errorf("move to dir from chat: can't extract title and content: %w", err)
 		}
@@ -1907,11 +1903,9 @@ func (b *Bot) moveToDir(params []string) error {
 	}
 
 	b.delAllKeyboards()
-	if toDir != fs.DirToday {
-		msg := txt.Emoji(i18n.Emoji("dir"), fmt.Sprintf(i18n.Tr("Moved to <b>%s</b>"), fs.DisplayName(toDir)))
-		// Just an informative messages
-		_, _ = b.tg.Send(b.userID, msg, nil, tg.MarkupHTML)
-	}
+	msg := txt.Emoji(i18n.Emoji("dir"), fmt.Sprintf(i18n.Tr("Moved to <b>%s</b>"), fs.DisplayName(toDir)))
+	// Just an informative messages
+	_, _ = b.tg.Send(b.userID, msg, nil, tg.MarkupHTML)
 
 	return b.ShowToday(nil)
 }
