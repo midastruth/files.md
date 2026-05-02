@@ -772,8 +772,9 @@ func TestTodayQuickMenuFilled(t *testing.T) {
 	bot, tgram, r := makeBot(t, cfg)
 	err := bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("today", nil)))
 	r.NoError(err)
-	r.Equal("🌴 You don't have any tasks!", tgram.LastSentText)
+	r.Equal("<b>1</b> left"+wideSpacer, tgram.LastSentText)
 	r.Equal(tg.NewKeyboard([]tg.Row{
+		tg.NewBtn("First task", tg.NewCmd("c_ch", []string{"832a6c2a713"})),
 		tg.NewRow(
 			tg.NewBtn("📄", tg.NewCmd("files", nil)),
 			tg.NewBtn("☑️", tg.NewCmd("checklists", nil)),
@@ -1017,13 +1018,13 @@ func TestBotTodayLabelIcons(t *testing.T) {
 	todayMD, err := b.fs.Read("", "Today.md")
 	r.NoError(err)
 	r.Nil(b.fs.Write("", "Today.md", txt.AddChecklistItem(todayMD, "Task", false)))
-	label = b.todayLabel()
+	label = b.todayLabel(1)
 	r.NotContains(label, "🌴")
 	r.Contains(label, "🍅")
 
 	// No pomodoro, but there is another task in today
 	r.Nil(b.completeChecklistItem([]string{fs.Hash(fs.TodayFilename), fs.Hash(fs.PomodoroTask)}))
-	label = b.todayLabel()
+	label = b.todayLabel(1)
 	r.NotContains(label, "🌴")
 	r.NotContains(label, "🍅")
 
@@ -1615,10 +1616,9 @@ func TestMoveFromTodayAndInbox_ToLater(t *testing.T) {
 
 	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
 	r.NoError(err)
-	r.NoError(userFS.Write(fs.DirUserRoot, fs.TodayFilename, "- [ ] Today task"))
 	r.NoError(userFS.Write(
 		fs.DirUserRoot, fs.InboxFilename,
-		"#### 29 June, Sunday\n- [ ] `09:00` Inbox body",
+		"- [ ] Today task\n#### 29 June, Sunday\n- [ ] `09:00` Inbox body",
 	))
 
 	tgram := tg.NewFakeTG()

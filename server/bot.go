@@ -1161,14 +1161,15 @@ func (b *Bot) showLaterTasks(_ []string) error {
 }
 
 // TODO improve a bit
+// msgsCount - how many messages (inbox items) were shown to a user
 func (b *Bot) todayLabel(msgsCount ...int) string {
 	var statusBar string
 
 	hasPomodoroInToday := false
 	todayMD, err := b.fs.Read(fs.DirUserRoot, fs.TodayFilename)
 	if err == nil {
-		_, isCompleted := txt.ChecklistItems(todayMD)
-		checked, exists := isCompleted[fs.PomodoroTask]
+		_, completed := txt.ChecklistItems(todayMD)
+		checked, exists := completed[fs.PomodoroTask]
 		hasPomodoroInToday = exists && !checked
 	}
 	if hasPomodoroInToday {
