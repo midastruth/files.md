@@ -4468,9 +4468,9 @@ func TestShowToday_NormalModeWithTasks(t *testing.T) {
 }
 
 // TestShowToday_InboxMixedFormat confirms ShowToday renders inbox entries in
-// both the legacy `HH:MM` format and the new `- [ ] HH:MM` task format, and
-// hides completed `- [x]` entries while keeping the on-disk index stable so
-// callback params (Complete, MoveTo, ...) still point at the right line.
+// both the timestamped `- [ ] HH:MM body` and timestamp-less `- [ ] body`
+// forms, and hides completed `- [x]` entries while keeping the on-disk index
+// stable so callback params (Complete, MoveTo, ...) still point at the right line.
 func TestShowToday_InboxMixedFormat(t *testing.T) {
 	r := require.New(t)
 
@@ -4490,11 +4490,11 @@ func TestShowToday_InboxMixedFormat(t *testing.T) {
 	r.NoError(err)
 
 	// Inbox has three entries at on-disk positions 0, 1, 2:
-	//   0: legacy format (no checkbox)        -> shown
-	//   1: new format, not done `- [ ]`       -> shown
-	//   2: new format, completed `- [x]`      -> hidden
+	//   0: no-timestamp form `- [ ] body`       -> shown
+	//   1: timestamped form `- [ ] HH:MM body`  -> shown
+	//   2: completed `- [x] HH:MM body`         -> hidden
 	inbox := "#### 1 January, Thursday\n" +
-		"`09:00` Legacy msg\n" +
+		"- [ ] Plain msg\n" +
 		"- [ ] `09:05` New msg\n" +
 		"- [x] `09:10` Done msg\n"
 	err = userFS.Write(fs.DirUserRoot, fs.InboxFilename, inbox)
@@ -4510,24 +4510,23 @@ func TestShowToday_InboxMixedFormat(t *testing.T) {
 	err = bot.ShowToday(nil)
 	r.NoError(err)
 
-	// Label: 2 tasks left (legacy + new unchecked); completed one excluded.
+	// Label: 2 tasks left (plain + timestamped unchecked); completed one excluded.
 	r.Equal("<b>2</b> left"+wideSpacer, tgram.LastSentText)
 
-	// Two rows, each with one button. Button params carry the on-disk index
-	// (0 for "Legacy msg", 1 for "New msg"). The completed entry (disk
-	// position 2) is not rendered but its slot is preserved — the next fresh
-	// entry added to the inbox would be position 3, not 2.
+	// Two rows, each with one button. The completed entry (disk position 2) is
+	// not rendered but its slot is preserved — the next fresh entry added to
+	// the inbox would be position 3, not 2.
 	r.Len(tgram.LastSentKeyboard.Btns, 2)
 
 	firstBtn, ok := tgram.LastSentKeyboard.Btns[0].(tg.Btn)
 	r.True(ok)
-	r.Equal(tg.Cmd{Name: CmdCompleteFromInbox, Params: []string{inboxBlockHash("`09:00` Legacy msg")}, Type: "cmd"}, firstBtn.Cmd)
-	r.Contains(firstBtn.Name, "Legacy msg")
+	r.Equal(tg.Cmd{Name: CmdCompleteFromInbox, Params: []string{inboxBlockHash("- [ ] Plain msg")}, Type: "cmd"}, firstBtn.Cmd)
+	r.Contains(firstBtn.Name, "Plain msg")
 
 	secondBtn, ok := tgram.LastSentKeyboard.Btns[1].(tg.Btn)
 	r.True(ok)
 	// The completed `- [x] `09:10` Done msg` entry is hidden, but the
-	// remaining new-format entry keeps its own stable hash (unchanged by
+	// remaining unchecked entry keeps its own stable hash (unchanged by
 	// completion-toggle behaviour).
 	r.Equal(tg.Cmd{Name: CmdCompleteFromInbox, Params: []string{inboxBlockHash("- [ ] `09:05` New msg")}, Type: "cmd"}, secondBtn.Cmd)
 	r.Contains(secondBtn.Name, "New msg")

@@ -333,6 +333,7 @@ Read 4K randomly from SSD = 150,000 ns
 ```
 
 ## ADRs (Architecture Decision Records)
+- Merged Inbox.md and Today.md to Today.md. Inbox name is too abstract, productivity-related and GTD-ish. I want calmness and simplicity. Today is like "the page I live in today".
 - Moved from API_HOST, APP_HOST to API_URL, APP_URL. For different environments it's better to provide more information like desired schema in configuration.
 - Inbox entries in the bot are now identified by a stable content hash (`fs.Hash` of the block with the `- [ ] `/`- [x] ` marker stripped) instead of a positional index, so a button keeps pointing at the right line even if other entries are added/removed/completed in between.
 - It was mentally taxing to see two buttons/messages "to inbox" and "to today", it was not as mentally easy just to drop a task for today. Because it went to inbox, and 1 more click needed. That one click was the reason adding new tasks became frustrating. I let go of two different flow, and now everything goes to inbox, and every item is inbox is a markdown checklist item. As a bonus, PWA app is now very handy as it shows tasks for today by default. Also, maybe "inbox" is a mentally overloaded term, and "today" sounds better. Will see.

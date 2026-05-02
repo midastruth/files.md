@@ -28,57 +28,57 @@ func TestReadMessagesOnlyHeader(t *testing.T) {
 
 func TestReadMessagesSingleRecord(t *testing.T) {
 	r := require.New(t)
-	result := readBlocks("`01:01` Simple record")
-	r.Equal([]string{"`01:01` Simple record"}, result)
+	result := readBlocks("- [ ] `01:01` Simple record")
+	r.Equal([]string{"- [ ] `01:01` Simple record"}, result)
 }
 
 func TestReadMessagesHeaderWithRecord(t *testing.T) {
 	r := require.New(t)
-	content := "#### 27 June, Friday\n`01:01` Simple record"
+	content := "#### 27 June, Friday\n- [ ] `01:01` Simple record"
 	result := readBlocks(content)
-	r.Equal([]string{"#### 27 June, Friday", "`01:01` Simple record"}, result)
+	r.Equal([]string{"#### 27 June, Friday", "- [ ] `01:01` Simple record"}, result)
 }
 
 func TestReadMessagesMultilineRecord(t *testing.T) {
 	r := require.New(t)
-	content := "#### 27 June, Friday\n`01:01` Multiline\nc\nontent"
+	content := "#### 27 June, Friday\n- [ ] `01:01` Multiline\nc\nontent"
 	result := readBlocks(content)
-	r.Equal([]string{"#### 27 June, Friday", "`01:01` Multiline\nc\nontent"}, result)
+	r.Equal([]string{"#### 27 June, Friday", "- [ ] `01:01` Multiline\nc\nontent"}, result)
 }
 
 func TestReadMessagesMultipleRecords(t *testing.T) {
 	r := require.New(t)
-	content := "#### 27 June, Friday\n`01:01` First record\n`02:02` Second record"
+	content := "#### 27 June, Friday\n- [ ] `01:01` First record\n- [ ] `02:02` Second record"
 	result := readBlocks(content)
-	r.Equal([]string{"#### 27 June, Friday", "`01:01` First record", "`02:02` Second record"}, result)
+	r.Equal([]string{"#### 27 June, Friday", "- [ ] `01:01` First record", "- [ ] `02:02` Second record"}, result)
 }
 
 func TestReadMessagesMultipleHeaders(t *testing.T) {
 	r := require.New(t)
-	content := "#### 27 June, Friday\n`01:01` First day\n#### 28 June, Saturday\n`02:02` Second day"
+	content := "#### 27 June, Friday\n- [ ] `01:01` First day\n#### 28 June, Saturday\n- [ ] `02:02` Second day"
 	result := readBlocks(content)
-	r.Equal([]string{"#### 27 June, Friday", "`01:01` First day", "#### 28 June, Saturday", "`02:02` Second day"}, result)
+	r.Equal([]string{"#### 27 June, Friday", "- [ ] `01:01` First day", "#### 28 June, Saturday", "- [ ] `02:02` Second day"}, result)
 }
 
 func TestReadMessagesWindowsLineEndings(t *testing.T) {
 	r := require.New(t)
-	content := "#### 27 June, Friday\r\n`01:01` Windows record"
+	content := "#### 27 June, Friday\r\n- [ ] `01:01` Windows record"
 	result := readBlocks(content)
-	r.Equal([]string{"#### 27 June, Friday", "`01:01` Windows record"}, result)
+	r.Equal([]string{"#### 27 June, Friday", "- [ ] `01:01` Windows record"}, result)
 }
 
 func TestReadMessagesWithEmptyLines(t *testing.T) {
 	r := require.New(t)
-	content := "#### 27 June, Friday\n\n`01:01` Record with\n\nempty lines"
+	content := "#### 27 June, Friday\n\n- [ ] `01:01` Record with\n\nempty lines"
 	result := readBlocks(content)
-	r.Equal([]string{"#### 27 June, Friday", "`01:01` Record with\n\nempty lines"}, result)
+	r.Equal([]string{"#### 27 June, Friday", "- [ ] `01:01` Record with\n\nempty lines"}, result)
 }
 
 func TestReadMessagesInvalidTimestamp(t *testing.T) {
 	r := require.New(t)
-	content := "#### 27 June, Friday\n`not timestamp` Should be continuation\n`01:01` Real record"
+	content := "#### 27 June, Friday\n`not timestamp` Should be continuation\n- [ ] `01:01` Real record"
 	result := readBlocks(content)
-	r.Equal([]string{"#### 27 June, Friday", "`not timestamp` Should be continuation", "`01:01` Real record"}, result)
+	r.Equal([]string{"#### 27 June, Friday", "`not timestamp` Should be continuation", "- [ ] `01:01` Real record"}, result)
 }
 
 func TestSaveToChatNewFile(t *testing.T) {
@@ -236,16 +236,16 @@ func TestSaveToChatEmptyFile(t *testing.T) {
 // Test normal case - properly formatted content
 func TestReadMessages_NormalCase(t *testing.T) {
 	content := `#### 1 July, Tuesday
-` + "`15:19`" + ` Пройтись на улице
+- [ ] ` + "`15:19`" + ` Пройтись на улице
 #### 2 July, Wednesday
-` + "`10:30`" + ` Почитать книгу`
+- [ ] ` + "`10:30`" + ` Почитать книгу`
 
 	result := readBlocks(content)
 	expected := []string{
 		"#### 1 July, Tuesday",
-		"`15:19` Пройтись на улице",
+		"- [ ] `15:19` Пройтись на улице",
 		"#### 2 July, Wednesday",
-		"`10:30` Почитать книгу",
+		"- [ ] `10:30` Почитать книгу",
 	}
 
 	if len(result) != len(expected) {
@@ -262,19 +262,19 @@ func TestReadMessages_NormalCase(t *testing.T) {
 // Test message without timestamp - this could be the source of the issue
 func TestReadMessages_MessageWithoutTimestamp(t *testing.T) {
 	content := `#### 1 July, Tuesday
-` + "`15:19`" + ` Пройтись на улице
+- [ ] ` + "`15:19`" + ` Пройтись на улице
 Провести звонок с Нео
 #### 2 July, Wednesday
-` + "`10:30`" + ` Почитать книгу`
+- [ ] ` + "`10:30`" + ` Почитать книгу`
 
 	result := readBlocks(content)
 
 	// The message without timestamp should be grouped with the previous timestamped message
 	expected := []string{
 		"#### 1 July, Tuesday",
-		"`15:19` Пройтись на улице\nПровести звонок с Нео",
+		"- [ ] `15:19` Пройтись на улице\nПровести звонок с Нео",
 		"#### 2 July, Wednesday",
-		"`10:30` Почитать книгу",
+		"- [ ] `10:30` Почитать книгу",
 	}
 
 	if len(result) != len(expected) {
@@ -345,18 +345,18 @@ func TestReadMessages_MessageWithoutTimestamp(t *testing.T) {
 // Test multiline message formatting
 func TestReadBlocks_MultilineMessage(t *testing.T) {
 	content := `#### 1 July, Tuesday
-` + "`15:19`" + ` Пройтись на улице
+- [ ] ` + "`15:19`" + ` Пройтись на улице
 и купить хлеб
 в магазине
 #### 2 July, Wednesday
-` + "`10:30`" + ` Почитать книгу`
+- [ ] ` + "`10:30`" + ` Почитать книгу`
 
 	result := readBlocks(content)
 	expected := []string{
 		"#### 1 July, Tuesday",
-		"`15:19` Пройтись на улице\nи купить хлеб\nв магазине",
+		"- [ ] `15:19` Пройтись на улице\nи купить хлеб\nв магазине",
 		"#### 2 July, Wednesday",
-		"`10:30` Почитать книгу",
+		"- [ ] `10:30` Почитать книгу",
 	}
 
 	if len(result) != len(expected) {
@@ -372,10 +372,10 @@ func TestReadBlocks_MultilineMessage(t *testing.T) {
 
 func TestReadBlocksHasTimestamp(t *testing.T) {
 	content := `#### 1 July, Tuesday
-` + "`15:19`" + ` Do some stuff 
+- [ ] ` + "`15:19`" + ` Do some stuff
 Arrange a call with Neo
 #### 2 July, Wednesday
-` + "`10:30`" + ` Read a book`
+- [ ] ` + "`10:30`" + ` Read a book`
 
 	messages := readBlocks(content)
 
@@ -396,7 +396,7 @@ Arrange a call with Neo
 		t.Logf("Record %d: %q", i, record)
 	}
 
-	timestampRegex := regexp.MustCompile(`^` + "`" + `\d{2}:\d{2}` + "`" + ` `)
+	timestampRegex := regexp.MustCompile(`^- \[[ xX]\] ` + "`" + `\d{2}:\d{2}` + "`" + ` `)
 	for i, record := range records {
 		hasTimestamp := timestampRegex.MatchString(record)
 		t.Logf("Record %d has timestamp: %v", i, hasTimestamp)
@@ -527,17 +527,17 @@ func TestReadMessages_OnlyHeaders(t *testing.T) {
 	}
 }
 
-func TestMoveFromChatSingleRecord(t *testing.T) {
+func TestMoveFromInboxSingleRecord(t *testing.T) {
 	r := require.New(t)
 
 	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
 	r.NoError(err)
 
 	initialContent := `#### 27 June, Thursday
-` + "`01:01`" + ` First record
-` + "`02:02`" + ` Second record
+- [ ] ` + "`01:01`" + ` First record
+- [ ] ` + "`02:02`" + ` Second record
 #### 28 June, Friday
-` + "`03:03`" + ` Third record`
+- [ ] ` + "`03:03`" + ` Third record`
 
 	err = userFS.Write(fs.DirUserRoot, fs.InboxFilename, initialContent)
 	r.NoError(err)
@@ -557,7 +557,7 @@ func TestMoveFromChatSingleRecord(t *testing.T) {
 		return nil
 	}
 
-	err = bot.moveFromInbox(callback, false, inboxBlockHash("`02:02` Second record"))
+	err = bot.moveFromInbox(callback, false, inboxBlockHash("- [ ] `02:02` Second record"))
 	r.NoError(err)
 
 	r.Len(callbackCalls, 1)
@@ -570,26 +570,26 @@ func TestMoveFromChatSingleRecord(t *testing.T) {
 	r.NoError(err)
 
 	expectedContent := `#### 27 June, Thursday
-` + "`01:01`" + ` First record
+- [ ] ` + "`01:01`" + ` First record
 #### 28 June, Friday
-` + "`03:03`" + ` Third record`
+- [ ] ` + "`03:03`" + ` Third record`
 
 	r.Equal(expectedContent, content)
 }
 
-func TestMoveFromChatMultipleRecords(t *testing.T) {
+func TestMoveFromInboxMultipleRecords(t *testing.T) {
 	r := require.New(t)
 
 	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
 	r.NoError(err)
 
 	initialContent := `#### 1 July, Monday
-` + "`10:30`" + ` Buy groceries
+- [ ] ` + "`10:30`" + ` Buy groceries
 milk, bread, eggs
-` + "`11:45`" + ` Call mom
+- [ ] ` + "`11:45`" + ` Call mom
 #### 2 July, Tuesday
-` + "`09:15`" + ` Morning workout
-` + "`14:20`" + ` Team meeting
+- [ ] ` + "`09:15`" + ` Morning workout
+- [ ] ` + "`14:20`" + ` Team meeting
 discuss project timeline
 and resource allocation`
 
@@ -612,8 +612,8 @@ and resource allocation`
 	}
 
 	err = bot.moveFromInbox(callback, false,
-		inboxBlockHash("`10:30` Buy groceries\nmilk, bread, eggs"),
-		inboxBlockHash("`09:15` Morning workout"),
+		inboxBlockHash("- [ ] `10:30` Buy groceries\nmilk, bread, eggs"),
+		inboxBlockHash("- [ ] `09:15` Morning workout"),
 	)
 	r.NoError(err)
 
@@ -631,9 +631,9 @@ and resource allocation`
 	r.NoError(err)
 
 	expectedContent := `#### 1 July, Monday
-` + "`11:45`" + ` Call mom
+- [ ] ` + "`11:45`" + ` Call mom
 #### 2 July, Tuesday
-` + "`14:20`" + ` Team meeting
+- [ ] ` + "`14:20`" + ` Team meeting
 discuss project timeline
 and resource allocation`
 
@@ -647,10 +647,10 @@ func TestMoveFromChatCollapsedSingleRecord(t *testing.T) {
 	r.NoError(err)
 
 	initialContent := `#### 27 June, Thursday
-` + "`01:01`" + ` First record
-` + "`02:02`" + ` Second record
+- [ ] ` + "`01:01`" + ` First record
+- [ ] ` + "`02:02`" + ` Second record
 #### 28 June, Friday
-` + "`03:03`" + ` Third record`
+- [ ] ` + "`03:03`" + ` Third record`
 
 	err = userFS.Write(fs.DirUserRoot, fs.InboxFilename, initialContent)
 	r.NoError(err)
@@ -670,7 +670,7 @@ func TestMoveFromChatCollapsedSingleRecord(t *testing.T) {
 		return nil
 	}
 
-	err = bot.moveFromInbox(callback, true, inboxBlockHash("`02:02` Second record"))
+	err = bot.moveFromInbox(callback, true, inboxBlockHash("- [ ] `02:02` Second record"))
 	r.NoError(err)
 
 	r.Len(callbackCalls, 1)
@@ -683,9 +683,9 @@ func TestMoveFromChatCollapsedSingleRecord(t *testing.T) {
 	r.NoError(err)
 
 	expectedContent := `#### 27 June, Thursday
-` + "`01:01`" + ` First record
+- [ ] ` + "`01:01`" + ` First record
 #### 28 June, Friday
-` + "`03:03`" + ` Third record`
+- [ ] ` + "`03:03`" + ` Third record`
 
 	r.Equal(expectedContent, content)
 }
@@ -697,12 +697,12 @@ func TestMoveFromChatCollapsedMultipleRecords(t *testing.T) {
 	r.NoError(err)
 
 	initialContent := `#### 1 July, Monday
-` + "`10:30`" + ` Buy groceries
+- [ ] ` + "`10:30`" + ` Buy groceries
 milk, bread, eggs
-` + "`11:45`" + ` Call mom
+- [ ] ` + "`11:45`" + ` Call mom
 #### 2 July, Tuesday
-` + "`09:15`" + ` Morning workout
-` + "`14:20`" + ` Team meeting
+- [ ] ` + "`09:15`" + ` Morning workout
+- [ ] ` + "`14:20`" + ` Team meeting
 discuss project timeline
 and resource allocation`
 
@@ -726,8 +726,8 @@ and resource allocation`
 	}
 
 	err = bot.moveFromInbox(callback, true,
-		inboxBlockHash("`10:30` Buy groceries\nmilk, bread, eggs"),
-		inboxBlockHash("`09:15` Morning workout"),
+		inboxBlockHash("- [ ] `10:30` Buy groceries\nmilk, bread, eggs"),
+		inboxBlockHash("- [ ] `09:15` Morning workout"),
 	)
 	r.NoError(err)
 
@@ -745,9 +745,9 @@ Morning workout`
 	r.NoError(err)
 
 	expectedContent := `#### 1 July, Monday
-` + "`11:45`" + ` Call mom
+- [ ] ` + "`11:45`" + ` Call mom
 #### 2 July, Tuesday
-` + "`14:20`" + ` Team meeting
+- [ ] ` + "`14:20`" + ` Team meeting
 discuss project timeline
 and resource allocation`
 

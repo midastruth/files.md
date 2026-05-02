@@ -121,7 +121,8 @@ async function parseMessagesFromInbox() {
     const lines = chat.split('\n');
 
     const headerRegex = /^#### /;
-    const timestampRegex = /^(?:- \[[ xX]\] )?`\d{2}:\d{2}` /;
+    // Block start: any `- [ ] ` / `- [x] ` checklist line (timestamp optional).
+    const timestampRegex = /^- \[[ xX]\] /;
 
     const blocks = [];
     let currentBlock = '';
@@ -168,21 +169,33 @@ async function parseMessagesFromInbox() {
             continue;
         }
 
-        // Check if block is a timestamped message
-        const timeMatch = block.match(/^(?:- \[([ xX])\] )?`(\d{2}:\d{2})`\s*([\s\S]*)$/);
-        if (timeMatch) {
-            const [, mark, timestamp, text] = timeMatch;
-            const done = mark === 'x' || mark === 'X';
-
-            if (text.trim()) {
-                messages.push({
-                    index: i - numblocks,
-                    done: done,
-                    text: text.trim(),
-                    timestamp: timestamp,
-                    date: currentDate || new Date().toDateString()
-                });
-            }
+        // Strip optional `- [ ]`/`- [x]` marker, then optional `HH:MM`
+        // timestamp. Lines without either are not inbox entries.
+        let rest = block;
+        let mark = '';
+        const markerMatch = rest.match(/^- \[([ xX])\] /);
+        if (markerMatch) {
+            mark = markerMatch[1];
+            rest = rest.slice(markerMatch[0].length);
+        }
+        let timestamp = '';
+        const tsMatch = rest.match(/^`(\d{2}:\d{2})` /);
+        if (tsMatch) {
+            timestamp = tsMatch[1];
+            rest = rest.slice(tsMatch[0].length);
+        }
+        if (mark === '' && timestamp === '') {
+            continue;
+        }
+        const text = rest.trim();
+        if (text) {
+            messages.push({
+                index: i - numblocks,
+                done: mark === 'x' || mark === 'X',
+                text,
+                timestamp,
+                date: currentDate || new Date().toDateString(),
+            });
         }
     }
 
@@ -205,7 +218,8 @@ async function saveMessagesToInbox(messages) {
         if (content) content += '\n';
         content += `#### ${date}\n`;
         msgs.forEach(msg => {
-            content += `- [${msg.done ? 'x' : ' '}] \`${msg.timestamp}\` ${msg.text}\n`;
+            const tsPart = msg.timestamp ? `\`${msg.timestamp}\` ` : '';
+            content += `- [${msg.done ? 'x' : ' '}] ${tsPart}${msg.text}\n`;
         });
     });
 
@@ -225,12 +239,13 @@ async function toggleInboxLine(timestamp, text, done) {
     let content = await file.text();
 
     const escapeRegex = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const re = new RegExp(
-        `^(?:- \\[[ xX]\\] )?\`${escapeRegex(timestamp)}\` ${escapeRegex(text)}\\s*$`,
-        'm'
-    );
     const marker = done ? 'x' : ' ';
-    const replacement = `- [${marker}] \`${timestamp}\` ${text}`;
+    const re = timestamp
+        ? new RegExp(`^(?:- \\[[ xX]\\] )?\`${escapeRegex(timestamp)}\` ${escapeRegex(text)}\\s*$`, 'm')
+        : new RegExp(`^- \\[[ xX]\\] ${escapeRegex(text)}\\s*$`, 'm');
+    const replacement = timestamp
+        ? `- [${marker}] \`${timestamp}\` ${text}`
+        : `- [${marker}] ${text}`;
 
     if (!re.test(content)) {
         logError('toggleInboxLine: line not found', {timestamp, text});

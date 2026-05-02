@@ -1046,9 +1046,9 @@ func (b *Bot) ShowToday(_ []string) error {
 		return fmt.Errorf("show today: can't read chat file: %w", err)
 	}
 	blocks := readBlocks(content)
-	// Match both legacy `HH:MM` and new `- [ ] HH:MM` / `- [x] HH:MM` prefixes.
-	// Capture group 1 holds the checkbox marker (empty for legacy).
-	inboxEntryRegex := regexp.MustCompile(`^(?:- \[([ xX])\] )?` + "`" + `\d{2}:\d{2}` + "`" + ` `)
+	// Inbox entry: `- [ ] body` or `- [ ] `HH:MM` body` (timestamp optional).
+	// Capture group 1 holds the checkbox marker.
+	inboxEntryRegex := regexp.MustCompile(`^- \[([ xX])\] (?:` + "`" + `\d{2}:\d{2}` + "` )?")
 	shownCount := 0
 	for _, block := range blocks {
 		m := inboxEntryRegex.FindStringSubmatch(block)
@@ -1065,7 +1065,7 @@ func (b *Bot) ShowToday(_ []string) error {
 
 		msgHash := inboxBlockHash(block)
 
-		// Strip the matched prefix (optional checkbox + timestamp + space).
+		// Strip the matched prefix (optional checkbox + optional timestamp).
 		block = strings.TrimSpace(block[len(m[0]):])
 
 		// Skip image link if any.

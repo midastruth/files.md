@@ -19,7 +19,9 @@ var (
 
 	inboxMarkerPrefix = regexp.MustCompile(`^- \[[ xX]\] `)
 	inboxHeaderRegex  = regexp.MustCompile(`^#### `)
-	inboxEntryPrefix  = regexp.MustCompile(`^(?:- \[[ xX]\] )?` + "`" + `\d{2}:\d{2}` + "`" + ` `)
+	// inboxEntryPrefix matches the prefix of an inbox entry: `- [ ] ` /
+	// `- [x] ` marker followed by an optional `HH:MM` timestamp.
+	inboxEntryPrefix = regexp.MustCompile(`^- \[[ xX]\] (?:` + "`" + `\d{2}:\d{2}` + "` )?")
 )
 
 // stripInboxEntryPrefix removes the optional `- [ ]` / `- [x] ` task marker
@@ -199,18 +201,16 @@ func (b *Bot) moveFromInbox(
 			}
 		}
 
-		// Extract time and get full content. Tolerate optional Markdown-task
-		// prefix `- [ ] ` / `- [x] ` (new inbox format); legacy entries without
-		// the prefix also match.
-		timestampRegex := regexp.MustCompile(`^(?:- \[[ xX]\] )?` + "`" + `(\d{2}:\d{2})` + "`" + ` `)
-		timeMatch := timestampRegex.FindStringSubmatch(block)
-		if len(timeMatch) < 2 {
-			return fmt.Errorf("failed to parse msg timestamp for block %d", blockIndex)
+		// Strip optional `- [ ] ` / `- [x] ` marker, then optional `HH:MM`
+		// timestamp. A plain checklist line without timestamp is treated as a
+		// 00:00 entry on the header date.
+		recordContent := inboxMarkerPrefix.ReplaceAllString(block, "")
+		timeStr := "00:00"
+		tsMatch := regexp.MustCompile("^`(\\d{2}:\\d{2})` ").FindStringSubmatch(recordContent)
+		if tsMatch != nil {
+			timeStr = tsMatch[1]
+			recordContent = recordContent[len(tsMatch[0]):]
 		}
-
-		timeStr := timeMatch[1]
-		// Remove the full matched prefix (optional checkbox + timestamp + space).
-		recordContent := block[len(timeMatch[0]):]
 
 		// Parse full timestamp from header date + time
 		dateRegex := regexp.MustCompile(`^#### (\d{1,2}) ([A-Za-z]+), [A-Za-z]+`)
@@ -279,7 +279,8 @@ func readBlocks(content string) []string {
 	lines := strings.Split(content, "\n")
 
 	headerRegex := regexp.MustCompile(`^#### `)
-	timestampRegex := regexp.MustCompile(`^(?:- \[[ xX]\] )?` + "`" + `\d{2}:\d{2}` + "`" + ` `)
+	// Block start: a `- [ ] ` / `- [x] ` checklist line (timestamp optional).
+	timestampRegex := regexp.MustCompile(`^- \[[ xX]\] `)
 
 	var blocks []string
 	var currentBlock strings.Builder
