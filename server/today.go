@@ -30,7 +30,7 @@ func stripInboxEntryPrefix(block string) string {
 	return inboxEntryPrefix.ReplaceAllString(block, "")
 }
 
-// inboxBlockHash returns a stable identifier for an inbox block. We hash only
+// todayBlockHash returns a stable identifier for an inbox block. We hash only
 // the timestamped first line (after stripping the `- [ ]`/`- [x] ` marker)
 // so the identifier survives two mutations the bot makes to a block:
 //   - completion toggle `- [ ]` ↔ `- [x]`
@@ -43,39 +43,39 @@ func stripInboxEntryPrefix(block string) string {
 // this rare in practice, and the outcome (acting on the older entry) is
 // harmless — it's still the user's own content with the same first line.
 // !!! TIME IS INCLUDED in the hash !!!
-func inboxBlockHash(block string) string {
+func todayBlockHash(block string) string {
 	stripped := inboxMarkerPrefix.ReplaceAllString(block, "")
 	firstLine := strings.SplitN(stripped, "\n", 2)[0]
 	return fs.Hash(firstLine)
 }
 
-// findInboxBlockByHash returns (blockIndex, block, true) for the first
+// findTodayBlockByHash returns (blockIndex, block, true) for the first
 // non-header block whose hash matches msgHash. Returns (-1, "", false) if no
 // match is found.
-func findInboxBlockByHash(content, msgHash string) (int, string, bool) {
+func findTodayBlockByHash(content, msgHash string) (int, string, bool) {
 	blocks := readBlocks(content)
 	for i, block := range blocks {
 		if inboxHeaderRegex.MatchString(block) {
 			continue
 		}
-		if inboxBlockHash(block) == msgHash {
+		if todayBlockHash(block) == msgHash {
 			return i, block, true
 		}
 	}
 	return -1, "", false
 }
 
-// renameInboxBlock replaces the body of the block identified by msgHash with
+// renameTodayBlock replaces the body of the block identified by msgHash with
 // newBody, preserving the `- [ ] `/`- [x] ` marker and the “ `HH:MM` “
 // timestamp. Returns the rewritten file content.
-func renameInboxBlock(content, msgHash, newBody string) (string, error) {
+func renameTodayBlock(content, msgHash, newBody string) (string, error) {
 	blocks := readBlocks(content)
 	idx := -1
 	for i, block := range blocks {
 		if inboxHeaderRegex.MatchString(block) {
 			continue
 		}
-		if inboxBlockHash(block) == msgHash {
+		if todayBlockHash(block) == msgHash {
 			idx = i
 			break
 		}
@@ -91,8 +91,8 @@ func renameInboxBlock(content, msgHash, newBody string) (string, error) {
 	return strings.Join(blocks, "\n"), nil
 }
 
-// appendToInbox writes a new entry to Inbox.md and returns its stable hash.
-func (b *Bot) appendToInbox(content string, timezone *time.Location) (string, error) {
+// appendToToday writes a new entry to Inbox.md and returns its stable hash.
+func (b *Bot) appendToToday(content string, timezone *time.Location) (string, error) {
 	exists, err := b.fs.Exists(fs.DirUserRoot, fs.TodayFilename)
 	if err != nil {
 		return "", fmt.Errorf("appendToInbox: %w", err)
@@ -129,15 +129,15 @@ func (b *Bot) appendToInbox(content string, timezone *time.Location) (string, er
 		return "", fmt.Errorf("appendToInbox: %w", err)
 	}
 
-	return inboxBlockHash(newEntry), nil
+	return todayBlockHash(newEntry), nil
 }
 
-// moveFromInbox passes the messages identified by msgHashes to the callback.
+// moveFromToday passes the messages identified by msgHashes to the callback.
 // On callback success, it removes those messages from the chat file.
-// A msgHash is the stable hash returned by inboxBlockHash; it survives the
+// A msgHash is the stable hash returned by todayBlockHash; it survives the
 // `[ ]` ↔ `[x]` completion toggle.
 // On collapse=false the callback is called once per message.
-func (b *Bot) moveFromInbox(
+func (b *Bot) moveFromToday(
 	callback func(content string, timestamp time.Time) error,
 	collapse bool,
 	msgHashes ...string,
@@ -167,7 +167,7 @@ func (b *Bot) moveFromInbox(
 			continue
 		}
 		hasAnyMsg = true
-		hashToBlockIndex[inboxBlockHash(block)] = i
+		hashToBlockIndex[todayBlockHash(block)] = i
 	}
 	if !hasAnyMsg {
 		return fmt.Errorf("no messages found")

@@ -500,7 +500,7 @@ func (b *Bot) saveFromTextMsg(u Update) error {
 		return b.addToRepliedFile(replyMsgID, msg)
 	}
 
-	msgHash, err := b.appendToInbox(msg, b.cfg.Timezone())
+	msgHash, err := b.appendToToday(msg, b.cfg.Timezone())
 	if err != nil {
 		return fmt.Errorf("save to chat: %w", err)
 	}
@@ -548,7 +548,7 @@ func (b *Bot) saveFromImage(u Update) error {
 		return b.addToRepliedFile(replyMsgID, content)
 	}
 
-	msgHash, err := b.appendToInbox(content, b.cfg.Timezone())
+	msgHash, err := b.appendToToday(content, b.cfg.Timezone())
 	if err != nil {
 		return fmt.Errorf("save from image: %w", err)
 	}
@@ -703,7 +703,7 @@ func (b *Bot) answerFileRequest(msg string) error {
 		b.db.DelInputExpectation()
 		msgHash := c.Params[0]
 
-		err := b.moveFromInbox(func(content string, timestamp time.Time) error {
+		err := b.moveFromToday(func(content string, timestamp time.Time) error {
 			if dir == fs.DirUserRoot {
 				// We have a file
 				b.db.SetRecentCommand(CmdMoveToExistingFile)
@@ -1032,7 +1032,7 @@ func (b *Bot) ShowToday(_ []string) error {
 		}
 		shownCount++
 
-		msgHash := inboxBlockHash(block)
+		msgHash := todayBlockHash(block)
 
 		// Strip the matched prefix (optional checkbox + optional timestamp).
 		block = strings.TrimSpace(block[len(m[0]):])
@@ -1300,7 +1300,7 @@ func (b *Bot) showPostpone(_ []string) error {
 			if len([]rune(preview)) > maxHeaderLengthForMobile {
 				preview = string([]rune(preview)[:maxHeaderLengthForMobile]) + "…"
 			}
-			cmd := tg.NewCmd(CmdPostpone, []string{inboxBlockHash(block)})
+			cmd := tg.NewCmd(CmdPostpone, []string{todayBlockHash(block)})
 			kb.AddRow(tg.NewBtn("💬 "+preview, cmd))
 		}
 	}
@@ -1337,7 +1337,7 @@ func (b *Bot) showMoveFromToday(_ []string) error {
 			if len([]rune(preview)) > maxHeaderLengthForMobile {
 				preview = string([]rune(preview)[:maxHeaderLengthForMobile]) + "…"
 			}
-			cmd := tg.NewCmd(CmdShowMoveTo, []string{inboxBlockHash(block)})
+			cmd := tg.NewCmd(CmdShowMoveTo, []string{todayBlockHash(block)})
 			kb.AddRow(tg.NewBtn("💬 "+preview, cmd))
 		}
 	}
@@ -1358,7 +1358,7 @@ func (b *Bot) showMoveFromToday(_ []string) error {
 func (b *Bot) postpone(params []string) error {
 	hash := params[0]
 
-	err := b.moveFromInbox(func(content string, _ time.Time) error {
+	err := b.moveFromToday(func(content string, _ time.Time) error {
 		laterMD, rerr := b.fs.Read(fs.DirUserRoot, fs.LaterFilename)
 		if rerr != nil && !errors.Is(rerr, os.ErrNotExist) {
 			return fmt.Errorf("postpone: can't read later file: %w", rerr)
@@ -1388,7 +1388,7 @@ func (b *Bot) showRename(_ []string) error {
 			if len([]rune(preview)) > maxHeaderLengthForMobile {
 				preview = string([]rune(preview)[:maxHeaderLengthForMobile]) + "…"
 			}
-			cmd := tg.NewCmd(CmdShowRenameFile, []string{fs.TodayFilename, inboxBlockHash(block)})
+			cmd := tg.NewCmd(CmdShowRenameFile, []string{fs.TodayFilename, todayBlockHash(block)})
 			kb.AddRow(tg.NewBtn("💬 "+preview, cmd))
 		}
 	}
@@ -1433,7 +1433,7 @@ func (b *Bot) rename(params []string) error {
 	}
 
 	if checklist == fs.TodayFilename {
-		md, err = renameInboxBlock(md, itemHash, newItemNameFromUserInput)
+		md, err = renameTodayBlock(md, itemHash, newItemNameFromUserInput)
 		if err != nil {
 			return fmt.Errorf("rename: %w", err)
 		}
@@ -1542,7 +1542,7 @@ func (b *Bot) showLongItemFromInbox(params []string) error {
 		return fmt.Errorf("show long item: can't read inbox file: %w", err)
 	}
 
-	_, block, ok := findInboxBlockByHash(inboxMD, msgHash)
+	_, block, ok := findTodayBlockByHash(inboxMD, msgHash)
 	if !ok {
 		return fmt.Errorf("show long item: msgHash %q not found in inbox", msgHash)
 	}
@@ -1750,7 +1750,7 @@ func (b *Bot) moveToDir(params []string) error {
 		}
 	}
 
-	err = b.moveFromInbox(func(content string, timestamp time.Time) error {
+	err = b.moveFromToday(func(content string, timestamp time.Time) error {
 		var sanitizedTitle string
 		sanitizedTitle, content, err = b.extractHeaderAndBody(content, maxHeaderLength)
 		if err != nil {
@@ -1835,7 +1835,7 @@ func (b *Bot) addToChecklist(checklistHash string, msgHash string) (string, erro
 	}
 
 	var item string
-	err = b.moveFromInbox(func(content string, timestamp time.Time) error {
+	err = b.moveFromToday(func(content string, timestamp time.Time) error {
 		item = content
 		md := txt.AddChecklistItem(checklistMD, content, false)
 		return b.fs.Write(fs.DirUserRoot, checklist, md)
@@ -1932,7 +1932,7 @@ func (b *Bot) moveToExistingFile(params []string) error {
 		return fmt.Errorf("move to file: can't unhash existing file '%s': %w", existingFilenameHash, err)
 	}
 
-	err = b.moveFromInbox(func(content string, timestamp time.Time) error {
+	err = b.moveFromToday(func(content string, timestamp time.Time) error {
 		return b.addToFile(fs.DirUserRoot, existingFilename, content)
 	}, true, msgHashes...)
 	if err != nil {
@@ -1972,7 +1972,7 @@ func (b *Bot) moveToExistingNote(params []string) error {
 		return fmt.Errorf("move to existing note:: %w", err)
 	}
 
-	err = b.moveFromInbox(func(content string, t time.Time) error {
+	err = b.moveFromToday(func(content string, t time.Time) error {
 		err = b.addToFile(toDir, toFilename, content)
 		if err != nil {
 			return fmt.Errorf("move to existing note: can't add to file %s: %w", toFilename, err)
@@ -2004,7 +2004,7 @@ func (b *Bot) moveToDirChecklist(params []string) error {
 		return fmt.Errorf("move to checklistDir: %w", err)
 	}
 
-	err = b.moveFromInbox(func(content string, t time.Time) error {
+	err = b.moveFromToday(func(content string, t time.Time) error {
 		isMultiline := txt.IsMultiline(content)
 
 		if isMultiline && b.cfg.ShouldSplitChecklist(checklistDir) {
@@ -2067,7 +2067,7 @@ func (b *Bot) moveToNewFile(params []string) error {
 	//if err != nil {
 	//	return fmt.Errorf("move to new file: can't read file '%s': %w", filename, err)
 	//}
-	err := b.moveFromInbox(func(content string, t time.Time) error {
+	err := b.moveFromToday(func(content string, t time.Time) error {
 		content = strings.TrimSpace(content)
 		//if len(content) == 0 {
 		//	content = fs.DisplayName(filename)
@@ -2125,7 +2125,7 @@ func (b *Bot) moveToNewChecklist(params []string) error {
 func (b *Bot) moveToJournal(params []string) error {
 	msgHashes := params
 
-	err := b.moveFromInbox(func(content string, t time.Time) error {
+	err := b.moveFromToday(func(content string, t time.Time) error {
 		// TODO take into account time from chat
 		return journal.AddRecord(b.fs, content, b.cfg.Timezone())
 	}, false, msgHashes...)
@@ -2153,7 +2153,7 @@ func (b *Bot) addToJournalAndContinue(params []string) error {
 	}
 
 	// Don't return - continue to save to inbox as well.
-	msgHash, err := b.appendToInbox(content, b.cfg.Timezone())
+	msgHash, err := b.appendToToday(content, b.cfg.Timezone())
 	if err != nil {
 		return fmt.Errorf("save to inbox: %w", err)
 	}
@@ -2244,7 +2244,7 @@ func (b *Bot) complete(params []string) error {
 		return fmt.Errorf("complete: can't read inbox: %w", err)
 	}
 
-	blockIdx, block, ok := findInboxBlockByHash(content, msgHash)
+	blockIdx, block, ok := findTodayBlockByHash(content, msgHash)
 	if !ok {
 		return fmt.Errorf("complete: msgHash %q not found in inbox", msgHash)
 	}

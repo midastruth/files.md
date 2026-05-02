@@ -43,7 +43,7 @@ func inboxMsgHash(t *testing.T, userFS *fs.FS, nth int) string {
 			continue
 		}
 		if i == nth {
-			return inboxBlockHash(block)
+			return todayBlockHash(block)
 		}
 		i++
 	}
@@ -1831,7 +1831,7 @@ func TestForwardCollapse_HashStableAcrossContinuations(t *testing.T) {
 	// The keyboard on msg 1 still carries msgHash1. After the collapsed append,
 	// moveFromInbox must still resolve it to the first block.
 	var gotContent string
-	err = bot.moveFromInbox(func(content string, _ time.Time) error {
+	err = bot.moveFromToday(func(content string, _ time.Time) error {
 		gotContent = content
 		return nil
 	}, false, msgHash1)
@@ -4512,7 +4512,7 @@ func TestShowToday_InboxMixedFormat(t *testing.T) {
 
 	firstBtn, ok := tgram.LastSentKeyboard.Btns[0].(tg.Btn)
 	r.True(ok)
-	r.Equal(tg.Cmd{Name: CmdComplete, Params: []string{inboxBlockHash("- [ ] Plain msg")}, Type: "cmd"}, firstBtn.Cmd)
+	r.Equal(tg.Cmd{Name: CmdComplete, Params: []string{todayBlockHash("- [ ] Plain msg")}, Type: "cmd"}, firstBtn.Cmd)
 	r.Contains(firstBtn.Name, "Plain msg")
 
 	secondBtn, ok := tgram.LastSentKeyboard.Btns[1].(tg.Btn)
@@ -4520,7 +4520,7 @@ func TestShowToday_InboxMixedFormat(t *testing.T) {
 	// The completed `- [x] `09:10` Done msg` entry is hidden, but the
 	// remaining unchecked entry keeps its own stable hash (unchanged by
 	// completion-toggle behaviour).
-	r.Equal(tg.Cmd{Name: CmdComplete, Params: []string{inboxBlockHash("- [ ] `09:05` New msg")}, Type: "cmd"}, secondBtn.Cmd)
+	r.Equal(tg.Cmd{Name: CmdComplete, Params: []string{todayBlockHash("- [ ] `09:05` New msg")}, Type: "cmd"}, secondBtn.Cmd)
 	r.Contains(secondBtn.Name, "New msg")
 }
 

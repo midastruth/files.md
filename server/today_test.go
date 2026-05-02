@@ -95,9 +95,9 @@ func TestSaveToChatNewFile(t *testing.T) {
 
 	bot := NewBot(-1, tg.NewFakeTG(), userFS, db.NewFakeDB(), fakeConfig())
 
-	h, err := bot.appendToInbox("Test content", time.UTC)
+	h, err := bot.appendToToday("Test content", time.UTC)
 	r.NoError(err)
-	r.Equal(inboxBlockHash("- [ ] `01:01` Test content"), h)
+	r.Equal(todayBlockHash("- [ ] `01:01` Test content"), h)
 
 	content, err := userFS.Read(fs.DirUserRoot, fs.TodayFilename)
 	r.NoError(err)
@@ -121,9 +121,9 @@ func TestSaveToChatExistingFile(t *testing.T) {
 
 	bot := NewBot(-1, tg.NewFakeTG(), userFS, db.NewFakeDB(), fakeConfig())
 
-	h, err := bot.appendToInbox("New content", time.UTC)
+	h, err := bot.appendToToday("New content", time.UTC)
 	r.NoError(err)
-	r.Equal(inboxBlockHash("- [ ] `01:01` New content"), h)
+	r.Equal(todayBlockHash("- [ ] `01:01` New content"), h)
 
 	content, err := userFS.Read(fs.DirUserRoot, fs.TodayFilename)
 	r.NoError(err)
@@ -147,9 +147,9 @@ func TestSaveToChatNewDay(t *testing.T) {
 
 	bot := NewBot(-1, tg.NewFakeTG(), userFS, db.NewFakeDB(), fakeConfig())
 
-	h, err := bot.appendToInbox("Today content", time.UTC)
+	h, err := bot.appendToToday("Today content", time.UTC)
 	r.NoError(err)
-	r.Equal(inboxBlockHash("- [ ] `01:01` Today content"), h)
+	r.Equal(todayBlockHash("- [ ] `01:01` Today content"), h)
 
 	content, err := userFS.Read(fs.DirUserRoot, fs.TodayFilename)
 	r.NoError(err)
@@ -170,9 +170,9 @@ func TestSaveToChatWithImage(t *testing.T) {
 
 	bot := NewBot(-1, tg.NewFakeTG(), userFS, db.NewFakeDB(), fakeConfig())
 
-	h, err := bot.appendToInbox("![](image.jpg) Image description", time.UTC)
+	h, err := bot.appendToToday("![](image.jpg) Image description", time.UTC)
 	r.NoError(err)
-	r.Equal(inboxBlockHash("- [ ] `01:01` ![](image.jpg) Image description"), h)
+	r.Equal(todayBlockHash("- [ ] `01:01` ![](image.jpg) Image description"), h)
 
 	content, err := userFS.Read(fs.DirUserRoot, fs.TodayFilename)
 	r.NoError(err)
@@ -196,9 +196,9 @@ func TestSaveToChatEmptyFile(t *testing.T) {
 
 	bot := NewBot(-1, tg.NewFakeTG(), userFS, db.NewFakeDB(), fakeConfig())
 
-	h, err := bot.appendToInbox("Test content", time.UTC)
+	h, err := bot.appendToToday("Test content", time.UTC)
 	r.NoError(err)
-	r.Equal(inboxBlockHash("- [ ] `01:01` Test content"), h)
+	r.Equal(todayBlockHash("- [ ] `01:01` Test content"), h)
 
 	content, err := userFS.Read(fs.DirUserRoot, fs.TodayFilename)
 	r.NoError(err)
@@ -557,7 +557,7 @@ func TestMoveFromInboxSingleRecord(t *testing.T) {
 		return nil
 	}
 
-	err = bot.moveFromInbox(callback, false, inboxBlockHash("- [ ] `02:02` Second record"))
+	err = bot.moveFromToday(callback, false, todayBlockHash("- [ ] `02:02` Second record"))
 	r.NoError(err)
 
 	r.Len(callbackCalls, 1)
@@ -611,9 +611,9 @@ and resource allocation`
 		return nil
 	}
 
-	err = bot.moveFromInbox(callback, false,
-		inboxBlockHash("- [ ] `10:30` Buy groceries\nmilk, bread, eggs"),
-		inboxBlockHash("- [ ] `09:15` Morning workout"),
+	err = bot.moveFromToday(callback, false,
+		todayBlockHash("- [ ] `10:30` Buy groceries\nmilk, bread, eggs"),
+		todayBlockHash("- [ ] `09:15` Morning workout"),
 	)
 	r.NoError(err)
 
@@ -670,7 +670,7 @@ func TestMoveFromChatCollapsedSingleRecord(t *testing.T) {
 		return nil
 	}
 
-	err = bot.moveFromInbox(callback, true, inboxBlockHash("- [ ] `02:02` Second record"))
+	err = bot.moveFromToday(callback, true, todayBlockHash("- [ ] `02:02` Second record"))
 	r.NoError(err)
 
 	r.Len(callbackCalls, 1)
@@ -725,9 +725,9 @@ and resource allocation`
 		return nil
 	}
 
-	err = bot.moveFromInbox(callback, true,
-		inboxBlockHash("- [ ] `10:30` Buy groceries\nmilk, bread, eggs"),
-		inboxBlockHash("- [ ] `09:15` Morning workout"),
+	err = bot.moveFromToday(callback, true,
+		todayBlockHash("- [ ] `10:30` Buy groceries\nmilk, bread, eggs"),
+		todayBlockHash("- [ ] `09:15` Morning workout"),
 	)
 	r.NoError(err)
 

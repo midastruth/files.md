@@ -139,7 +139,7 @@ func MoveDueTasks(
 			}
 
 			bot := NewBot(userID, telegram, userFS, db.NewDB(userID), userconf)
-			_, err := bot.appendToInbox(schedule.Filename, userconf.Timezone())
+			_, err := bot.appendToToday(schedule.Filename, userconf.Timezone())
 			if err != nil {
 				slog.Error("schedule worker: can't append to inbox", "err", err)
 				continue
