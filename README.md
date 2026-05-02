@@ -235,8 +235,8 @@ We're used to sending messages to friends, now we're going to send stuff to the 
 | `Cmd+N` / `Ctrl+N`         | New file                       |
 | `Cmd+M` / `Ctrl+M`         | Move file                      |
 | `Cmd+D` / `Ctrl+D`         | Delete file                    |
-| `Cmd+Enter` / `Ctrl+Enter` | Open inbox                     |
-| `Cmd+Shift+Enter` / `Ctrl+Shift+Enter` | Toggle inbox dialog            |
+| `Cmd+Enter` / `Ctrl+Enter` | Open today                     |
+| `Cmd+Shift+Enter` / `Ctrl+Shift+Enter` | Toggle today dialog            |
 | `Cmd+[` / `Ctrl+[`         | Go to previous file            |
 | `Cmd+]` / `Ctrl+]`         | Go to next file                |
 | `Cmd+~` / `Ctrl+~`         | Toggle sidebar                 |
