@@ -143,7 +143,7 @@ func AddChecklistItem(md, item string, checked bool) string {
 }
 
 // CompleteChecklistItem marks given item as completed.
-// Returns newMarkdown, foundItem.
+// Returns newMarkdown and modifiedItem.
 func CompleteChecklistItem(md, itemHash string) (string, string) {
 	foundItem := ""
 	lines := strings.Split(md, "\n")

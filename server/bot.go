@@ -1858,15 +1858,8 @@ func (b *Bot) completeChecklistItem(params []string) error {
 		return fmt.Errorf("complete checklist item: can't complete item from chat: %w", err)
 	}
 
-	if item == fs.PomodoroTask {
-		err = b.cfg.AddToSchedule(item, time.Now().Unix()+int64(b.cfg.PomodoroDuration().Seconds()), "")
-		if err != nil {
-			return fmt.Errorf("complete checklist item: can't add to schedule: %w", err)
-		}
-	} else {
-		// We can tolerate failure of writing to journal, since that's not single source of truth
-		_ = journal.AddRecord(b.fs, fmt.Sprintf("✅ %s", fs.DisplayName(item)), b.cfg.Timezone())
-	}
+	// We can tolerate failure of writing to journal, since that's not single source of truth
+	_ = journal.AddRecord(b.fs, fmt.Sprintf("✅ %s", fs.DisplayName(item)), b.cfg.Timezone())
 
 	if checklist == fs.LaterFilename {
 		return b.showLaterTasks(nil)
@@ -2216,9 +2209,7 @@ func (b *Bot) moveToLater(params []string) error {
 	return b.moveToChecklist([]string{fs.LaterFilename, msgHash})
 }
 
-// complete toggles the Markdown task marker on a single Inbox.md entry
-// in place. `- [ ]` ↔ `- [x]`. Legacy entries without a prefix are upgraded to
-// `- [x]`. The entry stays in the file; it is no longer archived.
+// complete marks a single Today.md entry as done ("- [ ]" => "- [x]").
 func (b *Bot) complete(params []string) error {
 	msgHash := params[0]
 
@@ -2235,25 +2226,20 @@ func (b *Bot) complete(params []string) error {
 		return fmt.Errorf("complete: can't read inbox: %w", err)
 	}
 
-	blockIdx, block, ok := findTodayBlockByHash(content, msgHash)
-	if !ok {
-		return fmt.Errorf("complete: msgHash %q not found in inbox", msgHash)
+	newContent, item := txt.CompleteChecklistItem(content, msgHash)
+	if item == "" {
+		return b.ShowToday(nil)
 	}
 
-	blocks := readBlocks(content)
-	switch {
-	case strings.HasPrefix(block, "- [ ] "):
-		blocks[blockIdx] = "- [x] " + block[6:]
-	case strings.HasPrefix(block, "- [x] "), strings.HasPrefix(block, "- [X] "):
-		blocks[blockIdx] = "- [ ] " + block[6:]
-	default:
-		// Legacy entry without a task prefix — upgrade to completed form.
-		blocks[blockIdx] = "- [x] " + block
-	}
-
-	newContent := strings.TrimSpace(strings.Join(blocks, "\n"))
 	if err := b.fs.Write(fs.DirUserRoot, fs.TodayFilename, newContent); err != nil {
 		return fmt.Errorf("complete: can't write inbox: %w", err)
+	}
+
+	if item == fs.PomodoroTask {
+		err = b.cfg.AddToSchedule(fs.PomodoroTask, time.Now().Unix()+int64(b.cfg.PomodoroDuration().Seconds()), "")
+		if err != nil {
+			return fmt.Errorf("complete: can't add pomodoro to schedule: %w", err)
+		}
 	}
 
 	return b.ShowToday(nil)

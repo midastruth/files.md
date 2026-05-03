@@ -715,30 +715,73 @@ func TestCompleteTask_Incomplete_WithTimestamp_WithHeader(t *testing.T) {
 	require.Equal(t, "#### 1 January, Thursday\n- [x] `09:30` New task", got)
 }
 
-func TestCompleteTask_Completed_NoTimestamp_NoHeader(t *testing.T) {
+func TestCompleteTask_AlreadyCompleted_IsNoOp(t *testing.T) {
 	got := completeTask(t, "- [x] Done task", "- [x] Done task")
-	require.Equal(t, "- [ ] Done task", got)
+	require.Equal(t, "- [x] Done task", got)
 }
 
-func TestCompleteTask_Completed_WithTimestamp_NoHeader(t *testing.T) {
-	got := completeTask(t, "- [x] `00:00` Done task", "- [x] `00:00` Done task")
-	require.Equal(t, "- [ ] `00:00` Done task", got)
+func TestCompleteTask_Pomodoro_AddsSchedule(t *testing.T) {
+	r := require.New(t)
+
+	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
+	r.NoError(err)
+
+	cfg := fakeConfig()
+	bot := NewBot(-1, tg.NewFakeTG(), userFS, db.NewFakeDB(), cfg)
+
+	r.NoError(bot.togglePomodoro(nil))
+
+	pomodoroBlock := "- [ ] " + fs.PomodoroTask
+	before := time.Now().Unix()
+	r.NoError(bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("c", []string{todayBlockHash(pomodoroBlock)}))))
+	after := time.Now().Unix()
+
+	todayMD, err := userFS.Read("/", fs.TodayFilename)
+	r.NoError(err)
+	r.Contains(todayMD, "- [x] "+fs.PomodoroTask)
+
+	schedules, err := cfg.Schedules()
+	r.NoError(err)
+	r.Len(schedules, 1)
+	r.Equal(fs.PomodoroTask, schedules[0].Filename)
+
+	durationSec := int64(cfg.PomodoroDuration().Seconds())
+	r.GreaterOrEqual(schedules[0].ScheduledAt, before+durationSec)
+	r.LessOrEqual(schedules[0].ScheduledAt, after+durationSec)
 }
 
-func TestCompleteTask_Completed_NoTimestamp_WithHeader(t *testing.T) {
-	got := completeTask(t,
-		"#### 1 January, Thursday\n- [x] Done task",
-		"- [x] Done task",
-	)
-	require.Equal(t, "#### 1 January, Thursday\n- [ ] Done task", got)
+func TestCompleteTask_NonPomodoro_DoesNotSchedule(t *testing.T) {
+	r := require.New(t)
+
+	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
+	r.NoError(err)
+	r.NoError(userFS.Write("/", fs.TodayFilename, "- [ ] Regular task"))
+
+	cfg := fakeConfig()
+	bot := NewBot(-1, tg.NewFakeTG(), userFS, db.NewFakeDB(), cfg)
+
+	r.NoError(bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("c", []string{todayBlockHash("- [ ] Regular task")}))))
+
+	schedules, err := cfg.Schedules()
+	r.NoError(err)
+	r.Empty(schedules)
 }
 
-func TestCompleteTask_Completed_WithTimestamp_WithHeader(t *testing.T) {
-	got := completeTask(t,
-		"#### 1 January, Thursday\n- [x] `09:30` Done task",
-		"- [x] `09:30` Done task",
-	)
-	require.Equal(t, "#### 1 January, Thursday\n- [ ] `09:30` Done task", got)
+func TestCompleteChecklistItem_Pomodoro_DoesNotSchedule(t *testing.T) {
+	r := require.New(t)
+
+	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
+	r.NoError(err)
+	r.NoError(userFS.Write("/", fs.TodayFilename, "- [ ] "+fs.PomodoroTask))
+
+	cfg := fakeConfig()
+	bot := NewBot(-1, tg.NewFakeTG(), userFS, db.NewFakeDB(), cfg)
+
+	r.NoError(bot.completeChecklistItem([]string{fs.Hash(fs.TodayFilename), fs.Hash(fs.PomodoroTask)}))
+
+	schedules, err := cfg.Schedules()
+	r.NoError(err)
+	r.Empty(schedules)
 }
 
 func TestToday(t *testing.T) {
