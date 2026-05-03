@@ -1675,13 +1675,7 @@ func (b *Bot) showStart(params []string) error {
 		}
 	}
 
-	err := b.showHTML("Welcome!\n\nYou can send me any stuff and I'll save it to files!\n\nBy default <code>Full Mode</code> is enabled, it can feel overwhelming. You can switch to notes only or tasks only mode in /settings command.", nil)
-	if err != nil {
-		return err
-	}
-
-	// Default to full mode, people don't like to choose.
-	return b.setFullMode(nil)
+	return b.showHTML("Welcome!\n\nYou can send me any stuff and I'll save it to files!\n\nBy default <code>Full Mode</code> is enabled, it can feel overwhelming. You can switch to notes only or tasks only mode in /settings command.", nil)
 }
 
 func (b *Bot) moveToDirFromToday(params []string) error {
