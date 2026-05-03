@@ -2583,13 +2583,6 @@ func (b *Bot) togglePomodoro(_ []string) error {
 		_, hasPomodoroInToday = isCompleted[fs.PomodoroTask]
 	}
 
-	hasPomodoroInArchive := false
-	doneMD, err := b.fs.Read(fs.DirArchive, fs.DoneFilename)
-	if err == nil {
-		_, isCompleted := txt.ChecklistItems(doneMD)
-		_, hasPomodoroInToday = isCompleted[fs.PomodoroTask]
-	}
-
 	if hasPomodoroInToday {
 		todayMD, _ = txt.RemoveChecklistItem(todayMD, fs.PomodoroTask)
 		err = b.fs.Write(fs.DirUserRoot, fs.TodayFilename, todayMD)
@@ -2597,24 +2590,13 @@ func (b *Bot) togglePomodoro(_ []string) error {
 			return fmt.Errorf("toggle pomodoro: failed to delete pomodoro file: %w", err)
 		}
 	}
-	if hasPomodoroInArchive {
-		doneMD, _ = txt.RemoveChecklistItem(doneMD, fs.PomodoroTask)
-		err = b.fs.Write(fs.DirArchive, fs.DoneFilename, doneMD)
-		if err != nil {
-			return fmt.Errorf("toggle pomodoro: failed to delete pomodoro file: %w", err)
-		}
-	}
 
-	if hasPomodoroInToday || hasPomodoroInArchive {
+	if hasPomodoroInToday {
 		_, _ = b.tg.Send(b.userID, "Pomodoro is stopped", nil, tg.MarkupHTML)
 		return b.ShowToday(nil)
 	}
 
-	//todayMD, err = b.fs.Read(fs.DirUserRoot, fs.TodayFilename)
-	//if err != nil {
-	//	return fmt.Errorf("toggle pomodoro: failed to show pomodoro hint message %w", err)
-	//}
-	// Create Pomodoro task
+	// Create Pomodoro checklist item
 	err = b.fs.Write(fs.DirUserRoot, fs.TodayFilename, txt.AddChecklistItem(todayMD, fs.PomodoroTask, false))
 
 	_, err = b.tg.Send(b.userID, i18n.PomodoroStarted, nil, tg.MarkupHTML)
