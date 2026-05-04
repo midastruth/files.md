@@ -1159,7 +1159,7 @@ func (b *Bot) todayLabel(msgsCount ...int) string {
 	}
 
 	if tasksCount == 0 {
-		return statusBar + i18n.Tr("It's empty, send me something!")
+		return statusBar + i18n.Tr("Nothing here yet - send me something!")
 	}
 
 	return statusBar + fmt.Sprintf(i18n.Tr("<b>%d</b> left%s"), tasksCount, wideSpacer)
@@ -1675,7 +1675,9 @@ func (b *Bot) showStart(params []string) error {
 		}
 	}
 
-	return b.showHTML("Welcome! 👋\n\nSend me anything, and I’ll save it to files!\n\nBy default <b>Full Mode</b> is enabled, which can feel a bit overwhelming. You can switch to <b>Notes Only</b> or <b>Tasks Only</b> mode in /settings menu.", nil)
+	_, err := b.tg.Send(b.userID, "Welcome! 👋\n\nSend me anything, and I’ll save it to files!\n\nBy default <b>Full Mode</b> is enabled, which can feel a bit overwhelming. You can switch to <b>Notes Only</b> or <b>Tasks Only</b> mode in /settings menu.", nil, tg.MarkupHTML)
+
+	return err
 }
 
 func (b *Bot) moveToDirFromToday(params []string) error {

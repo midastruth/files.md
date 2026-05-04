@@ -39,7 +39,7 @@ That's it. Nothing to learn or setup.
 
 ## Web Application
 - Open [app.files.md](https://app.files.md) in Chrome browser
-- Click "Install Files.md" on the right side of the address bar:
+- Click "Install files.md" on the right side of the address bar:
 <div align="center">
     <img src="https://github.com/zakirullin/files.md/raw/main/web/img/install.png" alt="Install" title="Install" width="350"/>
 </div>  
@@ -47,17 +47,21 @@ That's it. Nothing to learn or setup.
 - Open a local folder to persist changes  
 - That's it  
 
+Occasionally hit force-refresh (`cmd`+`shift`+`r`) the app to get new updates.  
+
 ## Telegram bot 
 1) Open [@FilesMDBot](https://t.me/FilesMDBot)
 2) Execute the `/app` command
 3) Open the link in your Chrome browser
 4) Done! The app and the bot are synchronized now 
 
+Pin the bot in your contact list, so that it is easily accessible.  
+
 ## How to take notes 🗒️
 Leonardo da Vinci, Charles Darwin, Jules Verne and many others took notes using just pen and paper.
 
 You don't need to learn anything new to start taking notes.   
-We'll use a pattern that you know already: chatting with friends.  
+We'll use a familiar pattern: chatting with friends.  
 
 Only this time, we are going to messages to the bot (or to the web app):  
 
@@ -124,8 +128,8 @@ I'll quote [I Deleted My Second Brain](https://www.joanwestenberg.com/i-deleted-
 > 
 > **That self never arrived.**
 
-The Second Brain is fancy. _Sounds thrilling._  
-Advanced guru templates, plugins...  
+The Second Brain is thrilling.  
+Advanced guru templates, plugins and AI workflows...  
 One wants to scrape the wisdom of the whole internet.  
 There's some beauty in this neat system. Every new note brings dopamine.  
 _Second Brain gets better and better._  
@@ -133,6 +137,16 @@ _Second Brain gets better and better._
 However, **the first brain never actually gets smarter.**  
 And that's an issue - in the AI age, your first brain is as valuable as ever.  
 Use your brain to think through the notes. Apply and experience the knowledge.  
+
+## When to take notes
+If your goal is to:
+- Do research
+- Write an article or a book
+- Develop a deeper, more structured understanding of something
+
+Then taking notes is perfectly fine.  
+
+However, when it comes to personal changes, it can do more harm than good. See below.  
 
 ## Self-help through reading and taking notes? 🧘‍
 **Harm caused at the emotional level must be healed at the emotional level.**  
@@ -146,14 +160,7 @@ What can help is psychotherapy, rescripting and chair work. Meditation.
 Notes and intellectual work can actually prevent healing, see below.  
 
 ## Notes can prevent experience
-If your goal is to:
-- Do research
-- Write an article or a book
-- Develop a deeper, more structured understanding of something
-
-Then taking notes is perfectly fine.  
-
-However, when it comes to real personal changes, collecting too many notes **can prevent us from actual experience.**  
+When it comes to real personal changes, collecting too many notes **can prevent us from actual experience.**  
 
 - Reading and taking notes can easily fool us into believing that we understand a text
 - We think we understand, but in reality **we just know**  
@@ -168,7 +175,7 @@ Having good knowledge about something can create a false sense of competence or 
 The worst thing is that **we don’t let new experiences emerge because we already have knowledge**. It's a knowledge barrier. Life gives us opportunities to live through new experiences, but we refuse, because "we already know".
 
 When you read or listen, there is a small chance to turn an insight into experience.  
-**Do not spend your energy for just writing it down in the hope that one day you'll actually try it.**  
+**Don't spend your energy for just writing it down in the hope that one day you'll actually try it.**  
 
 ## First experience then notes
 
@@ -181,9 +188,9 @@ _Wow! That's a great insight._
 I feel the urge to take a note.   
 Instead, I used this impulse to stop and think it through. How I can apply this knowledge right now?    
 
-*I had an issue with the gym. I like working out. What I don't like was the preparation and changing clothes at the gym.  
-The preparation and changing clothes at the gym were a resistance for me. My resistance to those things can't be changed.  
-What I could change, is the environment. I reduced my equipment to the bare minimum and started getting dressed in my workout clothes at home.*
+_I had an issue with the gym. I like working out. What I don't like was the preparation and changing clothes at the gym._   
+_The preparation and changing clothes at the gym were a resistance for me. My resistance to those things can't be changed._   
+_What I could change, is the environment. I reduced my equipment to the bare minimum and started getting dressed in my workout clothes at home._  
 
 After a few weeks, the habit stuck. I got feedback from reality. _I experienced it._  
 
