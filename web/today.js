@@ -738,7 +738,7 @@ function attachEventListeners() {
 
             chatInput.focus();
             // dataset.filename is just "Foo.md"; the sidebar walker produces
-            // "/Foo.md" — normalize so modifiedPaths.includes(path) matches.
+            // "/Foo.md" - normalize so modifiedPaths.includes(path) matches.
             renderSidebar('', [joinPath('/', path)]);
         });
     });

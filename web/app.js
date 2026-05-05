@@ -378,7 +378,12 @@ async function removeSavedRootDirHandle() {
 
 async function getRootDirHandle() {
     const savedDirHandle = await getSavedRootDirHandle();
-    if (!(savedDirHandle instanceof FileSystemDirectoryHandle)) {
+    // Safari's FileSystemFileHandle has no createWritable - if the saved
+    // handle is from such an environment, fall back to the in-memory FS
+    // instead of letting later writes blow up.
+    const supportsWritable = typeof FileSystemFileHandle !== 'undefined'
+        && typeof FileSystemFileHandle.prototype.createWritable === 'function';
+    if (!(savedDirHandle instanceof FileSystemDirectoryHandle) || !supportsWritable) {
         return await getTemporaryStorageDirHandle();
     }
 

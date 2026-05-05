@@ -3,6 +3,18 @@
 // First we try to create OPFS storage, fallback to our own in-memory FS on failure.
 
 async function getTemporaryStorageDirHandle() {
+    // Safari ships OPFS but its FileSystemFileHandle exposes only
+    // createSyncAccessHandle (worker-only) - no createWritable, which the
+    // rest of the app relies on. Fall back to the in-memory FS so writes
+    // don't blow up at the first send-to-today.
+    const supportsWritable = typeof FileSystemFileHandle !== 'undefined'
+        && typeof FileSystemFileHandle.prototype.createWritable === 'function';
+    if (!supportsWritable) {
+        console.warn('FileSystemFileHandle.createWritable unavailable, using in-memory FS');
+        isMemFS = true;
+        return getMemFSRoot();
+    }
+
     // OPFS requires a secure context (https or localhost), not available on file://
     try {
         const root = await navigator.storage.getDirectory();

@@ -384,7 +384,7 @@ func TestCompleteChecklistItemWithWhitespace(t *testing.T) {
 
 // The Today.md flow hashes the FIRST line of a multi-line block (see
 // todayBlockHash), and CompleteChecklistItem walks the file line-by-line
-// hashing the same first-line content — so the box flips on the matched
+// hashing the same first-line content - so the box flips on the matched
 // line and the continuation stays right where the user wrote it.
 func TestCompleteChecklistItem_FlipsBox_WithContinuationLines(t *testing.T) {
 	r := require.New(t)

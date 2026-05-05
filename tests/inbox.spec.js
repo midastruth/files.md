@@ -169,7 +169,7 @@ test('move to file does not prepend a timestamp', async ({page}) => {
     await page.waitForTimeout(200);
     const content = await page.evaluate(() => document.querySelector('.CodeMirror').CodeMirror.getValue());
     expect(content).toContain('Attention is all you need');
-    // The body must not be prefixed with `HH:MM` — that's reserved for the
+    // The body must not be prefixed with `HH:MM` - that's reserved for the
     // chat→journal flow, not move-to-file (web/lib/md.js:addHeaderAndText).
     expect(content).not.toMatch(/`\d{2}:\d{2}`\s*500k/);
 });
