@@ -47,7 +47,7 @@ function initEditor(el) {
     newEditor.on('focus', function() {
         currentEditor = newEditor; // FIXME possible RC here? If isMessingWithCurrentEditor is hold, this would overwrite
         currentEditor.refresh(); // Cursor & hide tokens conflict if we don't call it
-        closeTodayModal();
+        closeChatModal();
         log('Focused to:', newEditor.path);
     });
 
@@ -103,8 +103,8 @@ function initEditor(el) {
             openDir();
             return;
         }
-        if (path === 'cmd:openToday') {
-            openToday();
+        if (path === 'cmd:openChat') {
+            openChat();
             return;
         }
 

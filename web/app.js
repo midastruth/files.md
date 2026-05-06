@@ -93,7 +93,7 @@ async function init() {
     files = await loadLocalFiles(rootDirHandle);
     log(`Files loaded in ${performance.now() - perf}ms`);
 
-    initToday();
+    initChat();
 
     perf = performance.now();
     renderSidebar();
@@ -104,7 +104,7 @@ async function init() {
         // By the time a user has setup custom API, he doesn't need welcome file :)
         await openFile('/🪴 Welcome.md');
     } else {
-        openToday();
+        openChat();
     }
 
     perf = performance.now();
@@ -279,7 +279,7 @@ async function openDir() {
 
     isMemFS = false;
     renderSidebar();
-    await openToday();
+    await openChat();
 }
 
 function getCurrentContent() {
@@ -658,7 +658,7 @@ document.addEventListener('keydown', (event) => {
                 return;
             }
 
-            closeTodayModal();
+            closeChatModal();
             editor.focus();
             return;
         }
@@ -684,7 +684,7 @@ document.addEventListener('keydown', function(event) {
             history.back();
         } else {
             event.preventDefault();
-            toggleTodayModal();
+            toggleChatModal();
         }
         return;
     }
@@ -697,7 +697,7 @@ document.addEventListener('keydown', function(event) {
         toggleSidebar();
     }
     if (isMetaKey(event) && event.key === 'Enter') {
-        openToday();
+        openChat();
     }
 });
 
@@ -768,7 +768,7 @@ window.addEventListener('blur', async function() {
 
     // Start timer to open inbox after idle
     openInboxIdleTimer = setTimeout(() => {
-        openToday();
+        openChat();
     }, OPEN_INBOX_AFTER_IDLE);
 
     // Sync media first, so that new images for current file would be loaded

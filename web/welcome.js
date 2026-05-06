@@ -196,7 +196,7 @@ const WELCOME_FILES = {
     },
     "🪴 Welcome.md": {
         "content":
-            "Open [today](cmd:openToday) to dump whatever's on your mind.\n\n" +
+            "Open [chat](cmd:openChat) to dump whatever's on your mind.\n\n" +
             "Select local [folder](cmd:openDir) to persist files.\n\n" +
             "[Markdown Guide](/Markdown%20Guide.md)\n[Hotkeys](/Hotkeys.md)\n[Links](/Links.md)",
         isFile: true,
@@ -260,8 +260,8 @@ const WELCOME_FILES = {
             "| `Cmd+N` / `Ctrl+N` | New file |\n" +
             "| `Cmd+M` / `Ctrl+M` | Move file |\n" +
             "| `Cmd+D` / `Ctrl+D` | Delete file |\n" +
-            "| `Cmd+Enter` / `Ctrl+Enter` | Open today |\n" +
-            "| `Cmd+Shift+Enter` / `Ctrl+Shift+Enter` | Toggle today dialog |\n" +
+            "| `Cmd+Enter` / `Ctrl+Enter` | Open chat |\n" +
+            "| `Cmd+Shift+Enter` / `Ctrl+Shift+Enter` | Toggle chat dialog |\n" +
             "| `Cmd+[` / `Ctrl+[`  | Go to previous file   |\n" +
             "| `Cmd+]` / `Ctrl+]`  | Go to next file  |\n" +
             "| `Cmd+~` / `Ctrl+~` | Toggle sidebar |\n" +

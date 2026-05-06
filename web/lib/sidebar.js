@@ -37,7 +37,7 @@ function renderSidebar(focusDir = '', modifiedPaths) {
         chat.setSelected(true);
     }
     chat.on('click', async function (n, node) {
-        await openToday();
+        await openChat();
     });
     root.addChild(chat)
 

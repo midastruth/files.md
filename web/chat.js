@@ -16,7 +16,7 @@ chatInput.addEventListener('input', autoResize);
 // Initial resize to set proper height
 autoResize();
 
-async function sendToToday() {
+async function sendToChat() {
     const text = chatInput.value.trim();
     if (!text) return;
 
@@ -42,8 +42,8 @@ async function sendToToday() {
     scrollToBottom();
 }
 
-async function openToday() {
-    closeTodayModal();
+async function openChat() {
+    closeChatModal();
     chatContainer.style.display = 'flex';
     // chatButton.classList.add('hidden');
 
@@ -69,7 +69,7 @@ async function openToday() {
     scrollToBottom();
 }
 
-async function openTodayModal() {
+async function openChatModal() {
     chatContainer.classList.add('modal');
     chatContainer.style.display = 'flex';
     // chatButton.classList.add('hidden');
@@ -83,7 +83,7 @@ async function openTodayModal() {
     scrollToBottom();
 }
 
-function closeTodayModal() {
+function closeChatModal() {
     chatContainer.classList.remove('modal');
     if (!isInbox) {
         chatContainer.style.display = 'none';
@@ -93,20 +93,20 @@ function closeTodayModal() {
     }
 }
 
-async function toggleTodayModal() {
+async function toggleChatModal() {
     if (isInbox) {
         return;
     }
 
     let isInboxModal = document.getElementById('inbox-container').classList.contains('modal');
     if (isInboxModal) {
-        closeTodayModal();
+        closeChatModal();
     } else {
-        openTodayModal();
+        openChatModal();
     }
 }
 
-async function parseMessagesFromToday() {
+async function parseMessagesFromChat() {
     const file = await ((await getFileHandle(CHAT_PATH, true)).getFile());
     let chat = await file.text();
 
@@ -196,7 +196,7 @@ async function parseMessagesFromToday() {
     return { messages, text: chat };
 }
 
-async function saveMessagesToToday(messages) {
+async function saveMessagesToChat(messages) {
     // Group messages by date
     const messagesByDate = {};
     messages.forEach(msg => {
@@ -227,7 +227,7 @@ async function saveMessagesToToday(messages) {
 //   - [ ] `HH:MM` text    (new, not done)
 //   - [x] `HH:MM` text    (new, done)
 // and rewrites it to the requested done/undone marker.
-async function toggleTodayLine(timestamp, text, done) {
+async function toggleChatMessage(timestamp, text, done) {
     const handle = await getFileHandle(CHAT_PATH, true);
     const file = await handle.getFile();
     let content = await file.text();
@@ -242,7 +242,7 @@ async function toggleTodayLine(timestamp, text, done) {
         : `- [${marker}] ${text}`;
 
     if (!re.test(content)) {
-        logError('toggleTodayLine: line not found', {timestamp, text});
+        logError('toggleChatMessage: line not found', {timestamp, text});
         return;
     }
     content = content.replace(re, replacement);
@@ -253,11 +253,11 @@ async function toggleTodayLine(timestamp, text, done) {
     lastInboxText = content;
 }
 
-function initToday() {
+function initChat() {
     chatInput.addEventListener('keydown', async function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            await sendToToday();
+            await sendToChat();
             autoResize();
         }
     });
@@ -399,9 +399,9 @@ async function addToJournal(text) {
 async function moveFromInbox(text, callback) {
     await callback(text);
 
-    const { messages } = await parseMessagesFromToday();
+    const { messages } = await parseMessagesFromChat();
     const filteredMessages = messages.filter(msg => msg.text !== text);
-    await saveMessagesToToday(filteredMessages);
+    await saveMessagesToChat(filteredMessages);
 }
 
 function attachEventListeners() {
@@ -571,7 +571,7 @@ function attachEventListeners() {
             el.classList.toggle('completed');
             const done = el.classList.contains('completed');
             try {
-                await toggleTodayLine(el.dataset.timestamp, el.dataset.text, done);
+                await toggleChatMessage(el.dataset.timestamp, el.dataset.text, done);
             } catch (err) {
                 logError('Failed to toggle inbox line:', err);
                 el.classList.toggle('completed'); // revert
@@ -760,7 +760,7 @@ function attachEventListeners() {
 }
 
 async function renderMessages() {
-    const { messages, text } = await parseMessagesFromToday();
+    const { messages, text } = await parseMessagesFromChat();
     if (text === lastInboxText) {
         log('Inbox unchanged, skipping render');
         return;
