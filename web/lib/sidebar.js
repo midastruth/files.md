@@ -94,6 +94,20 @@ function renderSidebar(focusDir = '', modifiedPaths) {
         }
     });
 
+    // Drop the Archive node if it has nothing the user cares about. The
+    // app writes /archive/Log.txt for its own diagnostics, so "empty" here
+    // means: no entries at all, or only Log.txt.
+    const archiveNode = dirNodes['/archive'];
+    if (archiveNode) {
+        const archiveEntries = Object.keys(files['archive/'] || {});
+        const archiveIsEmpty = archiveEntries.length === 0
+            || (archiveEntries.length === 1 && archiveEntries[0] === 'Log.txt');
+        if (archiveIsEmpty) {
+            if (archiveNode.parent) archiveNode.parent.removeChild(archiveNode);
+            delete dirNodes['/archive'];
+        }
+    }
+
     const groupedDirs = new Set(['journal', 'habits', 'insights', 'archive']);
 
     // Step 0: Lists group
