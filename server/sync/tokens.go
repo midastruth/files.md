@@ -176,21 +176,6 @@ func tokenMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 // TODO add tests
 func issueNewPermanentToken(r *http.Request) (string, bool) {
-	// Return false if IP is blocked.
-	ipAndPort := strings.Split(r.RemoteAddr, ":")
-	ip := ipAndPort[0]
-	blockedIPsMutex.RLock()
-	blockedUntil, isBlocked := blockedIPs[ip]
-	blockedIPsMutex.RUnlock()
-	if isBlocked && time.Now().Before(blockedUntil) {
-		logAuthFailure("onetime_swap_ip_blocked_401", r, map[string]any{
-			"http_status":     401,
-			"block_until":     blockedUntil.Format(time.RFC3339Nano),
-			"block_remaining": time.Until(blockedUntil).String(),
-		})
-		return "", false
-	}
-
 	r.Body = http.MaxBytesReader(nil, r.Body, MaxTokenSize)
 
 	var req struct {

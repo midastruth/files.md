@@ -114,7 +114,6 @@ func router(serverLogger *log.Logger) *http.ServeMux {
 		http.NotFound(w, r)
 	})
 
-	// TODO CHECK that user id belongs to oneTimeToken ID, or get userID by oneTimeToken id
 	r.HandleFunc("/syncFilenames", corsMiddleware(panicMiddleware(tokenMiddleware(gzipMiddleware(SyncFilenames)))))
 	r.HandleFunc("/syncFile", corsMiddleware(panicMiddleware(tokenMiddleware(gzipMiddleware(SyncFile)))))
 	r.HandleFunc("/syncMediaFilenames", corsMiddleware(panicMiddleware(tokenMiddleware(gzipMiddleware(SyncMediaFilenames)))))
