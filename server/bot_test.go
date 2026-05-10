@@ -82,6 +82,54 @@ func TestSaveFromTextMsg(t *testing.T) {
 	r.Equal("#### 29 June, Sunday\n- [ ] `12:00` New task\n", chat)
 }
 
+// A message containing a slash-token in the middle (e.g. "Check the /token
+// please") used to be intercepted as a `/token` command invocation and never
+// reached the chat. With the cmd-extraction now requiring the slashed token
+// to be the entire message, this kind of note must save normally with the
+// `/token` text intact.
+func TestSaveFromTextMsgWithSlashCmdInTheMiddle(t *testing.T) {
+	r := require.New(t)
+
+	savedNow := now
+	defer func() {
+		now = savedNow
+	}()
+	now = func() time.Time {
+		return time.Date(2025, 6, 29, 12, 0, 0, 0, time.UTC)
+	}
+
+	mode := userconfig.DefaultConfig.Mode
+	userconfig.DefaultConfig.Mode = userconfig.ModeFull
+	defer func() {
+		userconfig.DefaultConfig.Mode = mode
+	}()
+
+	userFS, err := fs.NewFS("/", afero.NewMemMapFs())
+	r.NoError(err)
+
+	tgram := tg.NewFakeTG()
+	bot := NewBot(-1, tgram, userFS, db.NewFakeDB(), fakeConfig())
+
+	const text = "Check the /token please"
+	rawUpdate := tgbotapi.Update{
+		Message: &tgbotapi.Message{
+			Chat: &tgbotapi.Chat{ID: -1},
+			Text: text,
+			Entities: []tgbotapi.MessageEntity{{
+				Type:   "bot_command",
+				Offset: 10, // index of '/' in text
+				Length: 6,  // length of "/token"
+			}},
+		},
+	}
+	err = bot.Reply(tg.NewTGUpd(rawUpdate))
+	r.NoError(err)
+
+	chat, err := bot.fs.Read("/", "Chat.md")
+	r.NoError(err)
+	r.Equal("#### 29 June, Sunday\n- [ ] `12:00` Check the /token please\n", chat)
+}
+
 // TODO Chat.md
 func TestSaveFromLongTextMsg(t *testing.T) {
 	r := require.New(t)
