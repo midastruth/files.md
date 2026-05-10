@@ -532,6 +532,54 @@ function goForward() {
     history.forward();
 }
 
+// Returns { json, error }. On success, error is null. On HTTP error,
+// json is null and error is a "<status> <statusText>: <body>" string.
+async function post(endpoint, data) {
+    let response;
+    try {
+        response = await fetch(`${API_URL}/${endpoint}`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Version': getCurrentVersion()
+            },
+            body: JSON.stringify(data)
+        });
+    } catch (e) {
+        return { json: null, error: `network: ${e.message}` };
+    }
+
+    if (!response.ok) {
+        let body = '';
+        try { body = await response.text(); } catch (_) {}
+        return { json: null, error: `${response.status} ${response.statusText}: ${body}`.trim() };
+    }
+    markServerOk();
+
+    // Some endpoints (e.g. /syncMedia upload) reply 200 with an empty
+    // body on success - treat that as `{}` so callers don't have to
+    // care about the difference.
+    let json;
+    try {
+        json = await response.json();
+    } catch (e) {
+        return { json: null, error: `parse: ${e.message}` };
+    }
+
+    // Handle special commands from server.
+    // We may need to force-update sometimes.
+    if (json.status === 'reload') {
+        const url = new URL(window.location);
+        url.searchParams.set('t', Date.now());
+        window.location.href = url.toString();
+    } else if (json.status === 'close') {
+        window.location.href = "about:blank"
+    }
+
+    return { json, error: null };
+}
+
 // Custom global log() function that display immediate values and writes to a file.
 // Logging a JavaScript object to the console isn't logging that object's state, it is logging an object reference.
 // We make a deep copy of the object at the moment of calling so to display its true value.

@@ -218,12 +218,13 @@ async function syncTextsWithServer() {
     } else {
         log('NEVER SYNCED BEFORE');
     }
-    const response = await post('syncTexts', {
+    const { json: response, error } = await post('syncTexts', {
         modified: modified,
         deleted: deleted,
         timestamps: server['timestamps'] || [],
     });
-    if (response === null) {
+    if (error) {
+        console.error('syncTexts failed:', error);
         isSyncingTexts = false;
         return;
     }
@@ -327,51 +328,36 @@ async function syncLocalFileWithServer(path) {
         let serverTimestamp = getServerFile(path)?.lastModified || 0;
 
         let serverFile = {};
-        try {
-            const clientLastModified = file.lastModified;
-            let response = await fetch(`${API_URL}/syncText`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Version': getCurrentVersion()
-                },
-                body: JSON.stringify({
-                    path: path,
-                    lastModified: serverTimestamp,
-                    clientLastModified: clientLastModified,
-                    // We take the last client timestamp known to the server. Server can
-                    // decide whether the file was modified on client or not.
-                    clientLastSynced: getServerFile(path)?.lastClientModified || 0,
-                    content: content,
-                })
-            });
-            if (!response.ok) {
-                log(`Server responded with ${response.status}`);
-                return;
-            }
-            markServerOk();
-            let json = await response.json();
-
-            // For the cases when server was updated only on server, we move lastSyncedAt pointer,
-            // meaning that there are no "dirty" changes on client.
-            if (json.status === 'notModified') {
-                setServerFileLastClientModified(path, clientLastModified);
-                return;
-            }
-            if (json.status === 'updatedOnServer') {
-                // TODO maybe RC here? When file was updated, but during this time we already changed it
-                setServerFile(path, content, json.lastModified, clientLastModified);
-                log(`Moved lastModified for ${path} with timestamp ${json.lastModified}`, json);
-                saveServerFiles();
-                return;
-            }
-            // if status is "merged" or "ok", it means it means we have changes to write.
-            serverFile = json
-        } catch (error) {
-            console.error('Network error occurred:', error.message);
+        const clientLastModified = file.lastModified;
+        const { json, error } = await post('syncText', {
+            path: path,
+            lastModified: serverTimestamp,
+            clientLastModified: clientLastModified,
+            // We take the last client timestamp known to the server. Server can
+            // decide whether the file was modified on client or not.
+            clientLastSynced: getServerFile(path)?.lastClientModified || 0,
+            content: content,
+        });
+        if (error) {
+            console.error(`syncText ${path} failed:`, error);
             return;
         }
+
+        // For the cases when server was updated only on server, we move lastSyncedAt pointer,
+        // meaning that there are no "dirty" changes on client.
+        if (json.status === 'notModified') {
+            setServerFileLastClientModified(path, clientLastModified);
+            return;
+        }
+        if (json.status === 'updatedOnServer') {
+            // TODO maybe RC here? When file was updated, but during this time we already changed it
+            setServerFile(path, content, json.lastModified, clientLastModified);
+            log(`Moved lastModified for ${path} with timestamp ${json.lastModified}`, json);
+            saveServerFiles();
+            return;
+        }
+        // if status is "merged" or "ok", it means it means we have changes to write.
+        serverFile = json;
 
         // We have either of these:
         // 1) New file from server
@@ -437,29 +423,19 @@ async function syncMedia() {
                 }
                 const base64String = btoa(binaryString);
 
-                const response = await fetch(`${API_URL}/syncMedia`, {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Content-Type': 'application/json',
-                            'Version': getCurrentVersion()
-                    },
-                    body: JSON.stringify({
-                        filename: mediaFilename,
-                        data: base64String,
-                    })
+                const { error } = await post('syncMedia', {
+                    filename: mediaFilename,
+                    data: base64String,
                 });
-
-                if (response.ok) {
-                    markServerOk();
+                if (error) {
+                    console.error(`Failed to sync media file ${mediaFilename}:`, error);
+                } else {
                     server['media'][mediaFilename] = {
                         isFile: true,
                         lastModified: 0, // We don't track binary files modifications.
                     };
                     saveServerFiles();
                     log(`Successfully synced media file: ${mediaFilename}`);
-                } else {
-                    console.error(`Failed to sync media file ${mediaFilename}:`, response.statusText, response, await response.text());
                 }
             } catch (error) {
                 console.error(`Error syncing media file ${mediaFilename}:`, error);
@@ -467,24 +443,14 @@ async function syncMedia() {
         }
     }
     try {
-        const response = await fetch(`${API_URL}/syncMedias`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                'Version': getCurrentVersion()
-            },
-            body: JSON.stringify({
-                timestamp: mediaTimestamp
-            })
+        const { json: serverData, error } = await post('syncMedias', {
+            timestamp: mediaTimestamp,
         });
-        if (!response.ok) {
-            console.error(`Server responded with ${response.status}`);
-        } else {
-            markServerOk();
+        if (error) {
+            console.error('syncMedias failed:', error);
+            isSyncingMedia = false;
+            return;
         }
-
-        const serverData = await response.json();
 
         let filesProcessed = 0;
         for (const fileInfo of serverData.files) {
@@ -492,7 +458,8 @@ async function syncMedia() {
             log(`Downloading media file: ${filename}`);
 
             try {
-                // Fetch binary file
+                // Raw fetch: this endpoint streams a binary blob, not JSON,
+                // so the JSON-based post() helper doesn't apply here.
                 const response = await fetch(`${API_URL}/syncMedia`, {
                     method: 'POST',
                     credentials: 'include',
@@ -1394,41 +1361,6 @@ function hash(str) {
     }
 
     return hash;
-}
-
-// Returns json response or null on error.
-async function post(endpoint, data) {
-    try {
-        let response = await fetch(`${API_URL}/${endpoint}`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-                'Version': getCurrentVersion()
-            },
-            body: JSON.stringify(data)
-        });
-        if (!response.ok) {
-            return null;
-        }
-        markServerOk();
-
-        const json = await response.json();
-
-        // Handle special commands from server;
-        if (json.status === 'reload') {
-            const url = new URL(window.location);
-            url.searchParams.set('t', Date.now());
-            window.location.href = url.toString();
-        } else if (json.status === 'close') {
-            window.location.href = "about:blank"
-        }
-
-        return json;
-    } catch (error) {
-        console.error('Network error occurred:', error.message);
-        return null;
-    }
 }
 
 // If there are files without isFile flag - we would have recursion.
