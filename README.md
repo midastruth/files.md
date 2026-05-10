@@ -182,11 +182,11 @@ Are you feeling good about something? Send a message.
 Hover over a bubble and press "To Journal".  
 
 <div align="center">
-    <img src="https://github.com/zakirullin/files.md/raw/main/web/img/journal.png" title="Journaling" width="450"/>
+    <img src="https://github.com/zakirullin/files.md/raw/main/web/img/journal.png" title="Journaling" width="350"/>
 </div>
 
-Or just use ` jj` or ` жж` at the end of your message.   
-Your record is gonna be saved nicely at `journal/Year Month.md` file.    
+Or just add ` jj` or ` жж` at the end of your message.   
+Your record is gonna be saved nicely at `journal/Year Month.md` file.   
 
 ## Checklists 🛒
 A good friend of yours recommends you a book.  
