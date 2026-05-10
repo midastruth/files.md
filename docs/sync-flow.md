@@ -9,14 +9,14 @@ flowchart TD
     U[User: sidebar click, link click, popstate] -->|openFile| OF[openFile]
     Timer1[setInterval 1000ms saver] -->|syncCurrentEditor| SCE[syncCurrentEditor]
     Focus[focusin / focus event] -->|syncCurrentEditor| SCE
-    Timer2[setInterval syncTexts + syncMedia] -->|syncTextsWithServer| STS[syncTextsWithServer]
+    Timer2[setInterval syncTextsWithServer + syncMedia] -->|syncTextsWithServer| STS[syncTextsWithServer]
 
     OF -->|save previous editor before swapping| SCE
     SCE -->|switchAwayEditor=false: end of fn| SLF[syncLocalFileWithServer]
-    STS -->|per-file path| POST1[POST /syncText per file]
-    SLF --> POST2[POST /syncText]
+    STS -->|per-file path| POST1[POST /syncFile per file]
+    SLF --> POST2[POST /syncFile]
 
-    STS -->|batch modified/deleted| POST3[POST /syncTexts]
+    STS -->|batch modified/deleted| POST3[POST /syncFilenames]
 ```
 
 The red node is the drift-seal line (files.js:1028). If `currentEditor` was rotated by anything during the yellow await above, this write lands on the wrong editor instance.
@@ -75,14 +75,14 @@ sequenceDiagram
 
     Note over Client: syncTextsWithServer fires
     Client->>Client: collect modified and deleted files (skip editor and editor2 paths)
-    Client->>Server: POST /syncTexts with modified, deleted, timestamps
+    Client->>Server: POST /syncFilenames with modified, deleted, timestamps
     Server-->>Client: files, timestamps, renames
     Client->>Client: write non-current files to disk and update server.files snapshot
     Client->>Client: advance per-dir timestamp pointers
 
     Note over Client: syncCurrentEditor finishes the switchAwayEditor=false branch
     Client->>Client: syncLocalFileWithServer for the active editor
-    Client->>Server: POST /syncText with path, lastModified, clientLastModified, clientLastSynced, content
+    Client->>Server: POST /syncFile with path, lastModified, clientLastModified, clientLastSynced, content
     alt notModified
         Server-->>Client: notModified
         Client->>Client: advance lastClientModified only
@@ -99,12 +99,12 @@ sequenceDiagram
 
 Two mechanisms, running in parallel:
 
-1. **Batch: `syncTextsWithServer` → `POST /syncTexts`.** The client sends:
+1. **Batch: `syncTextsWithServer` → `POST /syncFilenames`.** The client sends:
    - `modified`: files whose disk `lastModified` is newer than the `lastClientSynced` pointer recorded in `server.files` for that path.
    - `deleted`: files present in the client's `server.files` snapshot but no longer on disk.
    - `timestamps`: a per-directory pointer telling the server "everything I've seen up to here." The server replies with files newer than each directory's pointer. **The two currently-open editor files are skipped on both send and receive** (`files.js:230` and `files.js:577`) - they're handled by the per-file path instead, to avoid racing with the user's active edits.
 
-2. **Per-file: `syncLocalFileWithServer` → `POST /syncText`.** Called at the end of each `syncCurrentEditor` (when `switchAwayEditor=false`). Sends the single file's content plus its `lastModified` + `clientLastModified` + `clientLastSynced`. The server compares timestamps and responds with one of four statuses that the client maps to either "advance pointers only" or "write this content to disk."
+2. **Per-file: `syncLocalFileWithServer` → `POST /syncFile`.** Called at the end of each `syncCurrentEditor` (when `switchAwayEditor=false`). Sends the single file's content plus its `lastModified` + `clientLastModified` + `clientLastSynced`. The server compares timestamps and responds with one of four statuses that the client maps to either "advance pointers only" or "write this content to disk."
 
 The client's `server.files` object holds the triple `(content, lastModified, lastClientModified)` per path - this is the client's view of what the server thinks the world looks like, and the basis for deciding which files to include in the next `modified`/`deleted` lists. Persisted to `localStorage` under `SERVER_STORAGE_KEY`.
 
@@ -113,9 +113,8 @@ The client's `server.files` object holds the triple `(content, lastModified, las
 The auth token lives in an HttpOnly cookie, so JS can't see it directly. Instead, every successful response from the server stamps `localStorage.lastServerOk` with `Date.now()` via `markServerOk()` (files.js). `hasLastServerOk()` returns true if that key exists - which it only can if the server has previously accepted us. Use this as the gate before kicking off sync work: no stamp ⇒ no token ⇒ skip the request entirely. The flag is set in:
 
 - `app.js` after the `/token` exchange returns 200
-- `post()` after a 2xx JSON response (covers `/syncTexts` and friends)
-- `syncLocalFileWithServer` after `/syncText` 2xx
-- `syncMedia` after each `/syncMedias`, `/syncMedia` upload, and `/syncMedia` download 2xx
+- `post()` after a 2xx response (covers all `/syncFilenames`, `/syncFile`, `/syncMediaFilenames`, `/syncMediaFile` upload calls now that they go through this helper)
+- `syncMedia` directly after the raw `POST /syncMediaFile` download (binary blob, can't share `post()`)
 
 If the server later 401s, the stamp stays - but the request will simply fail and no sync state advances, so we don't need to clear it.
 

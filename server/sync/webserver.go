@@ -120,7 +120,7 @@ func router(serverLogger *log.Logger) *http.ServeMux {
 	r.HandleFunc("/syncMediaFile", corsMiddleware(panicMiddleware(tokenMiddleware(gzipMiddleware(SyncMediaFile)))))
 	r.HandleFunc("/token", corsMiddleware(panicMiddleware(IssueToken)))
 
-	// Old urls for backward compatibility.
+	// Deprecated due to cryptic names :) Will be removed soon.
 	r.HandleFunc("/syncTexts", corsMiddleware(panicMiddleware(tokenMiddleware(gzipMiddleware(SyncFilenames)))))
 	r.HandleFunc("/syncText", corsMiddleware(panicMiddleware(tokenMiddleware(gzipMiddleware(SyncFile)))))
 	r.HandleFunc("/syncMedias", corsMiddleware(panicMiddleware(tokenMiddleware(gzipMiddleware(SyncMediaFilenames)))))
