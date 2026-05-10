@@ -206,11 +206,11 @@ function initEditor(el) {
                         currentEditor.replaceSelection(markdownImageSyntax);
                         log(`Image saved as: ${fileName}`);
                     } else {
-                        log.error('Failed to save the image.');
+                        logError('Failed to save the image.');
                         alert('Failed to save the image. Please try again.');
                     }
                 } catch (error) {
-                    log.error('Error saving image:', error);
+                    logError('Error saving image:', error);
                     alert('Error saving image: ' + error.message);
                 }
             }

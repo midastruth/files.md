@@ -1340,7 +1340,7 @@ function addNewFileItem(item, parentDir) {
             await renderSidebar();
             await openFile(newFilePath);
         } catch (err) {
-            log.error('new file failed', err);
+            logError('new file failed', err);
             alert('Create file failed: ' + (err && err.message ? err.message : err));
         }
     });
@@ -1358,7 +1358,7 @@ function addNewDirItem(item, parentDir) {
             await createDir(newDirPath);
             await renderSidebar();
         } catch (err) {
-            log.error('new dir failed', err);
+            logError('new dir failed', err);
             alert('Create dir failed: ' + (err && err.message ? err.message : err));
         }
     });
@@ -1411,7 +1411,7 @@ function buildFolderMenu(item, dirPath) {
             }
             await renderSidebar();
         } catch (err) {
-            log.error('renameDir failed', err);
+            logError('renameDir failed', err);
             alert('Rename failed: ' + (err && err.message ? err.message : err));
         }
     });
@@ -1429,7 +1429,7 @@ function buildFolderMenu(item, dirPath) {
                 openRandomFile();
             }
         } catch (err) {
-            log.error('removeDir failed', err);
+            logError('removeDir failed', err);
             alert('Delete failed: ' + (err && err.message ? err.message : err));
         }
     });
@@ -1480,7 +1480,7 @@ function buildFileMenu(item, filePath) {
             }
             await renderSidebar();
         } catch (err) {
-            log.error('rename failed', err);
+            logError('rename failed', err);
             alert('Rename failed: ' + (err && err.message ? err.message : err));
         }
     });
@@ -1491,7 +1491,7 @@ function buildFileMenu(item, filePath) {
             document.getElementById('move-input').value = '';
             moveModal.open();
         } catch (err) {
-            log.error('move failed', err);
+            logError('move failed', err);
             alert('Move failed: ' + (err && err.message ? err.message : err));
         }
     });
@@ -1506,7 +1506,7 @@ function buildFileMenu(item, filePath) {
                 await renderSidebar();
             }
         } catch (err) {
-            log.error('delete failed', err);
+            logError('delete failed', err);
             alert('Delete failed: ' + (err && err.message ? err.message : err));
         }
     });

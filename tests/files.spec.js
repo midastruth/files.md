@@ -743,6 +743,7 @@ test('move file using keyboard navigation', async ({ page }) => {
 
             return testDir;
         };
+        window.dispatchEvent(new Event('focus'));
     });
 
     await page.evaluate(() => {
@@ -773,8 +774,11 @@ test('move file using keyboard navigation', async ({ page }) => {
     await page.click('#sidebar >> text=work');
     await page.waitForTimeout(100);
 
+    await page.pause();
+
     const workFiles = await page.locator('#sidebar >> text=work').locator('..').locator('text=Meeting Notes');
     expect(await workFiles.count()).toBe(1);
+
 });
 
 test('create file in selected folder', async ({ page }) => {

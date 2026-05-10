@@ -296,7 +296,7 @@ async function writeMediaFile(fileName, file) {
 
         return fileHandle;
     } catch (error) {
-        log.error('Error saving file:', error);
+        logError('Error saving file:', error);
         return null;
     }
 }

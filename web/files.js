@@ -224,7 +224,7 @@ async function syncTextsWithServer() {
         timestamps: server['timestamps'] || [],
     });
     if (error) {
-        log.error('syncFilenames failed:', error);
+        logError('syncFilenames failed:', error);
         isSyncingTexts = false;
         return;
     }
@@ -299,7 +299,7 @@ async function syncTextsWithServer() {
             log("BATCH sync error, timestamps aren't moved");
         }
     } catch (error) {
-        log.error("Can't sync:", error.message)
+        logError("Can't sync:", error.message)
     }
 
     log('Sync completed in ' + (performance.now() - startTime) + 'ms');
@@ -339,7 +339,7 @@ async function syncLocalFileWithServer(path) {
             content: content,
         });
         if (error) {
-            log.error(`syncText ${path} failed:`, error);
+            logError(`syncText ${path} failed:`, error);
             return;
         }
 
@@ -428,7 +428,7 @@ async function syncMedia() {
                     data: base64String,
                 });
                 if (error) {
-                    log.error(`Failed to sync media file ${mediaFilename}:`, error);
+                    logError(`Failed to sync media file ${mediaFilename}:`, error);
                 } else {
                     server['media'][mediaFilename] = {
                         isFile: true,
@@ -438,7 +438,7 @@ async function syncMedia() {
                     log(`Successfully synced media file: ${mediaFilename}`);
                 }
             } catch (error) {
-                log.error(`Error syncing media file ${mediaFilename}:`, error);
+                logError(`Error syncing media file ${mediaFilename}:`, error);
             }
         }
     }
@@ -447,7 +447,7 @@ async function syncMedia() {
             timestamp: mediaTimestamp,
         });
         if (error) {
-            log.error('syncMediaFilenames failed:', error);
+            logError('syncMediaFilenames failed:', error);
             isSyncingMedia = false;
             return;
         }
@@ -472,7 +472,7 @@ async function syncMedia() {
                     })
                 });
                 if (!response.ok) {
-                    log.error(`Failed to download ${filename}: ${response.status}`);
+                    logError(`Failed to download ${filename}: ${response.status}`);
                     continue;
                 }
                 markServerOk();
@@ -481,13 +481,13 @@ async function syncMedia() {
                 await saveMediaFile(`media/${filename}`, blob, lastModified);
                 filesProcessed++;
             } catch (error) {
-                log.error(`Error processing media file ${filename}:`, error);
+                logError(`Error processing media file ${filename}:`, error);
             }
         }
 
         log(`Media sync completed in ${(performance.now() - startTime).toFixed(2)}ms. Downloaded ${filesProcessed} files.`);
     } catch (error) {
-        log.error('Network error during media sync:', error.message);
+        logError('Network error during media sync:', error.message);
     }
 
     isSyncingMedia = false;
@@ -547,7 +547,7 @@ async function saveMediaFile(path, blob, lastModified) {
             files['media/'][filename].imageUrl = imageUrl;
         });
     } catch (error) {
-        log.error(`Error writing media file ${path}:`, error);
+        logError(`Error writing media file ${path}:`, error);
         throw error;
     }
 }
@@ -665,7 +665,7 @@ async function getFileStatus(path) {
             fileHandle = await getFileHandle(path, false);
         }
         if (!(fileHandle instanceof FileSystemFileHandle)) {
-            log.error("Error while getting file handle for status check", path);
+            logError("Error while getting file handle for status check", path);
             return {
                 status: 'error',
             }
@@ -674,7 +674,7 @@ async function getFileStatus(path) {
         const file = await memFile.handle.getFile();
         content = await file.text();
     } catch (error) {
-        log.error('Error while getting status for file', path, error);
+        logError('Error while getting status for file', path, error);
         return {
             status: 'error',
         }
@@ -793,7 +793,7 @@ async function moveCurrentFile(toDir) {
         await remove(oldPath);
         await renderSidebar();
     } catch (error) {
-        log.error('Error moving file:', error);
+        logError('Error moving file:', error);
     }
 
     isMessingWithCurrentEditor = false;
@@ -857,7 +857,7 @@ async function moveFile(oldPath, newPath) {
 
         log(`Moved ${oldPath} to ${newPath}`);
     } catch (error) {
-        log.error('Error moving file:', error);
+        logError('Error moving file:', error);
     }
 }
 
@@ -1159,7 +1159,7 @@ async function syncCurrentText(switchAwayEditor = false) {
             try {
                 await syncLocalFileWithServer(CHAT_PATH);
             } catch (error) {
-                log.error('Error during sync with server:', error);
+                logError('Error during sync with server:', error);
             }
         }
 
@@ -1250,7 +1250,7 @@ async function syncCurrentText(switchAwayEditor = false) {
             return;
         }
     } catch (error) {
-        log.error('Error during filename change:', error);
+        logError('Error during filename change:', error);
         isMessingWithCurrentEditor = false;
         return;
     }
@@ -1266,7 +1266,7 @@ async function syncCurrentText(switchAwayEditor = false) {
         // const path = `${dir}/${filename}`;
         contentWasModifiedLocally = !await isContentEqual(path, content);
     } catch (error) {
-        log.error('Error checking content equality:', error);
+        logError('Error checking content equality:', error);
         isMessingWithCurrentEditor = false;
         return;
     }
@@ -1289,7 +1289,7 @@ async function syncCurrentText(switchAwayEditor = false) {
                 await openFile(path, false, el);
             }
         } catch (error) {
-            log.error('Error opening file:', error);
+            logError('Error opening file:', error);
             isMessingWithCurrentEditor = false;
             return;
         }
@@ -1321,11 +1321,11 @@ async function syncCurrentText(switchAwayEditor = false) {
             } else {
                 // When could that happen?
                 if (file.handle) {
-                    log.error(`Cannot save ${path}. No file handle found.`);
+                    logError(`Cannot save ${path}. No file handle found.`);
                 }
             }
         } catch (error) {
-            log.error('Error during save:', error);
+            logError('Error during save:', error);
             isSaving = false;
             if (isCurrentEditorSame()) {
                 // Revert doc back to dirty state
@@ -1344,7 +1344,7 @@ async function syncCurrentText(switchAwayEditor = false) {
         try {
             await syncLocalFileWithServer(path);
         } catch (error) {
-            log.error('Error during sync with server:', error);
+            logError('Error during sync with server:', error);
         }
     }
 }
@@ -1654,7 +1654,7 @@ async function openRandomFile() {
     });
 
     if (allFiles.length === 0) {
-        log.error('No files found to open.');
+        logError('No files found to open.');
         return;
     }
 
@@ -1662,6 +1662,6 @@ async function openRandomFile() {
     try {
         await openFile(randomPath);
     } catch (error) {
-        log.error('Failed to open random file:', error);
+        logError('Failed to open random file:', error);
     }
 }

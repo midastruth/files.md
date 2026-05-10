@@ -21,7 +21,7 @@ $ make deploy_systemd host=<YOUR_SSH_HOST>
 Bot's artifacts can be seen in `/app/storage/<USER_ID>` folder
 
 ### Additional bot's settings
-1) Enable `Inline Mode` for your bot in [@BotFather](https://t.me/BotFather)
+1) For search functionality, enable `Inline Mode` for your bot in [@BotFather](https://t.me/BotFather)
 2) Press "Edit Commands", and send the following list:
 ```
 chat - 🏠 Home
@@ -61,7 +61,7 @@ We don't need to transfer fslog (renames), if we're certain that all clients rea
 5) Make sure that all files are available
 6) Cleanup the oldserver
 
-## Additional information
+## Maintenance notes
 Add this to your crontab (`crontab -e`) for daily git backups:
 `0 0 * * * cd /app/storage/<YOUR_TELEGRAM_ID> && git add . && git commit -m "$(date +\%d.\%m.\%Y)"`
 
