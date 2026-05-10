@@ -833,7 +833,7 @@ async function renderMessages() {
                                 12.0393 20.0062 12.1225 19.9815C12.2178 19.9532 12.2994 19.8811 12.4628 19.7369C13.9229 
                                 18.4479 18.3778 14.4654 19.8499 12.5772C21.6204 10.3061 21.3417 7.07538 19.0484 
                                 5.17534C16.7551 3.2753 13.7994 3.90317 12 6.00019Z" 
-                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                             </svg>
                         </button>
                         <span class="btn-label">To Journal</span>
@@ -842,7 +842,7 @@ async function renderMessages() {
                     <div class="btn-wrapper">
                         <button class="action-btn to-checklist-btn" data-checklist="Later.md">
                             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 32 32">
-                                <circle cx="16" cy="16" r="13" stroke-width="2"/>
+                                <circle cx="16" cy="16" r="13" stroke-width="2" style="fill: none !important;"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8l4 4"/>
                             </svg>
                         </button>
@@ -853,7 +853,7 @@ async function renderMessages() {
                         <button class="action-btn to-checklist-btn" data-checklist="Read.md">
                             <?xml version="1.0" encoding="utf-8"?>
                             <svg width="32px" height="32px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M4 19V6.2C4 5.0799 4 4.51984 4.21799 4.09202C4.40973 3.71569 4.71569 3.40973 5.09202 3.21799C5.51984 3 6.0799 3 7.2 3H16.8C17.9201 3 18.4802 3 18.908 3.21799C19.2843 3.40973 19.5903 3.71569 19.782 4.09202C20 4.51984 20 5.0799 20 6.2V17H6C4.89543 17 4 17.8954 4 19ZM4 19C4 20.1046 4.89543 21 6 21H20M9 7H15M9 11H15M19 17V21"  stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                                <path d="M4 19V6.2C4 5.0799 4 4.51984 4.21799 4.09202C4.40973 3.71569 4.71569 3.40973 5.09202 3.21799C5.51984 3 6.0799 3 7.2 3H16.8C17.9201 3 18.4802 3 18.908 3.21799C19.2843 3.40973 19.5903 3.71569 19.782 4.09202C20 4.51984 20 5.0799 20 6.2V17H6C4.89543 17 4 17.8954 4 19ZM4 19C4 20.1046 4.89543 21 6 21H20M9 7H15M9 11H15M19 17V21"  stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                             </svg>
                         </button>
                         <span class="btn-label">To Read</span>
