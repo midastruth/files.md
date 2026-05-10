@@ -207,7 +207,7 @@ const WELCOME_FILES = {
     "🪴 Welcome.md": {
         "content":
             "[Open or create folder](cmd:openDir) to save changes.\n\n" +
-            "[Open chat](cmd:openChat) to dump whatever's on your mind.\n\n" +
+            "[Use chat](cmd:openChat) to dump whatever is on your mind.\n\n" +
             "[Markdown Guide](/Markdown%20Guide.md)\n[Hotkeys](/Hotkeys.md)\n[Links](/Links.md)",
         isFile: true,
     },
