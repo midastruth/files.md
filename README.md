@@ -72,10 +72,6 @@ Move it anywhere later:
 
 With this flow you can save anything.  
 
-## No productivity, no complexity. Relax
-The only thing that matters is your calmness.  
-**We reuse same well-familiar messaging pattern for everything.**
-
 ## Journal 💚
 Are you feeling good about something? Send a message.  
 
@@ -99,7 +95,7 @@ Drop a message and stay in flow.
 </div>
 
 Add only small, actionable items.  
-Not things like `Plan a vacation`.  
+Not things like "Plan a vacation".  
 Add the first tiny step of what should be done anyway.     
 **Not what you wish to be done, but don't have motivation just yet.**    
 **Your task list should not create a feeling of guilt**.  

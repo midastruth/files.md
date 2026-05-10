@@ -1070,15 +1070,19 @@ function TreeView(root, container, options) {
             li_outer.appendChild(span_desc);
         } else {
             var ret = '';
-            if (node.isExpanded()) {
+            if (node.toString() === 'journal') {
+                // Heart-folder icon stays for journal regardless of
+                // expand state - it's the "love letters to yourself"
+                // marker, swapping it for the generic open-folder icon
+                // breaks the visual cue.
+                ret += '<span class="tree-mod_icon">' + TreeConfig.journal_icon + '</span>';
+            } else if (node.isExpanded()) {
                 ret += '<span class="tree-mod_icon">' + TreeConfig.open_icon + '</span>';
             } else {
                 if (node.toString().startsWith('_') && node.toString().endsWith('_')) {
                     ret += '<span class="tree-mod_icon">' + TreeConfig.checklists_icon + '</span>';
                 } else if (node.toString() === 'today' || node.toString() === 'later') {
                     ret += '<span class="tree-mod_icon">' + TreeConfig.later_icon + '</span>';
-                } else if (node.toString() === 'journal') {
-                    ret += '<span class="tree-mod_icon">' + TreeConfig.journal_icon + '</span>';
                 } else {
                     ret += '<span class="tree-mod_icon">' + TreeConfig.close_icon + '</span>';
                 }
