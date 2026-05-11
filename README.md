@@ -109,11 +109,11 @@ Drop them in chat, then sort into matching checklists.
 ## How to take notes
 1) I used [files.md](https://files.md) to grow my knowledge about brain and software development
 2) I added new notes to either `brain` or `dev` folders. One idea per note
-3) I made connections between the notes (type `[` in the web app). Everything is connected, just as in our brain
+3) I made connections between the notes in the web app (typed `[` and selected a relevant note). Everything is connected, just as in our brain
 4) **I spent time travelling through the notes and thinking it through**
 5) At some point, `brain` and `dev` notes appeared very related
-6) I interconnected the knowledge, **I got the insight**
-7) I wrote an article about [Cognitive Load in Software Development](https://github.com/zakirullin/cognitive-load)
+6) An interconnection between domains produced an insight
+7) I wrote an article based on that insight: [Cognitive Load in Software Development](https://github.com/zakirullin/cognitive-load)
 8) Many considered it a great write-up
 
 All this activity helped me to:
@@ -181,14 +181,14 @@ You don't have to think about the structure, it is predefined.
 Although, you're free to use whatever structure you want.  
 
 - Chat: `Chat.md`
-- Notes: `brain/Note.md` (`<category>/*.md`, files in subfolder)
-- Projects: `My project.md` (`/*.md`, files in the root folder)
+- Notes: `brain/Note.md`, `<category>/*.md`
+- Projects: `My project.md`, `*.md`
 - Checklists: `Read.md`, `Watch.md`, `Shop.md`, `MyChecklist_.md`
-- Journal: `journal/2024.08 August.md` (`journal/<YYYY>.<MM> <Month>.md`)
+- Journal: `journal/2024.08 August.md`
 - Tasks: `Later.md`
-- Habits: `habits/Ate consciously.md` (`habits/*.md`)
+- Habits: `habits/Ate consciously.md`, `habits/*.md`
 - Media: `media/*` (png, jpg, webp, gif)
-- Archive: `archive/*`
+- Archive: `archive/*.md`
 - Config: `config.json`
 
 Scheme is also available at [files.md/llms.txt](https://files.md/llms.txt).  
@@ -198,6 +198,7 @@ You can copy-paste it into `CLAUDE.md` or `AGENTS.md`, so that your AI agent wou
 
 | Hotkey                     | Action                         |
 |----------------------------|--------------------------------|
+| `[`                        | Trigger file link autocomplete |  
 | `Cmd+P` / `Ctrl+P`         | Open file search modal         |
 | `Cmd+N` / `Ctrl+N`         | New file                       |
 | `Cmd+M` / `Ctrl+M`         | Move file                      |
@@ -212,7 +213,6 @@ You can copy-paste it into `CLAUDE.md` or `AGENTS.md`, so that your AI agent wou
 | `Cmd+Y` / `Ctrl+Y`         | Insert checkbox                |
 | `Cmd/Ctrl` + `Click`       | Copy inline text / open link   |
 | `Ctrl+Cmd+Space`           | Insert emoji (macOS)           |
-| `[`                        | Trigger file link autocomplete |  
 
 ## Useful scripts for your files
 All scripts are in `cmd` and can be run **inside your files directory**. Install [Go](https://go.dev/doc/install) first.

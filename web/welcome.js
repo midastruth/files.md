@@ -275,6 +275,12 @@ const WELCOME_FILES = {
     },
     "Hotkeys.md": {
         "content":
+            "#### Editor Functions\n" +
+            "\n" +
+            "| Hotkey | Action |\n" +
+            "| -------- | -------- |\n" +
+            "| `[` | Trigger file link autocomplete |\n" +
+            "\n" +
             "| Hotkey | Action |\n" +
             "| -------- |-------- |\n" +
             "| `Cmd+P` / `Ctrl+P` | Open file search modal |\n" +
@@ -297,12 +303,6 @@ const WELCOME_FILES = {
             "| `Cmd` / `Ctrl`+`Click`| Copy text from `inline` element |\n" +
             "| `Cmd` / `Ctrl`+`Click`| To open a link like https//files.md |\n" +
             "| `Ctrl` + `Cmd` + `Space`| Insert emoji (MacOS) |\n" +
-            "\n" +
-            "#### Editor Functions\n" +
-            "\n" +
-            "| Hotkey | Action |\n" +
-            "| -------- | -------- |\n" +
-            "| `[` | Trigger file link autocomplete |\n" +
             "\n" +
             "[Markdown Guide](/Markdown%20Guide.md)",
         isFile: true,
