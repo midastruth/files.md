@@ -279,6 +279,7 @@ const WELCOME_FILES = {
         "content":
             "| Hotkey | Action |\n" +
             "| -------- | -------- |\n" +
+            "| `[` | Insert a link to a file |\n" +
             "| `Cmd+P` / `Ctrl+P` | Open file search modal |\n" +
             "| `Cmd+N` / `Ctrl+N` | New file |\n" +
             "| `Cmd+M` / `Ctrl+M` | Move file |\n" +
@@ -294,7 +295,6 @@ const WELCOME_FILES = {
             "| `Cmd` / `Ctrl` + `Click` | Copy text from `inline` element |\n" +
             "| `Cmd` / `Ctrl` + `Click` | Open a link like https//files.md |\n" +
             "| `Ctrl` + `Cmd` + `Space` | Insert emoji (MacOS) |\n" +
-            "| `[` | Insert a link to a file |\n" +
             "\n" +
             "[Markdown Guide](/Markdown%20Guide.md)",
         isFile: true,
