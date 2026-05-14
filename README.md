@@ -41,14 +41,14 @@ Maybe. But this time:
 ## Dump your thoughts
    
 <div align="center">
+    Open the chat and send a message:
     <img src="https://github.com/zakirullin/files.md/raw/main/web/img/note1.png"  width="350"/>
-    <sub>Open the chat and send a message</sub>
 </div>
 
 
 <div align="center">
+    Select where to save:
     <img src="https://github.com/zakirullin/files.md/raw/main/web/img/actions.png" width="350"/>
-    <sub>Select where to save</sub>
 </div>
 
 You can save to notes, journal and checklists.
