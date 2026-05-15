@@ -1778,7 +1778,7 @@ func TestShowMoveTo(t *testing.T) {
 			{Name: "📆 To a day", Cmd: tg.Cmd{Name: "sc_day", Params: []string{h}, Type: "cmd"}},
 		},
 		[]tg.Btn{
-			{Name: "📄 To File", Cmd: tg.Cmd{Name: "to_file", Params: []string{h}, Type: "cmd"}},
+			{Name: "📄 To Note", Cmd: tg.Cmd{Name: "to_file", Params: []string{h}, Type: "cmd"}},
 			{Name: "💚 To Journal", Cmd: tg.Cmd{Name: "mv_to_journal", Params: []string{h}, Type: "cmd"}},
 		},
 	},
@@ -2953,7 +2953,7 @@ func TestSaveToNewTask(t *testing.T) {
 			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{inboxMsgHash(t, userFS, 0)})),
 		),
 		tg.NewRow(
-			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
+			tg.NewBtn("📄 To Note", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("👌", tg.NewCmd("home", []string{})),
 		),
@@ -3024,7 +3024,7 @@ func TestSaveToExistingFile(t *testing.T) {
 			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{inboxMsgHash(t, userFS, 1)})),
 		),
 		tg.NewRow(
-			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 1)})),
+			tg.NewBtn("📄 To Note", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 1)})),
 			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{inboxMsgHash(t, userFS, 1)})),
 			tg.NewBtn("👌", tg.NewCmd("home", []string{})),
 		),
@@ -3111,7 +3111,7 @@ func TestSaveToExistingFileModeTasks(t *testing.T) {
 			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{inboxMsgHash(t, userFS, 1)})),
 		),
 		tg.NewRow(
-			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 1)})),
+			tg.NewBtn("📄 To Note", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 1)})),
 			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{inboxMsgHash(t, userFS, 1)})),
 			tg.NewBtn("👌", tg.NewCmd("home", []string{})),
 		),
@@ -3199,7 +3199,7 @@ func TestSaveToNewFile(t *testing.T) {
 			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{inboxMsgHash(t, userFS, 1)})),
 		),
 		tg.NewRow(
-			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 1)})),
+			tg.NewBtn("📄 To Note", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 1)})),
 			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{inboxMsgHash(t, userFS, 1)})),
 			tg.NewBtn("👌", tg.NewCmd("home", []string{})),
 		),
@@ -3280,7 +3280,7 @@ func TestSaveToNewDirFull(t *testing.T) {
 			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{inboxMsgHash(t, userFS, 0)})),
 		),
 		tg.NewRow(
-			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
+			tg.NewBtn("📄 To Note", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("👌", tg.NewCmd("home", []string{})),
 		),
@@ -3366,7 +3366,7 @@ func TestSaveToNewDir(t *testing.T) {
 			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{inboxMsgHash(t, userFS, 0)})),
 		),
 		tg.NewRow(
-			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
+			tg.NewBtn("📄 To Note", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("👌", tg.NewCmd("home", []string{})),
 		),
@@ -3454,7 +3454,7 @@ func TestSaveToNewMultilineFile(t *testing.T) {
 			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{inboxMsgHash(t, userFS, 0)})),
 		),
 		tg.NewRow(
-			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
+			tg.NewBtn("📄 To Note", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("👌", tg.NewCmd("home", []string{})),
 		),
@@ -3536,7 +3536,7 @@ func TestSaveToNewCustomFile(t *testing.T) {
 			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{inboxMsgHash(t, userFS, 0)})),
 		),
 		tg.NewRow(
-			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
+			tg.NewBtn("📄 To Note", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("👌", tg.NewCmd("home", []string{})),
 		),
@@ -3617,7 +3617,7 @@ func TestSaveToRecentFile(t *testing.T) {
 			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{inboxMsgHash(t, userFS, 0)})),
 		),
 		tg.NewRow(
-			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
+			tg.NewBtn("📄 To Note", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("👌", tg.NewCmd("home", []string{})),
 		),
@@ -3663,7 +3663,7 @@ func TestSaveToRecentFile(t *testing.T) {
 			tg.NewBtn("📆 To a day", tg.NewCmd("sc_day", []string{inboxMsgHash(t, userFS, 0)})),
 		),
 		tg.NewRow(
-			tg.NewBtn("📄 To File", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
+			tg.NewBtn("📄 To Note", tg.NewCmd("to_file", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("💚 To Journal", tg.NewCmd("mv_to_journal", []string{inboxMsgHash(t, userFS, 0)})),
 			tg.NewBtn("⭐️ Text", tg.NewCmd("mf", []string{"23200", inboxMsgHash(t, userFS, 0)})),
 		),

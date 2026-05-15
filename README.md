@@ -51,7 +51,7 @@ Select where to save:
     <img src="https://github.com/zakirullin/files.md/raw/main/web/img/actions.png" width="350"/>
 </div>
 
-You can save to notes, journal and checklists.
+You can save notes, journal and checklists.
 
 ## Grow your knowledge base 🌱
 Connect ideas. Let them compound. Think through.  
@@ -87,7 +87,7 @@ To achieve all that, **you'll have to use your brain**, not advanced templates o
 
 My friends and I have been using this simple setup for five years, and it works well.
 
-## Taking notes in chatbot
+## Save things in the chatbot
 Open the chat and send a message:
 <div align="center">
     <img src="https://github.com/zakirullin/files.md/raw/main/web/img/note1.png" alt="Telegram Bot" title="Telegram Bot" width="350"/>
@@ -99,6 +99,8 @@ Move it anywhere later:
 </div>
 
 With this flow you can save anything.
+
+[Telegram Bot](https://t.me/FilesMDBot)  
 
 **Other messengers will follow**
 
