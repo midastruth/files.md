@@ -1,0 +1,311 @@
+/* Brutal theme - inspired by Soviet brutalism + Andy Matuschak's notes garden.
+   Paper-cream background, near-black text, monospace italic blockquotes,
+   marker-pen orange highlight on links, heavy bold for emphasis. Cloned
+   from theme-light.css and re-skinned; structure stays identical so the
+   editor wiring is unaffected. */
+/* Palette is applied regardless of system color scheme - brutal overrides
+   both light and dark defaults. Loaded INSTEAD of theme-light.css; comment
+   out theme-dark.css too if it's still linked or it'll fight on dark OS.
+   Neo-* colors follow the reference palette from
+   https://rustamagamaliev.ru — paper bg + lime/orange/blue accents. */
+:root {
+    --font: 'Space Mono', monospace !important;
+    --font-mono-brutal: 'Space Mono', 'IBM Plex Mono', ui-monospace, 'Courier New', Courier, monospace;
+    --color-neo-bg: #F4F4F0;
+    --color-neo-text: #1A1A1A;
+    --color-neo-border: #000;
+    --color-neo-blue: #2E5CFF;
+    --color-neo-lime: #C2F970;
+    --color-neo-orange: #FF6B35;
+    --col-tx: #1A1A1A !important;
+    --col-tx-alt: #6B6B5C !important;
+    --col-bg: #F4F4F0 !important;
+    --col-bg-alt: #EDEDE5 !important;
+    --col-inline-code: #1A1A1A !important;
+    --col-inline-code-bg: #E5E5DC !important;
+    --col-link: #1A1A1A !important;
+    --col-link-hover: #1A1A1A !important;
+    --col-url: #6B6B5C !important;
+    --col-tx-sel: #000 !important;
+    --col-msg-sel: color-mix(in srgb, #000, transparent 60%) !important;
+    --col-bg-active: #E0E0D8 !important;
+    --col-border: #000 !important;
+    --col-marker: var(--color-neo-orange);
+    --col-accent: #000;
+}
+
+@media (prefers-color-scheme: light) {
+    :root {
+        /* explicit empty: unconditional :root above already covers light. */
+    }
+
+    .cm-s-hypermd-light span.cm-formatting-task {
+        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAwCAMAAAA8VkqRAAAAclBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACa4vOeAAAAJXRSTlMADcjpDswcLZOzsvOYBvWdbtvTX0D69+ORa1dRJCDtuaF7ZDkoQyuUXgAAAMhJREFUOMvt0reywjAUhOFjKxmcrgMZboL//V8Rm6GwkNUx0LClvhkVZ1fEZoqHqMwO7wuUSb0YxcJKxtLpxIt2SzJRykkQp5RgdAjaIKRJCEn6gWdA9OzRoqLVRscQnc9bdtXX/eyurOF7N3erLVDPwCGHxoVwamH1LwGUBfBbhrCvoLlMitL9DY8trLtJg7qoCj18VAN1OYE/YJBuDe1RJtBVo5wbqPb+GL5yWG1GLX0YZYw5iQ93yQ/yAHfZzu5qt/mxr97VFS15JGSVM0C6AAAAAElFTkSuQmCC");
+    }
+
+    .to-recent-btn, .action-btn svg {
+        fill: var(--col-tx-alt);
+        color: var(--col-tx-alt) !important;
+        stroke: var(--col-tx-alt) !important;
+    }
+
+    .to-recent-btn:hover, .action-btn:hover svg {
+        fill: var(--col-accent);
+        color: var(--col-accent) !important;
+        stroke: var(--col-accent) !important;
+    }
+
+    #toolbar svg {
+        stroke: var(--col-tx) !important;
+    }
+
+    #toolbar button:hover svg {
+        border-radius: 0;
+        stroke: var(--col-accent) !important;
+        background: var(--col-bg-active);
+    }
+
+    #close-chat, #fullscreen-chat {
+        color: var(--col-tx-alt) !important;
+    }
+
+    #open-inbox-modal:hover svg {
+       stroke: var(--col-accent) !important;
+    }
+
+    #close-chat:hover, #fullscreen-chat:hover {
+        color: var(--col-accent) !important;
+    }
+
+    #open-inbox-modal svg {
+        stroke: #F5F5F5 !important;
+    }
+
+    #close-sidebar, #close-editor2, #go-forward svg, #go-backward svg {
+        color: var(--col-tx-alt) !important;
+        stroke: var(--col-tx-alt) !important;
+    }
+
+    #close-sidebar:hover, #close-editor2:hover, #go-forward:hover svg, #go-backward:hover svg {
+        color: var(--col-accent) !important;
+        stroke: var(--col-accent) !important;
+    }
+
+    #open-sidebar {
+        background: var(--col-bg-active);
+    }
+
+    .message.own {
+        background: color-mix(in srgb, var(--col-bg) 60%, transparent);
+    }
+}
+
+/* Headers: heavy weight + a hard black rule under H1 / H2, brutalist style. */
+.cm-s-hypermd-light .cm-header.cm-header-1 {
+    font-size: 32px !important;
+    line-height: 38px !important;
+    font-weight: 700 !important;
+}
+
+.cm-s-hypermd-light pre.HyperMD-header.HyperMD-header-1 {
+    padding-top: 18px !important;
+    border-bottom: 1.5px solid var(--col-border);
+    padding-bottom: 6px !important;
+}
+
+.cm-s-hypermd-light .CodeMirror-code > pre.HyperMD-header.HyperMD-header-1:first-child,
+.cm-s-hypermd-light .CodeMirror-code > :first-child pre.HyperMD-header.HyperMD-header-1 {
+    padding-top: 0 !important;
+    padding-bottom: 11px !important;
+}
+
+.cm-s-hypermd-light pre.HyperMD-header.HyperMD-header-2 {
+    padding-top: 18px !important;
+    font-size: 24px !important;
+    line-height: 30px !important;
+    font-weight: 700 !important;
+}
+
+.cm-s-hypermd-light pre.HyperMD-header.HyperMD-header-3 {
+    padding-top: 16px !important;
+    font-size: 22px !important;
+    line-height: 28px !important;
+    font-weight: 700 !important;
+}
+
+.cm-s-hypermd-light pre.HyperMD-header.HyperMD-header-4 {
+    padding-top: 14px !important;
+    font-size: 20px !important;
+    line-height: 26px !important;
+    font-weight: 700 !important;
+}
+
+.cm-s-hypermd-light pre.HyperMD-header.HyperMD-header-5 {
+    padding-top: 12px;
+    font-size: 18px;
+    line-height: 24px !important;
+    font-weight: 700 !important;
+}
+
+.cm-s-hypermd-light pre.HyperMD-header.HyperMD-header-6 .cm-header-6 {
+    padding-top: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+}
+
+.cm-s-hypermd-light .cm-header {
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.cm-s-hypermd-light .cm-strong, .cm-s-hypermd-light span.cm-url {
+    font-family: var(--font) !important;
+    font-weight: 400;
+}
+
+.cm-s-hypermd-light span.cm-formatting-list-ol {
+    color: var(--col-tx-alt) !important;
+}
+
+/* Heavy bold - brutalist emphasis. */
+.cm-s-hypermd-light .cm-strong {
+    font-weight: 800;
+}
+
+.cm-s-hypermd-light pre.HyperMD-list-line {
+    padding-top: 0 !important;
+}
+
+.cm-s-hypermd-light span.cm-url:not(.cm-string) {
+    color: var(--col-url) !important;
+    font-weight: 400;
+}
+
+/* Link default: classic blue + thin underline, no marker bg. */
+.cm-s-hypermd-light .cm-link,
+.cm-s-hypermd-light .cm-string.cm-url.cm-hmd-barelink {
+    line-height: 1.6 !important;
+    color: var(--color-neo-blue) !important;
+    background: transparent !important;
+    border-bottom: 1px solid var(--color-neo-blue) !important;
+    font-weight: 500;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    transition: background .15s, color .15s;
+}
+
+/* Selected (cursor on the line) or hover: lime-green chip + blue text,
+   no underline. CodeMirror tags the active line's pre with
+   `.CodeMirror-activeline`. */
+.cm-s-hypermd-light pre.CodeMirror-activeline .cm-link,
+.cm-s-hypermd-light pre.CodeMirror-activeline .cm-string.cm-url.cm-hmd-barelink,
+.cm-s-hypermd-light .cm-link:hover,
+.cm-s-hypermd-light .cm-string.cm-url.cm-hmd-barelink:hover {
+    background: var(--color-neo-lime) !important;
+    color: var(--color-neo-blue) !important;
+    border-bottom: none !important;
+}
+
+/* Blockquote: soft light-blue gradient strip with a thick neo-blue left
+   bar. Mirrors the `.prose blockquote` style from the brutal reference. */
+.cm-s-hypermd-light pre.HyperMD-quote {
+    font-family: var(--font-mono-brutal) !important;
+    color: var(--col-tx) !important;
+    background: linear-gradient(135deg, #F8FAFC, #F1F5F9) !important;
+}
+
+.cm-s-hypermd-light pre.HyperMD-quote-1:before {
+    background: var(--color-neo-blue) !important;
+    width: 4px !important;
+}
+
+.cm-s-hypermd-light span.cm-quote {
+    color: var(--col-tx) !important;
+}
+
+/* Inline code: lime-green chip with bold mono text and a thin dark
+   outline. Lifted from the brutal reference's `.prose code`. */
+.cm-s-hypermd-light span.cm-inline-code:not(.cm-formatting):not(.cm-hmd-indented-code) {
+    font-family: var(--font-mono-brutal) !important;
+    background: var(--color-neo-lime) !important;
+    color: #1A1A1A !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    border-radius: 4px !important;
+    padding: 0.2em 0.5em !important;
+    font-weight: 600 !important;
+    font-size: 0.9em !important;
+}
+
+/* Codeblocks: paper-darker background, sharp edges, mono font. */
+.cm-s-hypermd-light div.HyperMD-codeblock-bg {
+    background: var(--col-bg-alt) !important;
+    border-left: 4px solid var(--col-border) !important;
+    border-right: none !important;
+    border-radius: 0 !important;
+}
+
+.cm-s-hypermd-light pre.HyperMD-codeblock {
+    font-family: var(--font-mono-brutal) !important;
+}
+
+/* Horizontal rule: hard solid bar - core brutalist motif. */
+.cm-s-hypermd-light pre.HyperMD-hr {
+    color: var(--col-border) !important;
+    background: transparent !important;
+}
+
+.cm-s-hypermd-light div.HyperMD-hr-bg {
+    background: var(--col-border) !important;
+    height: 2px !important;
+}
+
+/* Text selection: black highlight + white text. CodeMirror draws the
+   selection as an overlay div behind text; ::selection on the actual
+   span layer handles the white text-color. -webkit-text-fill-color is
+   the override that beats the `color: ... !important` set on cm-* spans
+   in some Chromium versions. */
+::selection,
+*::selection {
+    background: #000 !important;
+    color: #FFF !important;
+    -webkit-text-fill-color: #FFF !important;
+}
+::-moz-selection,
+*::-moz-selection {
+    background: #000 !important;
+    color: #FFF !important;
+}
+.CodeMirror-selected,
+.CodeMirror-focused .CodeMirror-selected {
+    background: #000 !important;
+}
+
+/* Sidebar tree: brutalist palette. Mono font, blue on hover (focused),
+   orange on selected (current open file). Selectors match sidebar.css's
+   structure so they win without going nuclear with `!important`. */
+#sidebar,
+#sidebar .tree-container,
+#sidebar .tree-item {
+    font-family: 'IBM Plex Mono', monospace !important;
+}
+
+.tree-container li span.tree-item:hover {
+    background-color: var(--color-neo-blue) !important;
+    color: #FFF !important;
+}
+.tree-container li span.tree-item:hover .tree-mod_icon svg {
+    stroke: #FFF !important;
+}
+
+.tree-container span.tree-item.selected,
+.tree-container span.tree-item.selected:hover {
+    background-color: var(--color-neo-orange) !important;
+    color: #1A1A1A !important;
+}
+.tree-container span.tree-item.selected .tree-mod_icon svg,
+.tree-container span.tree-item.selected:hover .tree-mod_icon svg {
+    stroke: #1A1A1A !important;
+}
