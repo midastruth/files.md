@@ -14,8 +14,10 @@
     --color-neo-text: #E8E3D8;
     --color-neo-border: #C8C2B5;
     /* Muted accents (Aivazovsky palette) - share names with theme-brutal.css
-       so the rules below stay one-to-one with the light variant. */
-    --color-neo-blue: #5B7BA8;
+       so the rules below stay one-to-one with the light variant. Blue is
+       the popping electric variant so ol/ul/quote/checkbox markers read
+       clearly against the warm-dark canvas. */
+    --color-neo-blue: #2E5CFF;
     --color-neo-lime: #A5B888;
     --color-neo-orange: #B86A40;
     --col-tx: #E8E3D8 !important;
@@ -35,10 +37,12 @@
     --col-accent: #E8E3D8;
 }
 
-/* Checkbox icon: glyph PNG colorized to the dusty accent blue. */
+/* Checkbox icon: glyph PNG colorized to bright orange (#FF6B35) so it
+   matches the ol/ul marker color. The filter chain normalizes the PNG to
+   black first, then rotates the hue toward warm orange. */
 .cm-s-hypermd-light span.cm-formatting-task.hmd-hidden-token {
     background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAwCAMAAAA8VkqRAAAAclBMVEUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACa4vOeAAAAJXRSTlMADcjpDswcLZOzsvOYBvWdbtvTX0D69+ORa1dRJCDtuaF7ZDkoQyuUXgAAAMhJREFUOMvt0reywjAUhOFjKxmcrgMZboL//V8Rm6GwkNUx0LClvhkVZ1fEZoqHqMwO7wuUSb0YxcJKxtLpxIt2SzJRykkQp5RgdAjaIKRJCEn6gWdA9OzRoqLVRscQnc9bdtXX/eyurOF7N3erLVDPwCGHxoVwamH1LwGUBfBbhrCvoLlMitL9DY8trLtJg7qoCj18VAN1OYE/YJBuDe1RJtBVo5wbqPb+GL5yWG1GLX0YZYw5iQ93yQ/yAHfZzu5qt/mxr97VFS15JGSVM0C6AAAAAElFTkSuQmCC") !important;
-    filter: brightness(0) saturate(100%) invert(48%) sepia(15%) saturate(800%) hue-rotate(180deg) brightness(95%) contrast(85%);
+    filter: brightness(0) saturate(100%) invert(54%) sepia(75%) saturate(2461%) hue-rotate(343deg) brightness(101%) contrast(101%);
 }
 
 #toolbar svg {
@@ -175,14 +179,16 @@
     font-weight: 400;
 }
 
+/* Ol/ul markers in bright orange to match the checkbox glyph - separates
+   list affordances visually from the blue quote-bar/`>` marker. */
 .cm-s-hypermd-light span.cm-formatting-list-ol {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    color: var(--color-neo-blue) !important;
+    color: #FF6B35 !important;
     font-weight: 700 !important;
 }
 
-.cm-formatting-list-ul {
-    color: var(--color-neo-blue) !important;
+.cm-s-hypermd-light .cm-formatting-list-ul {
+    color: #FF6B35 !important;
 }
 
 .cm-s-hypermd-light .cm-strong {
@@ -198,12 +204,15 @@
     font-weight: 400;
 }
 
+/* Links in dark mode use a brighter sky-blue than the muted slate-blue
+   accent - the dusty `--color-neo-blue` is too low-contrast against the
+   warm-dark canvas to read as a clear link affordance. */
 .cm-s-hypermd-light span.cm-link,
 .cm-s-hypermd-light span.cm-string.cm-url.cm-hmd-barelink {
     line-height: 1.6 !important;
-    color: var(--color-neo-blue) !important;
+    color: #6CB4E5 !important;
     background: transparent !important;
-    border-bottom: 1px solid var(--color-neo-blue) !important;
+    border-bottom: 1px solid #6CB4E5 !important;
     font-weight: 500;
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
@@ -243,11 +252,13 @@
     text-indent: -5px !important;
 }
 
+/* Code chip: slate-dark tile with bright-lime text and a thin lime
+   border - reads as a terminal-style token instead of a popping chip. */
 .cm-s-hypermd-light span.cm-inline-code:not(.cm-formatting):not(.cm-hmd-indented-code) {
     font-family: var(--font-mono-brutal) !important;
-    background: var(--color-neo-lime) !important;
-    color: #1F1D1A !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: #28251F !important;
+    color: #C1F970 !important;
+    border: 1px solid #C1F970 !important;
     border-radius: 4px !important;
     padding: 0.2em 0.5em !important;
     font-weight: 600 !important;
