@@ -265,18 +265,21 @@ a:hover {
     padding: 2em calc((100% - var(--normal-width)) / 2);
 }
 
-/* When editor2 opens, shift editor1's centered content into the left
-   half of the screen so the right half (covered by editor2) doesn't
-   hide it - but keep the content's WIDTH identical to its closed state
-   (--normal-width) so the text doesn't re-wrap. The trick: instead of
-   collapsing padding to 0, redistribute padding so left+right padding
-   still sum to (container - normal-width); left padding shrinks, right
-   padding grows by exactly the editor2 overlay width (50%). */
+/* When editor2 opens, shift editor1's content into the left half of the
+   viewport so the right half (covered by editor2) doesn't hide it -
+   while keeping the content's WIDTH identical to its closed state
+   (--normal-width) so the text doesn't re-wrap. The padding sum stays
+   at (container - normal-width); left padding shrinks by 25vw (half of
+   editor2's 50vw overlay), right padding grows by the same amount.
+   `max(0px, ...)` clamps gracefully on narrow viewports where the
+   ideal left padding would go negative - in that case content snaps
+   to the editor1 container's left edge, but its width still equals
+   --normal-width so no re-flow happens. */
 #content:has(#editor2-container.show) .CodeMirror-scroll {
     padding-top: 2em;
     padding-bottom: 2em;
-    padding-left: calc(25% - var(--normal-width) / 2);
-    padding-right: calc(75% - var(--normal-width) / 2);
+    padding-left: max(0px, calc((100% - var(--normal-width)) / 2 - 25vw));
+    padding-right: calc(100% - var(--normal-width) - max(0px, calc((100% - var(--normal-width)) / 2 - 25vw)));
 }
 
 .CodeMirror-lines::after {

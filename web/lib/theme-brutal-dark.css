@@ -280,13 +280,14 @@
 
 .cm-s-hypermd-light div.HyperMD-codeblock-bg {
     background: var(--col-bg-alt) !important;
-    border-left: 4px solid #D88FFF !important;
+    border-left: none !important;
     border-right: none !important;
     border-radius: 0 !important;
 }
 
 .cm-s-hypermd-light pre.HyperMD-codeblock {
     font-family: var(--font-mono-brutal) !important;
+    padding-left: 20px !important;
 }
 
 .cm-s-hypermd-light img.hmd-image {
