@@ -154,12 +154,13 @@ body {
     transform: translateX(0);
 }
 
-/* Previously this pair shrank editor1 to 50% (with a row flex direction)
-   when the sidebar was hidden and editor2 was open, so the two editors
-   sat side-by-side. That made editor1 visibly "jump" because its width
-   changed and its centered content re-flowed. Editor2 is `position:
-   fixed` and already overlays on the right, so editor1 doesn't need to
-   shrink - leaving it at full width keeps the content in place. */
+/* Original (disabled): when the sidebar was hidden and editor2 was open,
+   editor1 was shrunk to 50% via a row flex layout. That collapsed
+   editor1's container width and forced its content to re-wrap - a
+   visible "jump". Editor2 is `position: fixed`, so it overlays without
+   needing editor1 to shrink. Keeping editor1 at full width means its
+   content keeps the same wrap; the padding-shift rule lower in this
+   file moves the (unchanged-width) content into the left half. */
 /*
 body:has(#sidebar[style*="display: none"]):has(#editor2-container.show) #content {
     flex-direction: row;
@@ -264,16 +265,19 @@ a:hover {
     padding: 2em calc((100% - var(--normal-width)) / 2);
 }
 
-/* Previously this stripped editor1's horizontal centering padding when
-   editor2 was open, snapping the content from its centered position to
-   the left edge - a visible "jump". Disabled: the centering rule above
-   stays in effect, so editor1's content stays put when editor2 opens
-   as a fixed overlay on the right. */
-/*
+/* When editor2 opens, shift editor1's centered content into the left
+   half of the screen so the right half (covered by editor2) doesn't
+   hide it - but keep the content's WIDTH identical to its closed state
+   (--normal-width) so the text doesn't re-wrap. The trick: instead of
+   collapsing padding to 0, redistribute padding so left+right padding
+   still sum to (container - normal-width); left padding shrinks, right
+   padding grows by exactly the editor2 overlay width (50%). */
 #content:has(#editor2-container.show) .CodeMirror-scroll {
-    padding: 2em 0;
+    padding-top: 2em;
+    padding-bottom: 2em;
+    padding-left: calc(25% - var(--normal-width) / 2);
+    padding-right: calc(75% - var(--normal-width) / 2);
 }
-*/
 
 .CodeMirror-lines::after {
     content: "";

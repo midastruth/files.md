@@ -225,7 +225,7 @@ const WELCOME_FILES = {
         isFile: true,
     },
     "Links.md": {
-        "content": "Links are important\n" +
+        "content": "Links are important.\n" +
             "\n" +
             "Relations among ideas are far more important than the ideas themselves.\n" +
             "Learning is making meaningful connections.\n\n" +
