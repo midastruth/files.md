@@ -122,16 +122,25 @@
 
 .cm-s-hypermd-light pre.HyperMD-header.HyperMD-header-1 {
     padding-top: 18px !important;
-    border-bottom: 1.5px solid var(--col-border);
-    padding-bottom: 14px !important;
-    margin-bottom: 18px !important;
+    /* No `border-bottom` and no `margin-bottom` (margins break CodeMirror
+       cursor placement). The horizontal rule is drawn as a 1.5px slice
+       inside a linear-gradient background, leaving ~14px of paper above
+       the line and another ~14px below before the next line begins. */
+    padding-bottom: 32px !important;
+    background-image: linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent calc(100% - 15.5px),
+        var(--col-border) calc(100% - 15.5px),
+        var(--col-border) calc(100% - 14px),
+        transparent calc(100% - 14px)
+    ) !important;
 }
 
 .cm-s-hypermd-light .CodeMirror-code > pre.HyperMD-header.HyperMD-header-1:first-child,
 .cm-s-hypermd-light .CodeMirror-code > :first-child pre.HyperMD-header.HyperMD-header-1 {
     padding-top: 0 !important;
-    padding-bottom: 14px !important;
-    margin-bottom: 18px !important;
+    padding-bottom: 32px !important;
 }
 
 .cm-s-hypermd-light pre.HyperMD-header.HyperMD-header-2 {
