@@ -346,6 +346,29 @@
     stroke: #1A1A1A !important;
 }
 
+/* Chat panel: brutal-palette overrides for the few spots in chat.css
+   that hard-code colors instead of using CSS variables. */
+.message-content:hover {
+    background: rgba(0, 0, 0, 0.04) !important;
+}
+.message-content.editing {
+    background: color-mix(in srgb, var(--color-neo-lime) 35%, transparent) !important;
+    border: 1px solid var(--color-neo-blue) !important;
+}
+.message-time {
+    color: var(--col-tx-alt) !important;
+}
+.action-btn:hover {
+    background: color-mix(in srgb, var(--color-neo-orange) 20%, transparent) !important;
+}
+/* Selected/pinned message uses neo-orange for parity with the sidebar's
+   selected-row treatment. */
+.message.actions-pinned,
+.message.selected {
+    background: color-mix(in srgb, var(--color-neo-orange) 18%, transparent) !important;
+    border-color: var(--color-neo-orange) !important;
+}
+
 /* Editor body line-height: brutalist body text breathes more. Headers
    keep their own explicit line-heights set above so they don't inherit. */
 .cm-s-hypermd-light .CodeMirror-line {
