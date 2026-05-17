@@ -336,6 +336,7 @@
 
 .cm-s-hypermd-light pre.HyperMD-codeblock {
     font-family: var(--font-mono-brutal) !important;
+    font-size: 1em !important;
     padding-left: 20px !important;
 }
 
@@ -471,7 +472,6 @@
 .empty-title,
 .empty-desc {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    text-transform: uppercase;
     letter-spacing: 0.04em;
 }
 .empty-title {
