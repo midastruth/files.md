@@ -43,9 +43,7 @@ You can use chat to quickly dump your thoughts.
 
 <img src="https://github.com/zakirullin/files.md/raw/main/web/img/app.png" alt="Files.md screenshot" title="Files.md"/>
 
-It will be synchronized across all devices.    
-
-Open the chat and send a message:
+It will be synchronized across all devices. Open the chat and send a message:
 <div align="center">
     <img src="https://github.com/zakirullin/files.md/raw/main/web/img/note1.png"  width="350"/>
 </div>
@@ -55,7 +53,7 @@ Choose where to save (can do later):
     <img src="https://github.com/zakirullin/files.md/raw/main/web/img/note2.png" width="350"/>
 </div>
 
-You can save notes, journal and checklists with this flow.  
+With this flow you can quickly save notes, journal and checklists.  
 
 ## Save things in the chatbot
 Open the chat, write something and press `Enter`:
