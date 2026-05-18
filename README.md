@@ -28,7 +28,7 @@ Maybe. But this time:
 - Free and open source, you can tweak it however you want
 - Extremely simple code. **One person or an LLM can fit the whole project in head**
 - Portable, no build systems, just open `web/index.html` 
-- Out of the box synchronization
+- Optional out of the box synchronization 
 - The server is just one binary (or use iCloud/Dropbox/Google Drive for sync)
 - Telegram chatbot for on-the-go access to your files
 
