@@ -22,7 +22,7 @@ Try it out: [app.files.md](https://app.files.md) (Beta). Main site: [files.md](h
 
 **I have been building this project for 5 years**. Consider **[supporting on GitHub 💚](https://github.com/sponsors/zakirullin)**.
 
-[Dump your thoughts](#dump-your-thoughts) · [How to think deeply](#how-to-think-deeply) · [Second Brain?](#second-brain) 
+[Dump your thoughts](#dump-your-thoughts) · [How to think deeply](#how-to-think-deeply) · [Second Brain?](#second-brain) · [Journal, tasks and checklists](#journal)
 
 ## Another note taking app? 
 Maybe. But this time:
@@ -162,6 +162,45 @@ If your goal is to:
 - Write an article or a book
 
 Then taking notes is perfectly fine.
+
+## Journal
+Are you feeling good about something? Send a message.
+
+<div align="center">
+    <img src="https://github.com/zakirullin/files.md/raw/main/web/img/journal.png" title="Journaling" width="350"/>
+</div>
+
+Then click "To Journal".  
+Or just add ` jj` or ` жж` at the end of your message.
+
+Your record is gonna be saved nicely in the `journal/YYYY.MM Month.md` file.
+
+## Tasks ✅
+You're in the flow.  
+A colleague asks you to send a report.  
+Holding that in your head drains energy.  
+Drop a message and stay in flow.
+
+<div align="center">
+    <img src="https://github.com/zakirullin/files.md/raw/main/web/img/task.png" title="Adding a task" width="350"/>
+    <sub>Select where to save</sub>
+</div>
+
+Add only small, actionable items.  
+Not things like "Plan a vacation".  
+Add the first tiny step of what should be done anyway.     
+**Not what you wish to be done, but don't have motivation just yet.**   
+Your task list should not create a feeling of guilt.  
+
+For tasks that should be done later press "To Later".  
+
+
+## Checklists 🛒
+A friend recommends a book.  
+You're out of butter and cheese.  
+Small things like these drain mental energy.  
+Drop them in chat, then sort into matching checklists.
+You can save to notes, journal and checklists.
 
 ## Files structure
 You don't have to think about the structure, it is predefined.  
