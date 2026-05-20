@@ -40,7 +40,7 @@ Maybe. But this time:
 - Telegram chatbot for on-the-go access to your files
 
 ## How to use
-- Open [app.files.md](https://app.files.md) in Chrome browser
+- Open [app.files.md](https://app.files.md) (Chrome is recommended)
 - Click "Install files.md" on the right side of the address bar:
 <div align="center">
     <img src="https://github.com/zakirullin/files.md/raw/main/web/img/install.png" alt="Install" title="Install" width="350"/>
