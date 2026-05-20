@@ -108,7 +108,7 @@ async function init() {
     }
 
     perf = performance.now();
-    await syncTextsWithServer();
+    await syncFilesWithServer();
     await renderSidebar();
     await syncMediaFiles();
     log(`Files initialized in: ${(performance.now() - perf).toFixed(3)} milliseconds`);
@@ -265,36 +265,6 @@ async function newFolder() {
 
 function isMetaKey(event) {
     return event.metaKey || event.ctrlKey || event.altKey;
-}
-
-async function openDir() {
-    let dirHandle = null;
-    try {
-        dirHandle = await window.showDirectoryPicker({ 'mode': 'readwrite' });
-    } catch (error) {
-        // User pressed Esc (AbortError) or the browser doesn't support
-        // the picker (TypeError). Either way, leave the CTA visible so
-        // the user can try again.
-        if (error instanceof TypeError) {
-            alert('For now only Chrome browser supports local folders :(');
-        }
-        return;
-    }
-    document.getElementById('open-folder').style.display = 'none';
-
-    // TODO check that permissions are given?
-
-    await saveDirectoryHandle(dirHandle);
-    await write('/Help.md', getHelpContent());
-
-    // Media files got corrupted because they got copied from OPFS to local fs storage.
-    // It breaks binary files via .text()
-    // await migrateFromOPFSToLocal();
-    files = await loadLocalFiles(dirHandle)
-
-    isMemFS = false;
-    renderSidebar();
-    await openChat();
 }
 
 function getCurrentContent() {
@@ -828,13 +798,13 @@ window.addEventListener('focus', async () => {
 
     // Sync media first, so that new images for current file would be loaded
     await syncMediaFiles();
-    await syncCurrentText();
+    await syncCurrentFile();
 
     const start = performance.now();
     files = await loadLocalFiles(savedDirectoryHandle, true);
     const end = performance.now();
     log(`Files loaded in: ${(end - start).toFixed(3)} milliseconds`);
-    await syncTextsWithServer()
+    await syncFilesWithServer()
     await renderSidebar();
     log('Sync completed');
 });
@@ -855,7 +825,7 @@ window.addEventListener('blur', async function() {
         return;
     }
     await syncMediaFiles();
-    await syncCurrentText();
+    await syncCurrentFile();
 
     const savedDirectoryHandle = await getRootDirHandle();
 
@@ -864,7 +834,7 @@ window.addEventListener('blur', async function() {
     files = await loadLocalFiles(savedDirectoryHandle);
     const end = performance.now();
     log(`Files loaded in: ${(end - start).toFixed(3)} milliseconds`);
-    await syncTextsWithServer()
+    await syncFilesWithServer()
     await renderSidebar();
     log('Sync completed');
 });
@@ -888,6 +858,6 @@ window.addEventListener('beforeunload', function() {
 // Worker to process the saving queue
 window.saver = setInterval(() => {
     if (document.hasFocus()) {
-        syncCurrentText();
+        syncCurrentFile();
     }
 }, CURRENT_FILE_SYNC_INTERVAL);

@@ -2,7 +2,7 @@ const API_URL = localStorage.getItem('apiUrl') || 'https://api.files.md';
 const CURRENT_FILE_SYNC_INTERVAL = 1000; // ms, how often to save currently open file
 
 let isSaving = false;
-let isSyncingTexts = false;
+let isSyncingFiles = false;
 let isSyncingMedia = false;
 let isMessingWithCurrentEditor = false;
 let isSyncingFileWithServer = {}; // path -> bool, prevents concurrent server syncs for the same file
@@ -46,6 +46,32 @@ function hasLastServerOk() {
 //   ]
 // }
 let files = {}; // In-memory representation of local files
+
+// In-memory snapshot of what the server has, persisted to localStorage
+// under SERVER_STORAGE_KEY and rehydrated at boot:
+// {
+//   files: {
+//     'dir/': {
+//       'filename.md': {
+//         hash: '<content hash>',
+//         lastModified: <server timestamp>,
+//         lastClientModified: <client timestamp the server acknowledged>,
+//         path: '/dir/filename.md'
+//       },
+//       ...
+//     },
+//     ...
+//   },
+//   media: {
+//     'image.png': {
+//       isFile: true,
+//       lastModified: <server timestamp>
+//     },
+//     ...
+//   },
+//   timestamps: { '<path>': <ts>, ... }, // per-path cursor for incremental sync
+//   mediaTimestamp: <max ts across media> // single cursor for media sync
+// }
 let server = {files: {}, media: {}, timestamps: {}, mediaTimestamp: 0}; // In-memory representation of server
 
 // Reverse index for non-md files (currently just images): filename -> first.
@@ -196,8 +222,7 @@ async function loadLocalFiles(rootDirHandle, slowMode = false) {
     return newFiles;
 }
 
-// config.json is currently only synced from server, no local changes are propogated.
-async function syncTextsWithServer() {
+async function syncFilesWithServer() {
     // We should have at least one 200 response from service.
     // The first 200 response we get from /token, meaning that
     // our application is linked to the server for sync.
@@ -211,8 +236,8 @@ async function syncTextsWithServer() {
         return;
     }
 
-    if (isSyncingTexts) return;
-    isSyncingTexts = true;
+    if (isSyncingFiles) return;
+    isSyncingFiles = true;
 
     const startTime = performance.now();
     log('Starting sync with server...');
@@ -238,7 +263,7 @@ async function syncTextsWithServer() {
     });
     if (error) {
         logError('syncFilenames failed:', error);
-        isSyncingTexts = false;
+        isSyncingFiles = false;
         return;
     }
 
@@ -315,7 +340,7 @@ async function syncTextsWithServer() {
 
     log('Sync completed in ' + (performance.now() - startTime) + 'ms');
 
-    isSyncingTexts = false;
+    isSyncingFiles = false;
 }
 
 async function syncLocalFileWithServer(path) {
@@ -969,6 +994,53 @@ function saveServerFiles() {
     localStorage.setItem(SERVER_STORAGE_KEY, JSON.stringify(server));
 }
 
+async function openDir() {
+    let dirHandle = null;
+    try {
+        dirHandle = await window.showDirectoryPicker({ 'mode': 'readwrite' });
+    } catch (error) {
+        // User pressed Esc (AbortError) or the browser doesn't support
+        // the picker (TypeError).
+        if (error instanceof TypeError) {
+            alert('For now only Chrome browser supports local folders :(');
+        }
+        return;
+    }
+    // TODO check that permissions are given?
+
+    // Don't race the existing files loading.
+    while (isLoadingLocalFiles) {
+        await new Promise(r => setTimeout(r, 50));
+    }
+    isLoadingLocalFiles = true
+
+    // Don't race with files sync.
+    while (isSyncingFiles) {
+        await new Promise(r => setTimeout(r, 50));
+    }
+    isSyncingFiles = true
+
+    // New folder would miss files that were synced from server before,
+    // into a previous folder. That would send a signal to server "client has deleted some files".
+    // Which we do not want, so we clean our server files "understanding".
+    server = {files: {}, media: {}, timestamps: {}, mediaTimestamp: 0};
+    localStorage.removeItem("server");
+
+    await saveDirectoryHandle(dirHandle);
+    await write('/Help.md', getHelpContent());
+
+    isLoadingLocalFiles = false
+    try {
+        files = await loadLocalFiles(dirHandle);
+    } finally {
+        isSyncingFiles = false;
+    }
+
+    isMemFS = false;
+    renderSidebar();
+    await openChat();
+}
+
 async function openFile(path, saveToHistory = true, el = 'editor-textarea') {
     // There are a few awaits during syncCurrentFile, we should not change currentEditor during that.
     while (isMessingWithCurrentEditor) {
@@ -996,7 +1068,7 @@ async function openFile(path, saveToHistory = true, el = 'editor-textarea') {
     let thereIsPreviousEditorToSync = currentEditor.path !== undefined;
     if (thereIsPreviousEditorToSync) {
         log('Began syncing previous file');
-        await syncCurrentText(true);
+        await syncCurrentFile(true);
         log('Finished syncing previous file');
     }
 
@@ -1116,7 +1188,7 @@ async function openFile(path, saveToHistory = true, el = 'editor-textarea') {
 // TODO It should be atomic.
 // If currentEditor is changed during the execution of this function, we'll have RC.
 // So, wherever we change currentEditor reference, we should lock via isMessingWithCurrentEditor.
-async function syncCurrentText(switchAwayEditor = false) {
+async function syncCurrentFile(switchAwayEditor = false) {
     if (files === undefined || debug || currentEditor.path === undefined) {
         return;
     }
