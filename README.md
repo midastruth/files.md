@@ -23,7 +23,7 @@ Try it out: [app.files.md](https://app.files.md) (Beta). Main site: [files.md](h
 
 **I have been building this project for 5 years**. Consider **[supporting on GitHub 💚](https://github.com/sponsors/zakirullin)**.
 
-[Dump your thoughts](#dump-your-thoughts) · [How to think deeply](#how-to-think-deeply) · [Second Brain?](#second-brain) · [Journal, tasks and checklists](#journal)
+[Dump your thoughts](#dump-your-thoughts) · [How to think deeply](#how-to-think-deeply) · [Second Brain?](#second-brain) · [Journal, tasks and checklists](#journal) · [Files structure](#files-structure)
 
 ## Another note taking app? 
 Maybe. But this time:
@@ -48,14 +48,6 @@ Maybe. But this time:
 
 - Open a local folder to persist changes  
 - Occasionally hit force-refresh (`Cmd+Shift+R`) to get new updates.  
-
-## How to sync
-| Setup                                                 | Where your files live                 | Sync across devices | Server needed      | Best for                                             |
-|-------------------------------------------------------|---------------------------------------|-------------------|--------------------|------------------------------------------------------|
-| **Local-first**, `app.files.md` doesn't send any data  | A folder on your device               | No                | None               | Maximum privacy, your data doesn't leave your device |
-| **Cloud-folder sync** (iCloud/Dropbox/Google Drive)   | Your existing cloud folder | Yes               | None (cloud provider) | Sync across devices without running a server         |
-| **[Self-hosted sync server](docs/your-own-server.md)** | Your own (or local) server | Yes               | One Go binary      | Sync between devices inside your network             |
-| **Hosted sync server**                                | Our managed server         | Yes               | `api.files.md`      | Try it instantly, no setup                           |
 
 ## Dump your thoughts
 You can use chat to quickly dump your thoughts.  
@@ -128,10 +120,11 @@ The Second Brain is thrilling.
 Advanced guru templates, plugins and AI workflows...  
 One wants to scrape the wisdom of the whole internet.  
 There's some beauty in this neat system. Every new note brings dopamine.  
-_Second Brain gets better and better._  
 
-However, **the first brain never actually gets smarter.**  
-And that's an issue - in the AI age, your first brain is as valuable as ever.  
+*Second Brain is getting better*.    
+**But the first brain is not improving**.  
+And that’s an issue.  
+In the AI age, your first brain is as valuable as ever.  
 
 Use **your brain** to think through the notes.  
 The tool is not important, your thinking is.  
@@ -139,6 +132,7 @@ The tool is not important, your thinking is.
 Before adding a new note, try to answer these questions:  
 - How this new knowledge can sharpen my judgment or expand my taxonomy?  
 - How can I see the world differently, given this new knowledge?  
+- How can I act differently?
 
 ## Notes can prevent experience
 - Reading and taking notes can easily fool us into believing that we understand a text
@@ -201,6 +195,14 @@ You're out of butter and buns.
 Holding things like this in your head is taxing.   
 
 Drop all that to chat, then move to a matching checklist.  
+
+## How to sync
+| Setup                                                 | Where your files live                 | Sync across devices | Server needed      | Best for                                             |
+|-------------------------------------------------------|---------------------------------------|-------------------|--------------------|------------------------------------------------------|
+| **Local-first**, `app.files.md` doesn't send any data  | A folder on your device               | No                | None               | Maximum privacy, your data doesn't leave your device |
+| **Cloud-folder sync** (iCloud/Dropbox/Google Drive)   | Your existing cloud folder | Yes               | None (cloud provider) | Sync across devices without running a server         |
+| **[Self-hosted sync server](docs/your-own-server.md)** | Your own (or local) server | Yes               | One Go binary      | Sync between devices inside your network             |
+| **Hosted sync server**                                | Our managed server         | Yes               | `api.files.md`      | Try it instantly, no setup                           |
 
 ## Files structure
 You don't have to think about the structure, it is predefined.  
