@@ -21,7 +21,9 @@ All in plain `.md` files, local-first. LLM-friendly. **Private - no data is sent
  
 Try it out: [app.files.md](https://app.files.md) (Beta). Main site: [files.md](https://files.md).
 
-**I have been building this project for 5 years**. Consider **[supporting on GitHub 💚](https://github.com/sponsors/zakirullin)**.
+**I have been building this project for 5 years**. Consider **[supporting on GitHub 💚](https://github.com/sponsors/zakirullin)**.  
+
+You can use this app for Zettelkasten, Second Brain, Notes taking, Journaling, Tasks management, Checklists, and more.  
 
 [Dump your thoughts](#dump-your-thoughts) · [How to think deeply](#how-to-think-deeply) · [Second Brain?](#second-brain) · [Journal, tasks and checklists](#journal) · [Files structure](#files-structure)
 
