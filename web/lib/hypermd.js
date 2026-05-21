@@ -192,11 +192,30 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
             if (inMarkdown) {
                 // now implement some extra features that require higher priority than CodeMirror's markdown
                 //#region Math
-                if (modeCfg.math && inMarkdownInline && (tmp = stream.match(/^\${1,2}/, false))) {
-                    var endTag_1 = tmp[0];
-                    var mathLevel = endTag_1.length;
-                    if (mathLevel === 2 || stream.string.slice(stream.pos).match(/[^\\]\$/)) {
-                        // $$ may span lines, $ must be paired
+                // PATCHED: in addition to $...$ and $$...$$, also recognize LaTeX-style
+                // \(...\) (inline) and \[...\] (display). These are emitted by ChatGPT/Claude
+                // and present in pasted LaTeX sources, so accepting them avoids a lossy
+                // format conversion step.
+                if (modeCfg.math && inMarkdownInline) {
+                    var openTag_1, endTag_1, mathLevel;
+                    if ((tmp = stream.match(/^\${1,2}/, false))) {
+                        var lvl = tmp[0].length;
+                        if (lvl === 2 || stream.string.slice(stream.pos).match(/[^\\]\$/)) {
+                            // $$ may span lines, $ must be paired on same line
+                            openTag_1 = tmp[0];
+                            endTag_1 = tmp[0];
+                            mathLevel = lvl;
+                        }
+                    } else if (stream.match(/^\\\(/, false)) {
+                        openTag_1 = '\\(';
+                        endTag_1 = '\\)';
+                        mathLevel = 1;
+                    } else if (stream.match(/^\\\[/, false)) {
+                        openTag_1 = '\\[';
+                        endTag_1 = '\\]';
+                        mathLevel = 2;
+                    }
+                    if (openTag_1) {
                         var texMode = CodeMirror.getMode(cmCfg, {
                             name: "stex",
                         });
@@ -210,7 +229,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                             })
                         });
                         if (noTexMode)
-                            stream.pos += tmp[0].length;
+                            stream.pos += openTag_1.length;
                         ans += " formatting formatting-math formatting-math-begin math-" + mathLevel;
                         return ans;
                     }

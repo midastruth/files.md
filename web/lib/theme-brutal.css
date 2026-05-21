@@ -1,11 +1,3 @@
-/* Brutal theme - inspired by Soviet brutalism + Andy Matuschak's notes garden.
-   Paper-cream background, near-black text, monospace italic blockquotes,
-   marker-pen orange highlight on links, heavy bold for emphasis. Cloned
-   from theme-light.css and re-skinned; structure stays identical so the
-   editor wiring is unaffected.
-
-   Scoped to `prefers-color-scheme: light` — brutal is the light-mode look,
-   theme-dark.css continues to handle OS-dark systems untouched. */
 @media (prefers-color-scheme: light) {
 :root {
     --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
@@ -48,10 +40,6 @@
     :root {
         /* explicit empty: unconditional :root above already covers light. */
     }
-
-    /* (Media-scoped overrides for light mode only - palette is forced
-       at :root above so most of these duplicate the unconditional rules
-       below; kept for parity with theme-light.css.) */
 
     #toolbar {
         padding-bottom: 8px !important;
@@ -116,11 +104,6 @@
     }
 }
 
-/* Action buttons: copy theme-light.css's approach but pulled outside the
-   color-scheme media query so it applies on dark-mode systems too.
-   Fill-on-svg + stroke-on-svg is enough: outline icons declare
-   `fill="none"` on the path so they ignore the inherited fill, while
-   shop (no path-level fill attr) picks it up and becomes visible. */
 .to-recent-btn,
 .action-btn svg {
     fill: var(--col-tx-alt);
@@ -134,7 +117,6 @@
     stroke: var(--col-accent) !important;
 }
 
-/* Headers: heavy weight + a hard black rule under H1 / H2, brutalist style. */
 .cm-s-hypermd-light .cm-header.cm-header-1 {
     font-size: 32px !important;
     line-height: 38px !important;
@@ -143,10 +125,6 @@
 
 .cm-s-hypermd-light pre.HyperMD-header.HyperMD-header-1 {
     padding-top: 18px !important;
-    /* ~14px breathing room on each side of the HR, drawn as a 1.5px
-       slice inside a linear-gradient. Selection of the H1 will extend
-       ~14px past the rule but that's the cost of keeping cursor math
-       intact (no margins, no padding-top on the next pre). */
     padding-bottom: 32px !important;
     background-image: linear-gradient(
         to bottom,
@@ -216,20 +194,12 @@
     font-weight: 400;
 }
 
-/* Ordered-list numbers: render in the sans-serif header font + neo-blue
-   accent so they read as labels, not slabs of mono text. Light/dark
-   themes get a clean look for free because their body font is already
-   sans-serif; in brutal the body is Space Mono so we have to override. */
 .cm-s-hypermd-light span.cm-formatting-list-ol {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
     color: var(--color-neo-blue) !important;
     font-weight: 700 !important;
 }
 
-/* Unordered-list dash: match the neo-blue accent used by ordered-list
-   numbers and the colorized checkbox - keeps every list-marker style
-   on the same hue. Overrides app.css's `.cm-formatting-list-ul`
-   slate-grey rule (same specificity, brutal loads later). */
 .cm-formatting-list-ul {
     color: var(--color-neo-blue) !important;
 }
@@ -248,10 +218,6 @@
     font-weight: 400;
 }
 
-/* Link default: classic blue + thin underline, no marker bg. The `span`
-   in the selector is required to beat app.css's `span.cm-link` rule;
-   without it our brutal `.cm-link` rule loses on specificity (0,2,0 vs
-   0,2,1) and only the wikilink variant ends up blue. */
 .cm-s-hypermd-light span.cm-link,
 .cm-s-hypermd-light span.cm-string.cm-url.cm-hmd-barelink {
     line-height: 1.6 !important;
@@ -264,9 +230,6 @@
     transition: background .15s, color .15s;
 }
 
-/* Active line (cursor on the line): lime-green chip + blue text.
-   No padding because adding any horizontal padding makes the text
-   jump as the cursor moves between lines. */
 .cm-s-hypermd-light pre.CodeMirror-activeline span.cm-link,
 .cm-s-hypermd-light pre.CodeMirror-activeline span.cm-string.cm-url.cm-hmd-barelink {
     background: var(--color-neo-lime) !important;
@@ -274,9 +237,6 @@
     border-bottom: none !important;
 }
 
-/* Hover: orange text + thick orange underline. No background swap
-   and no padding so the line doesn't shift under the cursor as the
-   user mouses over links. */
 .cm-s-hypermd-light span.cm-link:hover,
 .cm-s-hypermd-light span.cm-string.cm-url.cm-hmd-barelink:hover {
     background: transparent !important;
@@ -284,15 +244,11 @@
     border-bottom: 3px solid var(--color-neo-orange) !important;
 }
 
-/* Blockquote: dark-theme behavior, plus a thicker 4px neo-blue left bar
-   so it matches the codeblock's left border weight. */
 .cm-s-hypermd-light pre.HyperMD-quote-1:before {
     background: var(--color-neo-blue) !important;
     width: 4px !important;
 }
 
-/* Subtle blue-tinted wash behind quoted text - reinforces the left bar
-   without competing with the body text. */
 .cm-s-hypermd-light pre.HyperMD-quote-1 {
     background: color-mix(in srgb, var(--color-neo-blue) 5%, var(--col-bg)) !important;
 }
@@ -315,11 +271,6 @@
     text-indent: 0 !important;
 }
 
-
-
-/* Inline code: lime-green chip with bold mono text and a thin dark
-   outline. Bigger padding now that the body has 1.9 line-height to
-   accommodate the taller chip without breaking flow. */
 .cm-s-hypermd-light .cm-inline-code,
 .cm-s-hypermd-light code {
     font-family: var(--font-mono-brutal) !important;
@@ -337,7 +288,6 @@
     top: -1px;
 }
 
-/* Codeblocks: paper-darker background, sharp edges, mono font. */
 .cm-s-hypermd-light div.HyperMD-codeblock-bg {
     background: var(--col-bg-alt) !important;
     border-left: none !important;
@@ -377,13 +327,11 @@
     animation-name: sidebar-highlight-brutal !important;
 }
 
-/* Images: no border, slightly rounded corners (matching the chat modal). */
 .cm-s-hypermd-light img.hmd-image {
     border-radius: 7px !important;
     border: none !important;
 }
 
-/* Horizontal rule: hard solid bar - core brutalist motif. */
 .cm-s-hypermd-light pre.HyperMD-hr {
     color: var(--col-border) !important;
     background: transparent !important;
@@ -394,10 +342,6 @@
     height: 2px !important;
 }
 
-/* Text selection: semi-transparent neo-blue so dark body text underneath
-   stays readable (CodeMirror draws the overlay BEHIND the text; an
-   opaque bg + the editor's per-span `color: ... !important` makes text
-   invisible during selection). Matches the theme's accent blue. */
 ::selection {
     background: rgba(46, 92, 255, 0.35) !important;
 }
@@ -408,12 +352,11 @@
 .CodeMirror-focused .CodeMirror-selected {
     background: rgba(46, 92, 255, 0.35) !important;
 }
+.cm-s-hypermd-light span.cm-math,
+.cm-s-hypermd-light span.hmd-fold-math-placeholder {
+    background: rgba(46, 92, 255, 0.35) !important;
+}
 
-/* Sidebar tree: brutalist palette - blue on hover (focused),
-   orange on selected (current open file). Font inherits from body. */
-
-/* Sharp corners on every selectable row - brutalist motif. Kills the 5px
-   radius set on the base tree-item in sidebar.css. */
 .tree-container li span.tree-item {
     border-radius: 0 !important;
 }
@@ -436,9 +379,6 @@
     stroke: #FFF !important;
 }
 
-/* Search/move dialog: highlight the focused row in neo-orange - matches
-   the sidebar's hover treatment so "the thing under the pointer" is
-   always orange across the app. */
 #search-results .focused,
 #move-results .focused {
     background-color: var(--color-neo-orange) !important;
@@ -446,8 +386,6 @@
     border-radius: 0 !important;
 }
 
-/* Chat panel: brutal-palette overrides for the few spots in chat.css
-   that hard-code colors instead of using CSS variables. */
 .message {
     transition: background 0.15s ease !important;
 }
@@ -469,28 +407,19 @@
 .message-time {
     color: var(--col-tx-alt) !important;
 }
-/* Quick-action buttons inside chat messages: hover neo-blue, matching
-   the sidebar's "selected file" treatment. */
 .action-btn:hover {
     background: var(--color-neo-blue) !important;
 }
-/* Selected/pinned message: neo-orange tint. */
 .message.actions-pinned,
 .message.selected {
     background: color-mix(in srgb, var(--color-neo-orange) 18%, transparent) !important;
     border-color: var(--color-neo-orange) !important;
 }
 
-/* Editor body line-height: brutalist body text breathes more. Headers
-   keep their own explicit line-heights set above so they don't inherit. */
 .cm-s-hypermd-light .CodeMirror-line {
     line-height: 1.9 !important;
 }
 
-/* Empty-chat hero ("Free your head" / "Drop whatever's on your mind here"):
-   styled like an editor H1 - Inter, uppercase, heavy weight, tracking,
-   with a hard rule under the title. Description gets the same uppercase
-   tracking at a lighter weight so it reads as a subtitle. */
 .empty-title,
 .empty-desc {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
@@ -508,10 +437,6 @@
     color: var(--color-neo-orange) !important;
 }
 
-/* Sharp corners everywhere - core brutalist motif. Covers the search/move
-   modals + their inputs, the chat panel and its input, individual chat
-   messages and their content/action surfaces, the quick-action icons, the
-   link-insert autocomplete dropdown, and the sidebar's right-click menu. */
 #search, #move,
 #search-input, #move-input,
 #nav-buttons,
@@ -530,9 +455,6 @@
     border-radius: 0 !important;
 }
 
-/* Chat modal + input keep softened corners (not full brutal-sharp) - half
-   the chat.css defaults so they read as friendlier surfaces than the
-   rest of the app's hard rectangles. */
 #chat-container.modal {
     border-radius: 7px !important;
 }
@@ -540,8 +462,6 @@
     border-radius: 6px !important;
 }
 
-/* Selection inside the link-insert dropdown and sidebar context menu uses
-   the same neo-orange as every other "thing under the pointer" surface. */
 .CodeMirror-hints,
 .CodeMirror-hint {
     font-family: var(--font) !important;

@@ -28,8 +28,13 @@
             return null;
         var cm = stream.cm;
         var line = stream.lineNo;
-        var maySpanLines = /math-2\b/.test(token.type); // $$ may span lines!
+        var maySpanLines = /math-2\b/.test(token.type); // $$ or \[ may span lines!
         var tokenLength = maySpanLines ? 2 : 1; // "$$" or "$"
+        // PATCHED: \(...\) is inline (math-1) but its delimiter is 2 chars,
+        // not 1, so override here. \[ is already 2 via maySpanLines.
+        if (token.string === '\\(') {
+            tokenLength = 2;
+        }
         // CodeMirror GFM mode split "$$" into two tokens, so do a extra check.
         if (tokenLength == 2 && token.string.length == 1) {
             if (DEBUG)
@@ -69,7 +74,9 @@
             return null;
         }
         // Now let's make a math widget!
-        var isDisplayMode = tokenLength > 1 && from.ch == 0 && (noEndingToken || to.ch >= cm.getLine(to.line).length);
+        // PATCHED: gate display mode on maySpanLines (= $$ or \[) rather than
+        // tokenLength > 1. Inline \(...\) has tokenLength 2 but is always inline.
+        var isDisplayMode = maySpanLines && from.ch == 0 && (noEndingToken || to.ch >= cm.getLine(to.line).length);
         var marker = insertMathMark(cm, from, to, expr, tokenLength, isDisplayMode);
         foldMathAddon.editingExpr = null; // try to hide preview
         return marker;

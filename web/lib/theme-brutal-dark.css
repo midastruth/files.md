@@ -1,11 +1,3 @@
-/* Brutal dark theme - same brutalist geometry as theme-brutal.css but on a
-   warm-dark canvas with a muted palette pulled from Aivazovsky's seascapes:
-   sage-olive instead of neon lime, burnt amber instead of neon orange,
-   dusty slate-blue instead of electric blue. Off-white cream for body text.
-
-   Scoped to `prefers-color-scheme: dark`; theme-brutal.css covers light. The
-   styling rules here mirror theme-brutal.css because its rules are scoped
-   to `prefers-color-scheme: light` and don't apply on dark systems. */
 @media (prefers-color-scheme: dark) {
 :root {
     --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
@@ -13,10 +5,6 @@
     --color-neo-bg: #1F1D1A;
     --color-neo-text: #E8E3D8;
     --color-neo-border: #C8C2B5;
-    /* Muted accents (Aivazovsky palette) - share names with theme-brutal.css
-       so the rules below stay one-to-one with the light variant. Blue is
-       the popping electric variant so ol/ul/quote/checkbox markers read
-       clearly against the warm-dark canvas. */
     --color-neo-blue: #2E5CFF;
     --color-neo-lime: #A5B888;
     --color-neo-orange: #e8912d;
@@ -195,9 +183,6 @@
     font-weight: 400;
 }
 
-/* Ol/ul markers in the same muted-burnt-amber as the code chip and the
-   hover-orange (`--color-neo-orange`) - separates list affordances
-   visually from the blue quote-bar/`>` marker. */
 .cm-s-hypermd-light span.cm-formatting-list-ol {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
     color: var(--color-neo-orange) !important;
@@ -221,9 +206,6 @@
     font-weight: 400;
 }
 
-/* Links in dark mode use a brighter sky-blue than the muted slate-blue
-   accent - the dusty `--color-neo-blue` is too low-contrast against the
-   warm-dark canvas to read as a clear link affordance. */
 .cm-s-hypermd-light span.cm-link,
 .cm-s-hypermd-light span.cm-string.cm-url.cm-hmd-barelink {
     line-height: 1.6 !important;
@@ -273,11 +255,6 @@
     text-indent: 0 !important;
 }
 
-
-
-/* Code chip: dark tile with muted-burnt-amber text and matching border -
-   reuses the same `--color-neo-orange` hover hue (tree-item hover,
-   search-result focus, action-btn hover, etc.) so accents stay coherent. */
 .cm-s-hypermd-light .cm-inline-code,
 .cm-s-hypermd-light code {
     font-family: var(--font-mono-brutal) !important;
@@ -316,7 +293,6 @@
     display: none;
 }
 
-/* Sidebar blink in the neo-orange accent. */
 @keyframes sidebar-highlight-brutal {
     0%   { color: var(--color-neo-orange); opacity: 1; }
     20%  { color: var(--color-neo-orange); opacity: 0.7; }
@@ -409,8 +385,6 @@
 .message-time {
     color: var(--col-tx-alt) !important;
 }
-/* Quick-action buttons inside chat messages: hover neo-blue, matching
-   the sidebar's "selected file" treatment. */
 .action-btn:hover {
     background: var(--color-neo-blue) !important;
 }
@@ -424,8 +398,6 @@
     line-height: 1.9 !important;
 }
 
-/* Empty-chat hero styled like an editor H1 - Inter, uppercase, heavy
-   weight, tracking, with a hard rule under the title. */
 .empty-title,
 .empty-desc {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
@@ -462,7 +434,6 @@
     border-radius: 0 !important;
 }
 
-/* Chat modal + input keep softened corners (half the chat.css defaults). */
 #chat-container.modal {
     border-radius: 7px !important;
 }

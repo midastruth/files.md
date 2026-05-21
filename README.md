@@ -29,10 +29,10 @@ Try it out: [app.files.md](https://app.files.md) (Beta). Main site: [files.md](h
 Maybe. But this time:
 - Only necessary features, **restrictions foster creativity**
 - **Chat-like flow for lazy thought capture**
+- Free and open source
 - No need to install anything, all you need is a browser
 - Works offline
 - **Local-first, files don't leave your device**
-- Free and open source
 - Extremely simple code. **One person or an LLM can fit the whole project in head**
 - The codebase is ready for your LLM to extend to your needs
 - Portable, no build systems, just open `web/index.html` 
