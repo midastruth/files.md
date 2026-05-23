@@ -102,7 +102,7 @@ const CONFIG_PATH = '/config.json';
 
 async function loadLocalFiles(rootDirHandle, slowMode = false) {
     if (isLoadingLocalFiles) {
-        return;
+        return files;
     }
     isLoadingLocalFiles = true;
 
