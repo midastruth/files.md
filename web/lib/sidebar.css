@@ -76,11 +76,11 @@
 	background-color: inherit;
 }
 
-.tree-container span.tree-item.selected{
+.tree-container span.tree-item.tree-leaf.selected {
 	background-color: var(--col-bg-active);
 }
 
-.tree-container span.tree-item.selected:hover{
+.tree-container span.tree-item.tree-leaf.selected:hover {
 	background-color: var(--col-bg-active);
 }
 

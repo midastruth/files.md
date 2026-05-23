@@ -383,13 +383,13 @@
     stroke: #1F1D1A !important;
 }
 
-.tree-container span.tree-item.selected,
-.tree-container span.tree-item.selected:hover {
+.tree-container span.tree-item.tree-leaf.selected,
+.tree-container span.tree-item.tree-leaf.selected:hover {
     background-color: var(--color-neo-blue) !important;
     color: #E8E3D8 !important;
 }
-.tree-container span.tree-item.selected .tree-mod_icon svg,
-.tree-container span.tree-item.selected:hover .tree-mod_icon svg {
+.tree-container span.tree-item.tree-leaf.selected .tree-mod_icon svg,
+.tree-container span.tree-item.tree-leaf.selected:hover .tree-mod_icon svg {
     stroke: #E8E3D8 !important;
 }
 
