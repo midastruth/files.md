@@ -1232,10 +1232,8 @@ function isChecklist(filename) {
         return true;
     }
 
-    // Match `name_postfix_.md` style (trailing underscore postfix) but
-    // skip names that ALSO start with `_` (e.g. `_ss_.md`) - those are
-    // tags, not checklists.
-    return /^[^_].*_\.(md)$/.test(filename);
+    // Before we had custom checklists with "_" postfix. For now we got rid of them.
+    return false;
 }
 
 window.handleNodeMove = async function (sourcePath, targetDir) {

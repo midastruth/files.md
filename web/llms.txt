@@ -17,7 +17,6 @@ All files are plain Markdown (.md) stored locally.
 ├── Read.md               # Reading list (checklist)
 ├── Watch.md              # Watch list (checklist)
 ├── Shop.md               # Shopping list (checklist)
-├── MyChecklist_.md       # Custom checklist
 │
 ├── journal/              # Daily journal
 │   └── YYYY.MM Month.md  # e.g. 2024.08 August.md

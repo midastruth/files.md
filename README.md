@@ -216,7 +216,7 @@ Although, you're free to use whatever structure you want.
 - Chat: `Chat.md`
 - Notes: `brain/Note.md`, `<category>/*.md`
 - Projects: `Project.md`, `*.md`
-- Checklists: `Read.md`, `Watch.md`, `Shop.md`, `MyChecklist_.md`
+- Checklists: `Read.md`, `Watch.md`, `Shop.md`
 - Journal: `journal/2024.08 August.md`
 - Tasks: `Later.md`
 - Habits: `habits/Ate consciously.md`, `habits/*.md`
