@@ -416,9 +416,6 @@ func notMarkdown() parser {
 				return []result{{input[:i], input[i:]}}
 			}
 		}
-		if len(input) > 0 && (input[len(input)-1] == '*' || input[len(input)-1] != '_' || input[len(input)-1] != '`') {
-			return []result{{input, ""}}
-		}
 		if len(input) > 0 {
 			return []result{{input, ""}}
 		}

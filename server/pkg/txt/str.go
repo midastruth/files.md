@@ -34,6 +34,10 @@ func Lcfirst(str string) string {
 // Specifying skintone or gender of an emoji will count as 2 codepoints:
 // https://unicode.org/emoji/charts/full-emoji-modifiers.html
 func Substr(input string, start int, length int) string {
+	if start < 0 || length < 0 {
+		return ""
+	}
+
 	asRunes := []rune(input)
 	if start >= len(asRunes) {
 		return ""
