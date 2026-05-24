@@ -1,4 +1,4 @@
-// We need our application to work online, so we install a service worker.
+// We need our application to work offline, so we install a service worker.
 // Server worker intercept calls to the specified urls and returns cached copies.
 
 // Web folder is our doc root.
