@@ -273,13 +273,6 @@ const WELCOME_FILES = {
             "Here is some code.\n" +
             "```\n" +
             "\n" +
-            "## Diagram\n" +
-            "```mermaid\n" +
-            "pie title Taking notes\n" +
-            "         \"Notes saved for future me\" : 95\n" +
-            "         \"Notes future me ever opens\" : 5\n" +
-            "```\n" +
-            "\n" +
             "## Math\n" +
             "$\\LaTeX$ is fully supported: $e^{i\\pi} + 1 = 0$\n" +
             "\n" +
@@ -313,22 +306,6 @@ const WELCOME_FILES = {
     "My project.md": {
         "content":
             "You can dump project related thoughts here.\n" +
-            "\n" +
-            "```mermaid\n" +
-            "flowchart LR\n" +
-            "    I1[thought] --> H\n" +
-            "    I2[idea] --> H\n" +
-            "    I3[request] --> H\n" +
-            "    I4[task] --> H\n" +
-            "    H[🧠 head]\n" +
-            "    H -->|hold| D[😩 drained]\n" +
-            "    H -->|dump| C[💬 chat]\n" +
-            "    C --> N[📝 notes]\n" +
-            "    C --> J[💚 journal]\n" +
-            "    C --> T[✅ tasks]\n" +
-            "    C --> L[🛒 checklists]\n" +
-            "    C --> P[💼 project]\n" +
-            "```\n" +
             "\n" +
             "[Links](/Links.md)",
         isFile: true,
