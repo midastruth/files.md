@@ -742,7 +742,7 @@ pre.HyperMD-codeblock-end {
     color: var(--col-link);
     background: none;
     border: none;
-    top: -2px;
+    top: -3px;
 }
 
 #go-backward, #go-backward {
@@ -843,7 +843,7 @@ pre.HyperMD-codeblock-end {
     border-radius: 10px;
     display: flex;
     position: absolute;
-    padding: 0;
+    padding: 0 6px;
     top: 2px;
     right: 2px;
 }
