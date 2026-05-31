@@ -839,7 +839,10 @@ function getImageExtension(mimeType) {
         'image/jpeg': 'jpg',
         'image/jpg': 'jpg',
         'image/gif': 'gif',
-        'image/webp': 'webp'
+        'image/webp': 'webp',
+        'video/mp4': 'mp4',
+        'video/webm': 'webm',
+        'video/quicktime': 'mov'
     };
     return extensions[mimeType] || 'png';
 }

@@ -238,8 +238,10 @@ function initEditor(el) {
     newEditor.on('paste', async (_, event) => {
         const items = (event.clipboardData || event.originalEvent.clipboardData).items;
         for (const item of items) {
-            if (item.kind === 'file' && item.type.startsWith('image/')) {
-                event.preventDefault(); // Prevent default paste behavior
+            const isMedia = item.kind === 'file'
+                && (item.type.startsWith('image/') || item.type.startsWith('video/'));
+            if (isMedia) {
+                event.preventDefault();
 
                 const file = item.getAsFile();
                 const fileName = `${new Date().toISOString().replace(/[:.]/g, '-')}.${getImageExtension(item.type)}`;
@@ -259,14 +261,14 @@ function initEditor(el) {
 
                         const markdownImageSyntax = `![](media/${fileName})\n`;
                         currentEditor.replaceSelection(markdownImageSyntax);
-                        log(`Image saved as: ${fileName}`);
+                        log(`Media saved as: ${fileName}`);
                     } else {
-                        logError('Failed to save the image.');
-                        alert('Failed to save the image. Please try again.');
+                        logError('Failed to save the media.');
+                        alert('Failed to save the file. Please try again.');
                     }
                 } catch (error) {
-                    logError('Error saving image:', error);
-                    alert('Error saving image: ' + error.message);
+                    logError('Error saving media:', error);
+                    alert('Error saving file: ' + error.message);
                 }
             }
         }

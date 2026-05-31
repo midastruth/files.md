@@ -27,8 +27,9 @@
 
                 let url;
                 let title;
+                let rawurl;
                 { // extract the URL
-                    let rawurl = cm.getRange(// get the URL or footnote name in the parentheses
+                    rawurl = cm.getRange(// get the URL or footnote name in the parentheses
                         {line: lineNo, ch: url_begin.token.start + 1}, {line: lineNo, ch: url_end.token.start});
                     if (url_end.token.string === "]") {
                         let tmp = cm.hmdReadLink(rawurl, lineNo);
@@ -42,9 +43,11 @@
                     title = cm.getRange({line: lineNo, ch: from.ch + 2}, {line: lineNo, ch: url_begin.token.start - 1});
                 }
                 // PATCHED, treat ![](foo.mp4) as an inline autoplaying video.
+                // Detect on rawurl - hmdResolveURL may have rewritten the
+                // local-file path to a blob: URL with no extension.
                 // Browsers require `muted` for autoplay; `playsinline` keeps
                 // it inline on iOS instead of opening fullscreen.
-                const isVideo = /\.(mp4|webm|mov)$/i.test(url.split('?')[0]);
+                const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(rawurl);
                 let media;
                 if (isVideo) {
                     media = document.createElement("video");
