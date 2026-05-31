@@ -96,7 +96,7 @@ let server = {files: {}, media: {}, timestamps: {}, mediaTimestamp: 0}; // In-me
 let mediaIndex = {};
 
 const SERVER_STORAGE_KEY = 'server'; // If scheme is migrated, I believe it's better to introduce a new key, because for now old keys aren't removed.
-const SUPPORTED_EXTENSIONS = ['md', 'png', 'jpg', 'jpeg', 'webp', 'gif',];
+const SUPPORTED_EXTENSIONS = ['md', 'png', 'jpg', 'jpeg', 'webp', 'gif', 'mp4', 'webm', 'mov'];
 const SYSTEM_DIRS = ['media', 'archive', 'journal', 'habits', 'triggers', 'insights'];
 const CONFIG_PATH = '/config.json';
 
@@ -174,8 +174,8 @@ async function loadLocalFiles(rootDirHandle, slowMode = false) {
                 }
 
                 const ext = filename.split('.').pop().toLowerCase();
-                const isImg = ['png', 'jpg', 'jpeg', 'webp', 'gif'].includes(ext);
-                if (!isImg) {
+                const isMedia = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'mp4', 'webm', 'mov'].includes(ext);
+                if (!isMedia) {
                     continue
                 }
 

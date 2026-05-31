@@ -75,7 +75,7 @@ function initEditor(el) {
         // Exclude local-file extensions (md, image types) so `![](img.png)`
         // isn't mistaken for a domain.
         if (/^[a-z0-9-]+(\.[a-z0-9-]+)+(\/|$)/i.test(path)
-            && !/\.(md|png|jpg|jpeg|gif|webp)$/i.test(path)) {
+            && !/\.(md|png|jpg|jpeg|gif|webp|mp4|webm|mov)$/i.test(path)) {
             return 'https://' + path;
         }
 
@@ -89,7 +89,7 @@ function initEditor(el) {
 
         // Capture only the bare filename (no slashes) so the media/img
         // lookups by filename work even when path has a folder prefix.
-        const match = path.match(/(?:^|\/)([^/]+\.(png|jpg|jpeg|gif|webp))$/i);
+        const match = path.match(/(?:^|\/)([^/]+\.(png|jpg|jpeg|gif|webp|mp4|webm|mov))$/i);
 
         if (match && files['media/'] && files['media/'][match[1]]) {
             return files['media/'][match[1]].imageUrl;
