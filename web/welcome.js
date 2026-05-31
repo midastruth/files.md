@@ -250,7 +250,7 @@ const WELCOME_FILES = {
     },
     "🪴 Welcome.md": {
         "content":
-            "To store files in a local folder, [open or create folder](cmd:openDir).\n\n" +
+            "To store files locally, [open or create folder](cmd:openDir).\n\n" +
             "Use [chat](cmd:openChat) to dump whatever is on your mind.\n\n" +
             "Press `Cmd+K` or `Ctrl+K` to quick switch between files.\n\n" +
             "[Markdown Guide](/Markdown%20Guide.md)\n[Zettelkasten](/brain/Zettelkasten.md)\n[Hotkeys](/Hotkeys.md)\n[Links](/Links.md)",

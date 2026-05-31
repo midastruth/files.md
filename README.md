@@ -11,7 +11,7 @@ You can store your whole life:
 - 💚 Journal, Habits
 - ✅ Checklists, Tasks
 
-All in plain `.md` files, local-first. LLM-friendly. **Private - no data is sent to server**.    
+All in plain `.md` files, local-first. LLM-friendly. **Private - your data stays at your device**.    
 
 Try it out: [app.files.md](https://app.files.md) (Beta). Main site: [files.md](https://files.md).  
 
@@ -73,7 +73,7 @@ Choose where to save (can do later):
 
 **With this flow you can quickly save notes, tasks, journal records and checklists**.  
 
-## Dump things in the chatbot
+## Dump stuff in the chatbot
 Open the chat, write something and press `Enter`:
 
 <div align="center">
