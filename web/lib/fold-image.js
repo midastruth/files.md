@@ -56,6 +56,16 @@
                     media.loop = true;
                     media.playsInline = true;
                     media.controls = true;
+                    // We should release focus, so that app can catch hotkeys.
+                    media.addEventListener('focus', () => {
+                        requestAnimationFrame(() => {
+                            setTimeout(() => {
+                                if (document.activeElement === media) {
+                                    media.blur();
+                                }
+                            }, 0);
+                        });
+                    });
                 } else {
                     media = document.createElement("img");
                     media.style.cursor = "pointer";

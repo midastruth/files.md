@@ -864,7 +864,7 @@ window.addEventListener('focus', async () => {
 
 // Sync files on chat focus lose.
 window.addEventListener('blur', async function() {
-    log('Window lost focus');
+    log('BLUR');
     editor.refresh();
 
     // Start timer to open chat after idle.
