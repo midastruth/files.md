@@ -1,7 +1,7 @@
 <img src="https://github.com/zakirullin/files.md/raw/main/web/img/icon.png" alt="Files.md icon" title="Files.md" align="right" height="76" />
 
 # Files.md  
-Private, quiet space for thinking. A simple app for your `.md` files.  
+Private, quiet space for thinking. Simple app for `.md` files.  
 
 <img src="https://github.com/zakirullin/files.md/raw/main/web/img/appdark.png" alt="Files.md screenshot" title="Files.md"/>
 

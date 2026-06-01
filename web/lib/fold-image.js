@@ -42,12 +42,13 @@
                 { // extract the title
                     title = cm.getRange({line: lineNo, ch: from.ch + 2}, {line: lineNo, ch: url_begin.token.start - 1});
                 }
-                // PATCHED, treat ![](foo.mp4) as an inline autoplaying video.
-                // Detect on rawurl - hmdResolveURL may have rewritten the
-                // local-file path to a blob: URL with no extension.
-                // Browsers require `muted` for autoplay; `playsinline` keeps
-                // it inline on iOS instead of opening fullscreen.
+                // PATCHED, treat ![](foo.mp4) as an inline autoplaying video
+                // and ![](foo.mp3) as an inline audio player. Detect on rawurl
+                // - hmdResolveURL may have rewritten the local-file path to a
+                // blob: URL with no extension. Browsers require `muted` for
+                // video autoplay.
                 const isVideo = /\.(mp4|webm|mov)(\?|$)/i.test(rawurl);
+                const isAudio = /\.(mp3|ogg|wav)(\?|$)/i.test(rawurl);
                 let media;
                 if (isVideo) {
                     media = document.createElement("video");
@@ -56,6 +57,15 @@
                     media.loop = true;
                     media.playsInline = true;
                     media.controls = true;
+                } else if (isAudio) {
+                    media = document.createElement("audio");
+                    media.controls = true;
+                    media.preload = "metadata";
+                } else {
+                    media = document.createElement("img");
+                    media.style.cursor = "pointer";
+                }
+                if (isVideo || isAudio) {
                     // We should release focus, so that app can catch hotkeys.
                     media.addEventListener('focus', () => {
                         requestAnimationFrame(() => {
@@ -66,9 +76,6 @@
                             }, 0);
                         });
                     });
-                } else {
-                    media = document.createElement("img");
-                    media.style.cursor = "pointer";
                 }
                 // PATCHED, we don't want blank line with the cursor after image
                 let wrapper = document.createElement("span");
@@ -91,7 +98,7 @@
                     // PATCHED, was img
                     replacedWith: media,
                 });
-                if (!isVideo) {
+                if (!isVideo && !isAudio) {
                     media.addEventListener('click', function (e) {
                         e.stopPropagation();
                         let modal = document.createElement("div");
@@ -134,7 +141,7 @@
                         document.body.appendChild(modal);
                     }, false);
                 }
-                const readyEvent = isVideo ? 'loadedmetadata' : 'load';
+                const readyEvent = (isVideo || isAudio) ? 'loadedmetadata' : 'load';
                 media.addEventListener(readyEvent, function () {
                     media.classList.remove("hmd-image-loading");
                     marker.changed();

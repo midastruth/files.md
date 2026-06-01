@@ -28,6 +28,14 @@ var (
 		"video/webm",
 		"video/quicktime",
 	}
+	audioMimeTypes = []string{
+		"audio/mpeg",
+		"audio/mp3",
+		"audio/ogg",
+		"audio/wav",
+		"audio/x-wav",
+		"audio/webm",
+	}
 )
 
 // TGUpd is a simple wrapper over Telegram Update object
@@ -226,6 +234,11 @@ func (u *TGUpd) PhotoOrImageID() (string, bool) {
 		return videoID, true
 	}
 
+	audioID, found := u.audioID()
+	if found {
+		return audioID, true
+	}
+
 	return "", false
 }
 
@@ -302,6 +315,31 @@ func (u *TGUpd) videoID() (string, bool) {
 	}
 
 	if message.Document != nil && slices.Contains(videoMimeTypes, message.Document.MimeType) {
+		return message.Document.FileID, true
+	}
+
+	return "", false
+}
+
+// audioID returns the FileID of an audio attachment - either a Telegram voice
+// message (ogg/opus), a native audio file, or a Document with an audio MIME
+// type. Same downstream path as photo/video: DownloadFile -> media/ ->
+// fold-image.js renders an <audio> element.
+func (u *TGUpd) audioID() (string, bool) {
+	message := u.raw.Message
+	if message == nil {
+		return "", false
+	}
+
+	if message.Voice != nil {
+		return message.Voice.FileID, true
+	}
+
+	if message.Audio != nil {
+		return message.Audio.FileID, true
+	}
+
+	if message.Document != nil && slices.Contains(audioMimeTypes, message.Document.MimeType) {
 		return message.Document.FileID, true
 	}
 

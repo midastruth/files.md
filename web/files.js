@@ -102,10 +102,10 @@ let server = {files: {}, media: {}, timestamps: {}, mediaTimestamp: 0}; // In-me
 let mediaIndex = {};
 
 const SERVER_STORAGE_KEY = 'server'; // If scheme is migrated, I believe it's better to introduce a new key, because for now old keys aren't removed.
-const SUPPORTED_EXTENSIONS = ['md', 'png', 'jpg', 'jpeg', 'webp', 'gif', 'mp4', 'webm', 'mov'];
+const SUPPORTED_EXTENSIONS = ['md', 'png', 'jpg', 'jpeg', 'webp', 'gif', 'mp4', 'webm', 'mov', 'mp3', 'ogg', 'wav'];
 
 function isMediaPath(path) {
-    return /\.(png|jpg|jpeg|gif|webp|mp4|webm|mov)$/i.test(path);
+    return /\.(png|jpg|jpeg|gif|webp|mp4|webm|mov|mp3|ogg|wav)$/i.test(path);
 }
 const SYSTEM_DIRS = ['media', 'archive', 'journal', 'habits', 'triggers', 'insights'];
 const CONFIG_PATH = '/config.json';
@@ -863,7 +863,13 @@ function getImageExtension(mimeType) {
         'image/webp': 'webp',
         'video/mp4': 'mp4',
         'video/webm': 'webm',
-        'video/quicktime': 'mov'
+        'video/quicktime': 'mov',
+        'audio/mpeg': 'mp3',
+        'audio/mp3': 'mp3',
+        'audio/ogg': 'ogg',
+        'audio/wav': 'wav',
+        'audio/x-wav': 'wav',
+        'audio/webm': 'webm'
     };
     return extensions[mimeType] || 'png';
 }
