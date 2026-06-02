@@ -92,14 +92,25 @@ Don't worry - it's much simpler than that by default.
 ## How to think deeply 
 **Connect ideas. Let them compound. Think through.**
 
-1) I used [app.files.md](https://app.files.md) to grow my knowledge about brain and software development
-2) I added new notes to either `brain` or `dev` folders. One idea per note
-3) I made connections between the relevant notes in the web app (type `[`)  
-4) Everything is connected, just as in our brain
-5) **I spent time travelling through the notes and thinking it through**
-6) At one point, some `brain` and `dev` notes appeared very related
-7) This connection between two different domains produced an insight
-8) I wrote an article based on that insight: [Cognitive Load in Software Development](https://github.com/zakirullin/cognitive-load)
+I used [app.files.md](https://app.files.md) to improve my thinking in brain and software development area.  
+
+How I did that:  
+- I read articles and books
+- I took notes in the chat, so that my reading flow wasn't interrupted 
+- One idea or insight per note
+- Each note should be understandable without context
+- I moved notes to either `brain` or `dev` folders (can be done after reading)
+
+The main thing at this point is not to distract yourself from the reading process. That's why I used the chat.  
+
+Occasionally, I did the following thought work:
+- **I spent time travelling through the notes and thinking them through**
+- I made connections between the relevant notes (type `[`)
+- Notes should be connected, just like neurons in our brain
+- **I practiced my new knowledge, I applied it out in the world**
+- At one point, some ideas in `brain` and `dev` folders appeared very related
+- This connection between two different domains produced an insight
+- I wrote an article based on that insight: [Cognitive Load in Software Development](https://github.com/zakirullin/cognitive-load)
 
 All this activity helped me to:
 - **Think deeply** (which is very important in the AI-age)
