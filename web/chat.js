@@ -406,8 +406,10 @@ function autoResize() {
         chatInput.style.height = '';
         return;
     }
-    chatInput.style.height = 'auto';
-    chatInput.style.height = Math.min(chatInput.scrollHeight, 250) + 'px';
+    chatInput.style.height = '';
+    if (chatInput.scrollHeight > chatInput.clientHeight) {
+        chatInput.style.height = Math.min(chatInput.scrollHeight, 250) + 'px';
+    }
 }
 
 function getRecentlyModifiedFiles(n) {
