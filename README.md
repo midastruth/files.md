@@ -6,7 +6,7 @@ Private, quiet space for thinking. Simple app for `.md` files.
 <img src="https://github.com/zakirullin/files.md/raw/main/web/img/appdark.png" alt="Files.md screenshot" title="Files.md"/>
 
 <p align="center">
-    English · [简体中文](README.zh-CN.md)
+    English · <a href="README.zh-CN.md">简体中文</a>
 </p>
 
 You can store your whole life:
