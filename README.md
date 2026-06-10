@@ -266,6 +266,7 @@ You can copy-paste it into `CLAUDE.md` or `AGENTS.md`, so that your AI agent wou
 | `Cmd+B` / `Ctrl+B`                     | Toggle **bold**              |
 | `Cmd+I` / `Ctrl+I`                     | Toggle *italic*              |
 | `Cmd+Y` / `Ctrl+Y`                     | Insert checkbox              |
+| `Cmd+T` / `Ctrl+T`                     | Insert table                 |
 | `Cmd/Ctrl` + `Click`                   | Copy inline text / open link |
 | `Ctrl+Cmd+Space`                       | Insert emoji (macOS)         |
 

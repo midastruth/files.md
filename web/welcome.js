@@ -341,6 +341,8 @@ const WELCOME_FILES = {
             "| `Cmd+~` / `Ctrl+~` | Toggle sidebar |\n" +
             "| `Cmd+B` / `Ctrl+B` | Toggle **bold** formatting |\n" +
             "| `Cmd+I` / `Ctrl+I` | Toggle *italic* formatting |\n" +
+            "| `Cmd+Y` / `Ctrl+Y` | Insert checkbox |\n" +
+            "| `Cmd+T` / `Ctrl+T` | Insert table |\n" +
             "| `Cmd` / `Ctrl` + `Click` | Copy from `code` element |\n" +
             "| `Cmd` / `Ctrl` + `Click` | Open a link  |\n" +
             "| `Ctrl` + `Cmd` + `Space` | Insert emoji (MacOS) |\n" +

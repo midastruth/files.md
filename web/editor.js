@@ -355,6 +355,12 @@ function initEditor(el) {
                 {scroll: false}
             );
         },
+        'Cmd-T': function (cm) {
+            tableInsert(cm);
+        },
+        'Ctrl-T': function (cm) {
+            tableInsert(cm);
+        },
         'Cmd-Y': function (cm) {
             var cursor = cm.getCursor();
             var lineStart = {line: cursor.line, ch: 0};

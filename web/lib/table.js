@@ -392,6 +392,22 @@ function tableSelectCell(cm) {
     return true;
 }
 
+// Insert an empty 2x2 table at the cursor and focus its first cell
+function tableInsert(cm) {
+    const cursor = cm.getCursor();
+    const line = cm.getLine(cursor.line);
+    const table = '|  |  |\n| --- | --- |\n|  |  |';
+    cm.operation(function () {
+        if (line.trim() === '') {
+            cm.replaceRange(table, {line: cursor.line, ch: 0}, {line: cursor.line, ch: line.length});
+            cm.setCursor({line: cursor.line, ch: 1});
+        } else {
+            cm.replaceRange('\n' + table, {line: cursor.line, ch: line.length});
+            cm.setCursor({line: cursor.line + 1, ch: 1});
+        }
+    });
+}
+
 // Enter inside a table cell moves focus to the same column's cell one row
 // below (skipping the |---| separator), selecting its content if there is
 // any. Returns false on the last row so the default Enter applies.
@@ -412,10 +428,15 @@ function tableEnterCell(cm) {
             start = i + 1;
         }
     }
+    const cellStart = start; // after the pipe, before the padding spaces
     let end = text.indexOf('|', start);
     if (end < 0) end = text.length;
     while (start < end && text[start] === ' ') start++;
     while (end > start && text[end - 1] === ' ') end--;
+    if (start === end) {
+        cm.setCursor({line: target, ch: cellStart});
+        return true;
+    }
     cm.setSelection({line: target, ch: start}, {line: target, ch: end});
     return true;
 }
@@ -448,7 +469,7 @@ function tableAddColumn(cm, range) {
             }
         }
         const header = cm.getLine(range.from);
-        const inNewCell = /\|\s*$/.test(header) ? header.lastIndexOf('|') - 1 : header.length;
+        const inNewCell = /\|\s*$/.test(header) ? header.lastIndexOf('|') - 2 : header.length - 2;
         cm.setCursor({line: range.from, ch: inNewCell});
     });
     cm.focus();
