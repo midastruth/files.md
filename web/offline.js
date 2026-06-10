@@ -75,7 +75,7 @@ const urlsToCache = [
     '/lib/latex/KaTeX_Size3-Regular.woff2',
     '/lib/latex/KaTeX_Size4-Regular.woff2',
     '/lib/latex/KaTeX_Typewriter-Regular.woff2',
-    '/lib/table-align.js',
+    '/lib/table.js',
 
 ];
 
