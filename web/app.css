@@ -213,6 +213,7 @@ td {
 }
 .CodeMirror.cm-s-hypermd-light pre.HyperMD-table-row .hmd-table-column-content {
     padding: 2px 6px;
+    line-height: 1.2;
 }
 .CodeMirror.cm-s-hypermd-light pre.HyperMD-table-row .hmd-table-column-content:empty::before {
     content: '\00a0';
