@@ -366,7 +366,8 @@
 }
 
 #chat-input-wrap {
-    margin: 0 24px 24px 24px;
+    width: min(720px, calc(100% - 48px));
+    margin: 0 auto 24px auto;
 }
 
 #chat-input {
