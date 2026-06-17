@@ -1195,6 +1195,7 @@ async function openFile(path, saveToHistory = true, el = 'editor-textarea') {
 
         // Once we spent enough time in file, set viewportMargin to infinity to prevent artefacts.
         // Artefacts can be observed during text selection (cmd+a).
+        // Also cmd+f (native find) doesn't work on lazy-loaded documents =(
         setTimeout(() => {
             currentEditor.setOption('viewportMargin', Infinity);
         }, 200);
@@ -1323,7 +1324,9 @@ async function syncCurrentFile(switchAwayEditor = false) {
             const newPath = joinPath(toDirPath(path), newFilename);
 
 
-            // Do not delete existing files with same name.
+            // Do not delete existing files with same name. Compare names
+            // case-insensitively, as most local filesystems do.
+            let dirFiles = files;
             for (const dir of toDirPath(path).split('/').filter(s => s !== '')) {
                 dirFiles = dirFiles && dirFiles[dir + '/'];
             }
