@@ -362,6 +362,7 @@ Read 4K randomly from SSD = 150,000 ns
 ```
 
 ## ADRs (Architecture Decision Records)
+- `20.06.2026` Backlinks are now inserted automatically whenever we link a note. For our workspace to be cross-platform (so you can view it even in GitHub), we insert backlinks on the fly, and not infer them dynamically. That way from any viewer backlinks would work.  
 - `01.06.2026` Audio and video are now supported. I believe enriching journal with these kind of media can be useful for our emotional healing.  
 - `24.05.2026` Unfold everything (images, math, mermaid) in viewport immediately. It prevents flickering and doesn't add performance penalty. P.S. We should also schedule full document unfold on viewportChange, otherwise latex/mermaid block off the viewport won't be folded.  
 - `22.05.2026` Added Mermaid support. It was decided to lazy-load the script, because mermaid.min.js size is 3MB. It's quite a load to load synchronously for such a small app. 

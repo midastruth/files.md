@@ -1613,16 +1613,28 @@ async function addBacklink(sourcePath, targetPath) {
     const name = toFilename(sourcePath).replace(/\.md$/, '');
     const backlink = `[${name}](${url})`;
 
+    // Separator before the appended backlink: tight (single newline) when the
+    // file already ends with a link line, so stacked backlinks don't grow blank
+    // lines; a blank line only separates the first backlink from prose.
+    const separatorFor = (text) => {
+        const body = text.replace(/\s+$/, '');
+        if (!body) return '';
+        const lastLine = body.slice(body.lastIndexOf('\n') + 1);
+        return /^\s*\[/.test(lastLine) ? '\n' : '\n\n';
+    };
+
     // If the target is open in an editor, append through it so the edit goes
     // via the normal save path and isn't clobbered by a stale editor save.
     const open = (editor && editor.path === targetPath && editor)
         || (editor2 && editor2.path === targetPath && editor2) || null;
     if (open) {
-        if (open.getValue().includes(`](${url})`)) return; // already links back
+        const value = open.getValue();
+        if (value.includes(`](${url})`)) return; // already links back
         const doc = open.getDoc();
-        const lastLine = doc.lastLine();
-        const prefix = open.getValue().trim().length === 0 ? '' : '\n\n';
-        doc.replaceRange(prefix + backlink, {line: lastLine, ch: doc.getLine(lastLine).length});
+        const body = value.replace(/\s+$/, '');
+        const from = open.posFromIndex(body.length);
+        const to = {line: doc.lastLine(), ch: doc.getLine(doc.lastLine()).length};
+        doc.replaceRange(separatorFor(value) + backlink, from, to);
         return;
     }
 
@@ -1636,7 +1648,7 @@ async function addBacklink(sourcePath, targetPath) {
     if (content.includes(`](${url})`)) return; // already links back
 
     const body = content.replace(/\s+$/, '');
-    const newContent = (body ? body + '\n\n' : '') + backlink + '\n';
+    const newContent = body + separatorFor(content) + backlink + '\n';
     try {
         await write(targetPath, newContent);
     } catch (e) {
