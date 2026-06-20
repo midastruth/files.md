@@ -210,7 +210,12 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
                     var openTag_1, endTag_1, mathLevel;
                     if ((tmp = stream.match(/^\${1,2}/, false))) {
                         var lvl = tmp[0].length;
-                        if (lvl === 2 || stream.string.slice(stream.pos).match(/[^\\]\$/)) {
+                        // PATCHED: a single `$` immediately followed by whitespace
+                        // doesn't open inline math (e.g. "I have $5 and $10" prose),
+                        // matching the common "no space after the opening $" rule.
+                        // $$ (display math) is unaffected.
+                        var spaceAfter = /\s/.test(stream.string.charAt(stream.pos + lvl));
+                        if (lvl === 2 || (!spaceAfter && stream.string.slice(stream.pos).match(/[^\\]\$/))) {
                             // $$ may span lines, $ must be paired on same line
                             openTag_1 = tmp[0];
                             endTag_1 = tmp[0];
