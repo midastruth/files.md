@@ -56,7 +56,7 @@ Maybe. But this time:
 - Open a local folder to persist changes  
 - Occasionally hit force-refresh (`Cmd+Shift+R`) to get new updates.  
 
-P.S. For now, Chrome-based browsers are best at [File System API support](https://caniuse.com/native-filesystem-api).  
+P.S. For now, Chromium-based browsers (like [Brave](https://github.com/zakirullin/files.md/issues/61)) are best at [File System API support](https://caniuse.com/native-filesystem-api).  
 
 ## Dump your thoughts
 Open the chat (`Cmd+Enter`) and send a message:
@@ -244,8 +244,7 @@ Although, you're free to use whatever structure you want.
 - Archive: `archive/*.md`
 - Config: `config.json`
 
-Scheme is also available at [files.md/AGENTS.md](https://files.md/AGENTS.md).  
-Place it as `AGENTS.md` in your knowledge base - your files become a live personal space AI can work with.  
+Place [AGENTS.md](https://github.com/zakirullin/cognitive-load/blob/main/web/AGENTS.md) in your knowledge base - so that your files become a live personal space AI can work with.  
 
 ## Hotkeys
 

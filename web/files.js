@@ -16,7 +16,7 @@ const CURRENT_FILE_SYNC_INTERVAL = 1000; // ms, how often to save currently open
 // file limit is roughly 3/4 of this. Files above MAX_MEDIA_SIZE are rejected
 // outright; files between 3/4 and 1 of MAX_MEDIA_SIZE may still be refused
 // by the server when base64 pushes the body past the cap.
-const MAX_MEDIA_SIZE = 40 * 1024 * 1024;
+const MAX_MEDIA_SIZE = 65 * 1024 * 1024;
 
 let isSaving = false;
 let isSyncingFiles = false;
