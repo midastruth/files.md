@@ -132,7 +132,7 @@ function renderSidebar(focusDir = '', modifiedPaths) {
         }
     }
 
-    const groupedDirs = new Set(['journal', 'habits', 'insights', 'archive']);
+    const groupedDirs = new Set(['Journal', 'habits', 'insights', 'archive']);
 
     // Step 0: Lists group
     let lastListNode = null;
@@ -182,8 +182,8 @@ function renderSidebar(focusDir = '', modifiedPaths) {
 
     // Step 2: Personal group
     let lastNode = null;
-    if (dirNodes['/journal']) {
-        const journalNode = dirNodes['/journal'];
+    if (dirNodes['/Journal']) {
+        const journalNode = dirNodes['/Journal'];
         if (journalNode && journalNode.parent === root) {
             root.removeChild(journalNode);
             root.addChild(journalNode);
@@ -282,11 +282,11 @@ function renderSidebar(focusDir = '', modifiedPaths) {
 
         fileEntries.push(path);
     });
-    // Journal entries are filenames like "2026.05 May.md" - sort reverse so
-    // newest months land at the top of the journal folder.
+    // Journal entries are filenames like "2026-05-30.md" - sort reverse so
+    // newest days land at the top of the journal folder.
     fileEntries.sort((a, b) => {
-        const aJournal = a.startsWith('/journal/');
-        const bJournal = b.startsWith('/journal/');
+        const aJournal = a.startsWith('/Journal/');
+        const bJournal = b.startsWith('/Journal/');
         if (aJournal && bJournal) return b.localeCompare(a);
         return a.localeCompare(b);
     });
@@ -877,7 +877,7 @@ function TreeView(root, container, options) {
                 } else if (['today', 'later'].includes(nodeStr)) {
                     groupHeaderText = "TASKS";
                     groupHeaderClass = "tasks";
-                } else if (['journal', 'habits', 'insights'].includes(nodeStr)) {
+                } else if (['Journal', 'habits', 'insights'].includes(nodeStr)) {
                     groupHeaderText = "PERSONAL";
                     groupHeaderClass = "personal";
                 } else if (nodeStr === 'chat') {
@@ -1114,7 +1114,7 @@ function TreeView(root, container, options) {
             li_outer.appendChild(span_desc);
         } else {
             var ret = '';
-            if (node.toString() === 'journal') {
+            if (node.toString() === 'Journal') {
                 const heart = node.isExpanded() ? TreeConfig.journal_icon_filled : TreeConfig.journal_icon;
                 ret += '<span class="tree-mod_icon">' + heart + '</span>';
             } else if (node.isExpanded()) {

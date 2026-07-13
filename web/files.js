@@ -136,7 +136,7 @@ const SUPPORTED_EXTENSIONS = ['md', 'png', 'jpg', 'jpeg', 'webp', 'gif', 'mp4', 
 function isMediaPath(path) {
     return /\.(png|jpg|jpeg|gif|webp|mp4|webm|mov|mp3|ogg|oga|weba|wav)$/i.test(path);
 }
-const SYSTEM_DIRS = ['media', 'archive', 'journal', 'habits', 'triggers', 'insights'];
+const SYSTEM_DIRS = ['media', 'archive', 'Journal', 'habits', 'triggers', 'insights'];
 const CONFIG_PATH = '/config.json';
 
 async function loadLocalFiles(rootDirHandle, slowMode = false) {

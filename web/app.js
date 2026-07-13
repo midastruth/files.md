@@ -153,7 +153,7 @@ function createAutocompleteDict() {
     });
 
     let lowPriorityEntries = [];
-    ['_read_/', '_watch_/', '_shop_/', 'today/', 'later/', 'journal/'].forEach(dir => {
+    ['_read_/', '_watch_/', '_shop_/', 'today/', 'later/', 'Journal/'].forEach(dir => {
         if (!files[dir]) {
             return;
         }

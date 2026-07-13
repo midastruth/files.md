@@ -2260,11 +2260,11 @@ func TestMoveToJournal(t *testing.T) {
 	err = bot.Reply(tg.NewUpdCmd(-1, tg.NewCmd("mv_to_journal", []string{inboxMsgHash(t, userFS, 0)})))
 	r.NoError(err)
 
-	files, err := userFS.FilesAndDirs("journal")
+	files, err := userFS.FilesAndDirs("Journal")
 	r.NoError(err)
 	r.Len(files, 1)
 
-	content, err := userFS.Read("journal", files[0].Name)
+	content, err := userFS.Read("Journal", files[0].Name)
 	r.NoError(err)
 	r.Equal("## 1 January, Thursday\n`00:00` Multiline\ncontent\n", content)
 
@@ -2287,7 +2287,7 @@ func TestAddToJournalFromShortcut(t *testing.T) {
 	err = bot.Reply(tg.NewUpd(-1, "jj record"))
 	r.NoError(err)
 
-	files, err := userFS.FilesAndDirs("journal")
+	files, err := userFS.FilesAndDirs("Journal")
 	r.NoError(err)
 	r.Len(files, 1)
 }
@@ -2306,7 +2306,7 @@ func TestAddToJournalFromShortcutRu(t *testing.T) {
 	err = bot.Reply(tg.NewUpd(-1, "/ж запись"))
 	r.NoError(err)
 
-	files, err := userFS.FilesAndDirs("journal")
+	files, err := userFS.FilesAndDirs("Journal")
 	r.NoError(err)
 	r.Len(files, 1)
 }
@@ -2333,18 +2333,18 @@ func TestAddToJournalFromShortcutRuCases(t *testing.T) {
 	err = bot.Reply(tg.NewUpd(-1, "жЖ запись"))
 	r.NoError(err)
 
-	files, err := userFS.FilesAndDirs("journal")
+	files, err := userFS.FilesAndDirs("Journal")
 	r.NoError(err)
 	r.Len(files, 1)
 
-	content, err := userFS.Read("journal", files[0].Name)
+	content, err := userFS.Read("Journal", files[0].Name)
 	r.NoError(err)
 	r.Equal("## 1 January, Thursday\n`00:00` Запись\n", content)
 
 	err = bot.Reply(tg.NewUpd(-1, "Запись2 ЖЖ"))
 	r.NoError(err)
 
-	content, err = userFS.Read("journal", files[0].Name)
+	content, err = userFS.Read("Journal", files[0].Name)
 	r.NoError(err)
 	r.Equal("## 1 January, Thursday\n`00:00` Запись\n`00:00` Запись2\n", content)
 }
@@ -4554,11 +4554,11 @@ func TestJournalOnlyMode_SaveTextMessage(t *testing.T) {
 	r.NoError(err)
 	r.Len(todayFiles, 0)
 
-	journalFiles, err := bot.fs.FilesAndDirs("journal")
+	journalFiles, err := bot.fs.FilesAndDirs("Journal")
 	r.NoError(err)
 	r.Len(journalFiles, 1)
 
-	content, err := bot.fs.Read("journal", journalFiles[0].Name)
+	content, err := bot.fs.Read("Journal", journalFiles[0].Name)
 	r.NoError(err)
 	r.Contains(content, "Journal entry")
 	r.Contains(content, "11 August, Sunday")

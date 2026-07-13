@@ -60,7 +60,7 @@ func TestExcludeChecklists(t *testing.T) {
 func TestExcludeSystemDirs(t *testing.T) {
 	r := require.New(t)
 
-	noChecklists := ExcludeSystemDirs([]File{{Name: "not-a-system-dir"}, {Name: "media"}, {Name: "archive"}, {Name: "journal"}})
+	noChecklists := ExcludeSystemDirs([]File{{Name: "not-a-system-dir"}, {Name: "media"}, {Name: "archive"}, {Name: "Journal"}})
 
 	r.Equal([]File{{Name: "not-a-system-dir"}}, noChecklists)
 }
@@ -119,7 +119,7 @@ func TestCreateBaseDirs(t *testing.T) {
 	dirs = OnlyDirs(dirs)
 	dirNames := OnlyFilenames(dirs)
 
-	r.ElementsMatch([]string{"archive", "media", "journal"}, dirNames)
+	r.ElementsMatch([]string{"archive", "media", "Journal"}, dirNames)
 }
 
 func TestSortByCtimeDesc(t *testing.T) {

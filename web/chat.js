@@ -50,7 +50,7 @@ async function sendToChat() {
         // Reload from disk so the journal file/dir created by addToJournal
         // shows up, then blink its row in the sidebar.
         files = await loadLocalFiles(await getRootDirHandle());
-        renderSidebar('', [`/journal/${todayJournalFilename()}`]);
+        renderSidebar('', [`/Journal/${todayJournalFilename()}`]);
         return;
     }
 
@@ -513,15 +513,14 @@ chatInput.addEventListener('paste', async (e) => {
 });
 
 function todayJournalFilename() {
+    // One file per day, named with a sortable yyyy-mm-dd stamp, e.g. 2023-05-30.md
     const now = new Date();
-    const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    const monthIndex = parseInt(now.toLocaleDateString('en-US', {month: 'numeric',})) - 1;
     const year = parseInt(now.toLocaleDateString('en-US', {year: 'numeric'}));
+    const monthIndex = parseInt(now.toLocaleDateString('en-US', {month: 'numeric'})) - 1;
+    const day = parseInt(now.toLocaleDateString('en-US', {day: 'numeric'}));
     const month = (monthIndex + 1).toString().padStart(2, '0');
-    return `${year}.${month} ${monthNames[monthIndex]}.md`;
+    const dayStr = day.toString().padStart(2, '0');
+    return `${year}-${month}-${dayStr}.md`;
 }
 
 function todayHeader(timezone) {
@@ -545,7 +544,7 @@ function todayHeader(timezone) {
 async function addToJournal(text) {
     text = ucfirst(text.trim());
     const journalFilename = todayJournalFilename();
-    const journalPath = `journal/${journalFilename}`;
+    const journalPath = `Journal/${journalFilename}`;
     const journalHeader = todayHeader().replace(/^#### /, '## ');
     await addHeaderAndText(journalPath, journalHeader, text);
 }
@@ -799,7 +798,7 @@ function attachEventListeners() {
                 // so reload from disk before rendering or the new entry
                 // won't show up in the sidebar.
                 files = await loadLocalFiles(await getRootDirHandle());
-                renderSidebar('', [`/journal/${todayJournalFilename()}`]);
+                renderSidebar('', [`/Journal/${todayJournalFilename()}`]);
             })();
 
             // TODO only remove if previous is successful

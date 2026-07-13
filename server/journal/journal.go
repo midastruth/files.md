@@ -126,7 +126,8 @@ func AddEmoji(userFS *fs.FS, emoji string, timezone *time.Location) error {
 }
 
 func todayJournalFilename(timezone *time.Location) string {
-	return Now().In(timezone).Format("2006.01 January.md")
+	// One file per day, named with a sortable yyyy-mm-dd stamp, e.g. 2023-05-30.md
+	return Now().In(timezone).Format("2006-01-02.md")
 }
 
 func todayHeader(timezone *time.Location) string {

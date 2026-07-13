@@ -40,7 +40,7 @@ const (
 	DirUserRoot = "/"
 	DirArchive  = "archive"
 	DirMedia    = "media"
-	DirJournal  = "journal"
+	DirJournal  = "Journal"
 	DirHabits   = "habits"
 	DirInsights = "insights"
 
